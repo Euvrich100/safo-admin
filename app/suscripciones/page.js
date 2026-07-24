@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
@@ -11,9 +11,7 @@ export default function SuscripcionesPage() {
   const [cargando, setCargando] = useState(true)
   const [procesando, setProcesando] = useState(null)
 
-  useEffect(() => { cargarConductores() }, [])
-
-  const cargarConductores = async () => {
+  const cargarConductores = useCallback(async () => {
     setCargando(true)
     try {
       const { data } = await api.get('/api/admin/conductores?estado_doc=aprobado')
@@ -23,15 +21,14 @@ export default function SuscripcionesPage() {
     } finally {
       setCargando(false)
     }
-  }
+  }, [])
+
+  useEffect(() => { cargarConductores() }, [cargarConductores])
 
   const confirmarPago = async (conductor_id, metodo_pago) => {
     setProcesando(conductor_id)
     try {
-      await api.post('/api/admin/suscripciones/confirmar', {
-        conductor_id,
-        metodo_pago
-      })
+      await api.post('/api/admin/suscripciones/confirmar', { conductor_id, metodo_pago })
       toast.success('✅ Pago de S/ 5.00 confirmado')
       cargarConductores()
     } catch (err) {
@@ -87,7 +84,6 @@ export default function SuscripcionesPage() {
                       </div>
                     </div>
                   </div>
-
                   {suscripcionVencida(c.suscripcion_vence) && (
                     <div className="flex gap-2">
                       {['yape', 'plin', 'efectivo'].map(metodo => (
