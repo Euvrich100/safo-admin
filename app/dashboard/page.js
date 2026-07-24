@@ -2,17 +2,20 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
-import { Users, Car, DollarSign, AlertTriangle } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
+import { Users, Car, DollarSign, AlertTriangle, LogOut, MapPin } from 'lucide-react'
 
 export default function DashboardPage() {
   const router = useRouter()
   const [stats, setStats] = useState(null)
   const [cargando, setCargando] = useState(true)
+  const [usuario, setUsuario] = useState(null)
 
   useEffect(() => {
     const token = localStorage.getItem('safo_token')
-    if (!token) router.push('/login')
+    const u = localStorage.getItem('safo_usuario')
+    if (!token) { router.push('/login'); return }
+    if (u) setUsuario(JSON.parse(u))
     cargarStats()
   }, [])
 
@@ -33,110 +36,142 @@ export default function DashboardPage() {
     router.push('/login')
   }
 
+  const cards = [
+    {
+      label: 'Conductores activos',
+      value: stats?.conductores?.activos || 0,
+      sub: `de ${stats?.conductores?.total || 0} registrados`,
+      icon: Car,
+      color: '#1A6EFF',
+      bg: '#1A6EFF15'
+    },
+    {
+      label: 'Docs pendientes',
+      value: stats?.conductores?.pendientes_doc || 0,
+      sub: 'requieren revisión',
+      icon: AlertTriangle,
+      color: '#F59E0B',
+      bg: '#F59E0B15'
+    },
+    {
+      label: 'Viajes hoy',
+      value: stats?.viajes_hoy?.completados || 0,
+      sub: `${stats?.viajes_hoy?.en_curso || 0} en curso`,
+      icon: Users,
+      color: '#22C55E',
+      bg: '#22C55E15'
+    },
+    {
+      label: 'Ingresos del mes',
+      value: `S/ ${stats?.ingresos_mes?.suscripciones_mes || '0.00'}`,
+      sub: 'suscripciones',
+      icon: DollarSign,
+      color: '#A855F7',
+      bg: '#A855F715'
+    },
+  ]
+
   if (cargando) return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-      <div className="text-white text-lg">Cargando...</div>
+    <div className="min-h-screen bg-[#060B18] flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
+          style={{ background: 'linear-gradient(135deg, #0D1B4B, #1A6EFF)' }}>
+          <MapPin className="w-6 h-6 text-white" />
+        </div>
+        <div className="text-[#4D96FF] text-sm">Cargando SafO...</div>
+      </div>
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <Toaster />
+    <div className="min-h-screen bg-[#060B18]">
+      <Toaster position="top-center" />
 
       {/* Navbar */}
-      <nav className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">S</span>
+      <nav className="border-b border-[#1A6EFF15] px-6 py-4"
+        style={{ background: 'linear-gradient(135deg, #0D1B4B20, #060B18)' }}>
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #0D1B4B, #1A6EFF)' }}>
+              <MapPin className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <span className="font-bold text-white text-lg">SafO</span>
+              <span className="text-[#4D96FF] text-sm ml-2">Admin</span>
+            </div>
           </div>
-          <span className="font-semibold text-lg">SafO Admin</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <button onClick={() => router.push('/conductores')} className="text-gray-400 hover:text-white transition text-sm">Conductores</button>
-          <button onClick={() => router.push('/viajes')} className="text-gray-400 hover:text-white transition text-sm">Viajes</button>
-          <button onClick={cerrarSesion} className="text-red-400 hover:text-red-300 transition text-sm">Cerrar sesión</button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => router.push('/conductores')}
+              className="px-4 py-2 text-sm text-[#4D96FF] hover:text-white hover:bg-[#1A6EFF15] rounded-xl transition">
+              Conductores
+            </button>
+            <button onClick={() => router.push('/viajes')}
+              className="px-4 py-2 text-sm text-[#4D96FF] hover:text-white hover:bg-[#1A6EFF15] rounded-xl transition">
+              Viajes
+            </button>
+            <button onClick={() => router.push('/suscripciones')}
+              className="px-4 py-2 text-sm text-[#4D96FF] hover:text-white hover:bg-[#1A6EFF15] rounded-xl transition">
+              Pagos
+            </button>
+            <button onClick={cerrarSesion}
+              className="flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition">
+              <LogOut className="w-4 h-4" />
+              Salir
+            </button>
+          </div>
         </div>
       </nav>
 
       <main className="p-6 max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
-        {/* Tarjetas de estadísticas */}
+        {/* Saludo */}
+        <div className="mb-8 mt-2">
+          <h1 className="text-2xl font-bold text-white">
+            Bienvenido, {usuario?.nombre || 'Admin'} 👋
+          </h1>
+          <p className="text-[#4D96FF] text-sm mt-1">
+            {new Date().toLocaleDateString('es-PE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
+        </div>
+
+        {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-blue-600/20 rounded-xl flex items-center justify-center">
-                <Car className="w-5 h-5 text-blue-400" />
+          {cards.map((c, i) => (
+            <div key={i} className="rounded-2xl p-5 border border-[#1A6EFF15]"
+              style={{ background: `linear-gradient(135deg, ${c.bg}, #060B1880)` }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{ background: c.bg }}>
+                  <c.icon className="w-5 h-5" style={{ color: c.color }} />
+                </div>
+                <span className="text-[#4D96FF] text-xs font-medium">{c.label}</span>
               </div>
-              <span className="text-gray-400 text-sm">Conductores activos</span>
+              <div className="text-3xl font-bold text-white mb-1">{c.value}</div>
+              <div className="text-[#4D96FF50] text-xs">{c.sub}</div>
             </div>
-            <div className="text-3xl font-bold">{stats?.conductores?.activos || 0}</div>
-            <div className="text-gray-500 text-xs mt-1">de {stats?.conductores?.total || 0} registrados</div>
-          </div>
-
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-yellow-600/20 rounded-xl flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-yellow-400" />
-              </div>
-              <span className="text-gray-400 text-sm">Docs pendientes</span>
-            </div>
-            <div className="text-3xl font-bold">{stats?.conductores?.pendientes_doc || 0}</div>
-            <div className="text-gray-500 text-xs mt-1">requieren revisión</div>
-          </div>
-
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-green-600/20 rounded-xl flex items-center justify-center">
-                <Users className="w-5 h-5 text-green-400" />
-              </div>
-              <span className="text-gray-400 text-sm">Viajes hoy</span>
-            </div>
-            <div className="text-3xl font-bold">{stats?.viajes_hoy?.completados || 0}</div>
-            <div className="text-gray-500 text-xs mt-1">{stats?.viajes_hoy?.en_curso || 0} en curso</div>
-          </div>
-
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-purple-600/20 rounded-xl flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-purple-400" />
-              </div>
-              <span className="text-gray-400 text-sm">Ingresos del mes</span>
-            </div>
-            <div className="text-3xl font-bold">S/ {stats?.ingresos_mes?.suscripciones_mes || '0.00'}</div>
-            <div className="text-gray-500 text-xs mt-1">suscripciones</div>
-          </div>
+          ))}
         </div>
 
         {/* Accesos rápidos */}
-        <h2 className="text-lg font-semibold mb-4">Accesos rápidos</h2>
+        <h2 className="text-lg font-semibold text-white mb-4">Accesos rápidos</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button
-            onClick={() => router.push('/conductores')}
-            className="bg-gray-900 border border-gray-800 hover:border-blue-500 rounded-2xl p-6 text-left transition"
-          >
-            <Car className="w-8 h-8 text-blue-400 mb-3" />
-            <div className="font-medium mb-1">Gestionar conductores</div>
-            <div className="text-gray-400 text-sm">Aprobar documentos, ver suscripciones</div>
-          </button>
-
-          <button
-            onClick={() => router.push('/viajes')}
-            className="bg-gray-900 border border-gray-800 hover:border-green-500 rounded-2xl p-6 text-left transition"
-          >
-            <Users className="w-8 h-8 text-green-400 mb-3" />
-            <div className="font-medium mb-1">Ver viajes</div>
-            <div className="text-gray-400 text-sm">Historial, cancelaciones, pagos</div>
-          </button>
-
-          <button
-            onClick={() => router.push('/suscripciones')}
-            className="bg-gray-900 border border-gray-800 hover:border-purple-500 rounded-2xl p-6 text-left transition"
-          >
-            <DollarSign className="w-8 h-8 text-purple-400 mb-3" />
-            <div className="font-medium mb-1">Confirmar pagos</div>
-            <div className="text-gray-400 text-sm">Verificar Yape/Plin de conductores</div>
-          </button>
+          {[
+            { label: 'Gestionar conductores', sub: 'Aprobar documentos, ver suscripciones', icon: Car, color: '#1A6EFF', path: '/conductores' },
+            { label: 'Ver viajes', sub: 'Historial, cancelaciones, pagos', icon: Users, color: '#22C55E', path: '/viajes' },
+            { label: 'Confirmar pagos', sub: 'Verificar Yape/Plin de S/ 5.00', icon: DollarSign, color: '#A855F7', path: '/suscripciones' },
+          ].map((item, i) => (
+            <button key={i} onClick={() => router.push(item.path)}
+              className="rounded-2xl p-6 text-left border border-[#1A6EFF15] hover:border-[#1A6EFF40] transition group"
+              style={{ background: 'linear-gradient(135deg, #0D1B4B15, #060B18)' }}>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition"
+                style={{ background: `${item.color}15` }}>
+                <item.icon className="w-6 h-6" style={{ color: item.color }} />
+              </div>
+              <div className="font-semibold text-white mb-1 group-hover:text-[#4D96FF] transition">{item.label}</div>
+              <div className="text-[#4D96FF50] text-sm">{item.sub}</div>
+            </button>
+          ))}
         </div>
       </main>
     </div>

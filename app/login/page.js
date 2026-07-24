@@ -16,7 +16,7 @@ export default function LoginPage() {
     setCargando(true)
     try {
       await api.post('/api/auth/solicitar-otp', { celular })
-      toast.success('Código enviado a tu celular')
+      toast.success('Código enviado')
       setPaso(2)
     } catch (err) {
       toast.error(err.response?.data?.error || 'Error al enviar código')
@@ -30,12 +30,9 @@ export default function LoginPage() {
     setCargando(true)
     try {
       const { data } = await api.post('/api/auth/verificar-otp', { celular, codigo })
-      if (data.usuario.rol !== 'admin') {
-        return toast.error('Solo administradores pueden acceder')
-      }
+      if (data.usuario.rol !== 'admin') return toast.error('Solo administradores')
       localStorage.setItem('safo_token', data.token)
       localStorage.setItem('safo_usuario', JSON.stringify(data.usuario))
-      toast.success('Bienvenido al panel SafO')
       router.push('/dashboard')
     } catch (err) {
       toast.error(err.response?.data?.error || 'Código incorrecto')
@@ -45,70 +42,99 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
-      <Toaster />
-      <div className="bg-gray-900 rounded-2xl p-8 w-full max-w-md border border-gray-800">
+    <div className="min-h-screen bg-[#060B18] flex items-center justify-center p-4 relative overflow-hidden">
+      <Toaster position="top-center" />
+
+      {/* Fondo decorativo */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#1A6EFF] opacity-5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-[#0D1B4B] opacity-30 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="w-full max-w-md relative z-10">
 
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4">
-            <span className="text-white text-2xl font-bold">S</span>
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-5 relative"
+            style={{ background: 'linear-gradient(135deg, #0D1B4B, #1A6EFF)' }}>
+            <svg width="44" height="52" viewBox="0 0 60 70">
+              <ellipse cx="30" cy="26" rx="26" ry="26" fill="white"/>
+              <ellipse cx="30" cy="26" rx="14" ry="14" fill="#1A6EFF"/>
+              <path d="M30 52 Q30 62 30 65 Q22 70 16 64" fill="white"/>
+              <ellipse cx="30" cy="65" rx="4" ry="2.5" fill="white"/>
+            </svg>
           </div>
-          <h1 className="text-2xl font-bold text-white">SafO Admin</h1>
-          <p className="text-gray-400 text-sm mt-1">Panel de administración</p>
+          <h1 className="text-3xl font-bold text-white mb-1">SafO Admin</h1>
+          <p className="text-[#4D96FF] text-sm">Panel de administración</p>
         </div>
 
-        {paso === 1 ? (
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm text-gray-400 mb-1 block">Número de celular</label>
-              <input
-                type="tel"
-                placeholder="999000001"
-                value={celular}
-                onChange={e => setCelular(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
-              />
+        {/* Card */}
+        <div className="rounded-2xl p-8 border border-[#1A6EFF20]"
+          style={{ background: 'linear-gradient(135deg, #0D1B4B15, #1A6EFF08)' }}>
+
+          {paso === 1 ? (
+            <div className="space-y-5">
+              <div>
+                <label className="text-sm text-[#4D96FF] mb-2 block font-medium">
+                  Número de celular
+                </label>
+                <input
+                  type="tel"
+                  placeholder="999 000 001"
+                  value={celular}
+                  onChange={e => setCelular(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && solicitarOTP()}
+                  className="w-full bg-[#0D1B4B30] border border-[#1A6EFF30] rounded-xl px-4 py-3.5 text-white placeholder-[#4D96FF50] focus:outline-none focus:border-[#1A6EFF] transition text-lg"
+                />
+              </div>
+              <button
+                onClick={solicitarOTP}
+                disabled={cargando}
+                className="w-full py-3.5 rounded-xl font-semibold text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ background: cargando ? '#1A6EFF80' : 'linear-gradient(135deg, #1A6EFF, #0D1B4B)' }}
+              >
+                {cargando ? 'Enviando...' : 'Enviar código →'}
+              </button>
             </div>
-            <button
-              onClick={solicitarOTP}
-              disabled={cargando}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition disabled:opacity-50"
-            >
-              {cargando ? 'Enviando...' : 'Enviar código'}
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm text-gray-400 mb-1 block">Código OTP</label>
-              <input
-                type="text"
-                placeholder="123456"
-                value={codigo}
-                onChange={e => setCodigo(e.target.value)}
-                maxLength={6}
-                className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-center text-2xl tracking-widest"
-              />
-              <p className="text-gray-500 text-xs mt-2 text-center">
-                Código enviado al {celular}
-              </p>
+          ) : (
+            <div className="space-y-5">
+              <div className="text-center mb-2">
+                <div className="text-4xl mb-3">📱</div>
+                <p className="text-[#4D96FF] text-sm">Código enviado al <strong className="text-white">{celular}</strong></p>
+              </div>
+              <div>
+                <label className="text-sm text-[#4D96FF] mb-2 block font-medium">
+                  Código OTP
+                </label>
+                <input
+                  type="text"
+                  placeholder="_ _ _ _ _ _"
+                  value={codigo}
+                  onChange={e => setCodigo(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && verificarOTP()}
+                  maxLength={6}
+                  className="w-full bg-[#0D1B4B30] border border-[#1A6EFF30] rounded-xl px-4 py-4 text-white placeholder-[#4D96FF30] focus:outline-none focus:border-[#1A6EFF] transition text-3xl tracking-[0.5em] text-center font-bold"
+                />
+              </div>
+              <button
+                onClick={verificarOTP}
+                disabled={cargando}
+                className="w-full py-3.5 rounded-xl font-semibold text-white transition disabled:opacity-50"
+                style={{ background: 'linear-gradient(135deg, #1A6EFF, #0D1B4B)' }}
+              >
+                {cargando ? 'Verificando...' : 'Ingresar al panel →'}
+              </button>
+              <button
+                onClick={() => { setPaso(1); setCodigo('') }}
+                className="w-full text-[#4D96FF] text-sm hover:text-white transition py-2"
+              >
+                ← Cambiar número
+              </button>
             </div>
-            <button
-              onClick={verificarOTP}
-              disabled={cargando}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition disabled:opacity-50"
-            >
-              {cargando ? 'Verificando...' : 'Ingresar'}
-            </button>
-            <button
-              onClick={() => setPaso(1)}
-              className="w-full text-gray-400 text-sm hover:text-white transition"
-            >
-              Cambiar número
-            </button>
-          </div>
-        )}
+          )}
+        </div>
+
+        <p className="text-center text-[#4D96FF30] text-xs mt-6">
+          SafO — Safe + On © 2025
+        </p>
       </div>
     </div>
   )
