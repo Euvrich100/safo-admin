@@ -63,18 +63,19 @@ export default function RegistroPage() {
     </div>
   )
 
-  const InputField = ({ label, campo, placeholder, type = 'text', maxLength }) => (
-    <div>
-      <label className="text-xs font-semibold text-[#4D96FF] uppercase tracking-widest mb-2 block">{label}</label>
-      <input type={type} placeholder={placeholder} value={form[campo]} maxLength={maxLength}
-        onChange={e => actualizar(campo, e.target.value)}
-        className="w-full px-4 py-3.5 rounded-xl text-white placeholder-[#4D96FF30] focus:outline-none transition"
-        style={{ background: '#0D1B4B30', border: '1.5px solid #1A6EFF25' }}
-        onFocus={e => e.target.style.borderColor = '#1A6EFF'}
-        onBlur={e => e.target.style.borderColor = '#1A6EFF25'}
-      />
-    </div>
-  )
+ const InputField = ({ label, campo, placeholder, type = 'text', maxLength }) => (
+  <div>
+    <label className="text-xs font-semibold text-[#4D96FF] uppercase tracking-widest mb-2 block">{label}</label>
+    <input
+      type={type}
+      placeholder={placeholder}
+      value={form[campo]}
+      maxLength={maxLength}
+      onChange={e => actualizar(campo, e.target.value)}
+      className="w-full px-4 py-3.5 rounded-xl text-white placeholder-[#4D96FF30] focus:outline-none transition bg-[#0D1B4B30] border border-[#1A6EFF25] focus:border-[#1A6EFF]"
+    />
+  </div>
+)
 
   const registrarConductor = async () => {
     if (!form.nombre || !form.celular || !form.dni || !form.licencia_numero || !form.placa) {
