@@ -3,7 +3,8 @@ import { useState, useEffect, useCallback } from 'react'
 import api from '@/lib/api'
 import useAuthGuard from '@/lib/useAuthGuard'
 import toast, { Toaster } from 'react-hot-toast'
-import { CheckCircle, XCircle, Car, Search, X, FileText } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCircleCheck, faCircleXmark, faTaxi, faMagnifyingGlass, faXmark, faFileLines, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import AdminNavbar from '@/components/AdminNavbar'
 import DocImagen from '@/components/DocImagen'
 
@@ -48,7 +49,8 @@ function FichaConductor({ id, onCerrar, onDecidido }) {
     setEnviando(true)
     try {
       await api.put(`/api/admin/conductores/${id}/documentos`, { decision, motivo: motivo.trim() })
-      toast.success(decision === 'aprobado' ? '✅ Conductor aprobado' : '❌ Solicitud rechazada')
+      if (decision === 'aprobado') toast.success('Conductor aprobado')
+      else toast('Solicitud rechazada', { icon: <FontAwesomeIcon icon={faCircleXmark} className="text-[#D92D20]" /> })
       onDecidido()
     } catch (err) {
       toast.error(err.response?.data?.error || 'Error al procesar')
@@ -74,7 +76,7 @@ function FichaConductor({ id, onCerrar, onDecidido }) {
               </span>
             )}
             <button onClick={onCerrar} className="p-2 rounded-full hover:bg-[#F5F5F7]" aria-label="Cerrar">
-              <X className="w-5 h-5 text-[#6E6E73]" />
+              <FontAwesomeIcon icon={faXmark} className="text-lg text-[#6E6E73]" />
             </button>
           </div>
         </div>
@@ -100,7 +102,7 @@ function FichaConductor({ id, onCerrar, onDecidido }) {
             </div>
 
             <h3 className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-3 flex items-center gap-2">
-              <FileText className="w-4 h-4" /> Documentos (toca una foto para verla completa)
+              <FontAwesomeIcon icon={faFileLines} className="text-sm" /> Documentos (toca una foto para verla completa)
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
               <DocImagen archivo={c.dni_foto_frontal_url} etiqueta="DNI frontal" />
@@ -135,12 +137,12 @@ function FichaConductor({ id, onCerrar, onDecidido }) {
                   {c.estado_doc === 'pendiente' && (
                     <button onClick={() => setRechazando(true)}
                       className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium text-[#D92D20] bg-[#FCEAE9] hover:bg-[#F9D9D6]">
-                      <XCircle className="w-4 h-4" /> Rechazar
+                      <FontAwesomeIcon icon={faCircleXmark} className="text-sm" /> Rechazar
                     </button>
                   )}
                   <button onClick={() => decidir('aprobado')} disabled={enviando}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium text-white bg-[#1E8E3E] hover:bg-[#177530] disabled:opacity-50">
-                    <CheckCircle className="w-4 h-4" /> {c.estado_doc === 'rechazado' ? 'Aprobar de todos modos' : 'Aprobar conductor'}
+                    <FontAwesomeIcon icon={faCircleCheck} className="text-sm" /> {c.estado_doc === 'rechazado' ? 'Aprobar de todos modos' : 'Aprobar conductor'}
                   </button>
                 </div>
               )
@@ -208,7 +210,7 @@ export default function ConductoresPage() {
             ))}
           </div>
           <div className="relative flex-1 min-w-[220px] max-w-sm">
-            <Search className="w-4 h-4 text-[#A1A1A6] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <FontAwesomeIcon icon={faMagnifyingGlass} className="text-sm text-[#A1A1A6] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input value={busqueda} onChange={e => setBusqueda(e.target.value)}
               placeholder="Buscar por nombre, celular, DNI o placa"
               className="w-full pl-10 pr-4 py-2.5 rounded-full text-sm bg-[#F5F5F7] border border-transparent focus:bg-white focus:border-[#0A66E0] focus:outline-none" />
@@ -219,7 +221,7 @@ export default function ConductoresPage() {
           <div className="text-[#A1A1A6] text-center py-20">Cargando...</div>
         ) : conductores.length === 0 ? (
           <div className="rounded-2xl border border-[#E2E2E7] bg-[#F5F5F7] py-20 text-center">
-            <Car className="w-10 h-10 text-[#A1A1A6] mx-auto mb-3" />
+            <FontAwesomeIcon icon={faTaxi} className="text-4xl text-[#A1A1A6] mx-auto mb-3" />
             <div className="text-[#6E6E73]">No hay conductores {filtro === 'pendiente' ? 'pendientes' : filtro + 's'}</div>
           </div>
         ) : (
@@ -245,7 +247,7 @@ export default function ConductoresPage() {
                     <span className="text-xs px-3 py-1 rounded-full font-medium capitalize" style={{ color: estilo.color, background: estilo.bg }}>
                       {c.estado_doc}
                     </span>
-                    <span className="text-[#0A66E0] text-sm font-medium">Revisar →</span>
+                    <span className="text-[#0A66E0] text-sm font-medium">Revisar <FontAwesomeIcon icon={faArrowRight} className="text-xs ml-1" /></span>
                   </div>
                 </button>
               )

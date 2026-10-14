@@ -1,6 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import { Shield, Star, Clock, CheckCircle, Smartphone, Search, Car } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faShieldHalved, faStar, faClock, faCircleCheck, faMobileScreenButton, faMagnifyingGlass, faTaxi, faUserPlus, faArrowRight, faLocationDot, faArrowUpRightFromSquare, faCircleDot, faMapLocationDot, faPeopleRoof } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from '@/components/SafoLogo'
 import EscenaHuanuco from '@/components/EscenaHuanuco'
 import MapaHuanuco, { MAPA_URL } from '@/components/MapaHuanuco'
@@ -18,7 +19,7 @@ export default function InicioPage() {
           <SafoLogo size={28} priority />
           <button onClick={() => router.push('/registro/pasajero')}
             className="px-5 py-2.5 rounded-full text-sm font-semibold text-white transition bg-[#0A66E0] hover:bg-[#084FB0]">
-            Pedir mi taxi
+            <FontAwesomeIcon icon={faTaxi} className="mr-2" />Pedir mi taxi
           </button>
         </div>
       </nav>
@@ -28,7 +29,7 @@ export default function InicioPage() {
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#E2E8F0] mb-7">
-              <div className="w-2 h-2 rounded-full bg-[#1E8E3E] animate-pulse"/>
+              <FontAwesomeIcon icon={faCircleDot} className="text-[#1E8E3E] text-xs animate-pulse" />
               <span className="text-[#4B5873] text-sm font-medium">Operando en Huánuco, Perú</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-semibold mb-6 leading-[1.05] tracking-tight text-[#14213D]">
@@ -40,7 +41,7 @@ export default function InicioPage() {
             <div className="flex flex-wrap items-center gap-4">
               <button onClick={() => router.push('/registro/pasajero')}
                 className="px-8 py-4 rounded-full font-semibold text-white text-lg transition bg-[#0A66E0] hover:bg-[#084FB0]">
-                Registrarme gratis
+                <FontAwesomeIcon icon={faUserPlus} className="mr-2.5" />Registrarme gratis
               </button>
               <span className="text-[#6B7894] text-sm">Sin costo de registro. Solo pagas S/ 1.50 al pedir tu taxi.</span>
             </div>
@@ -55,7 +56,7 @@ export default function InicioPage() {
               </div>
               <div className="absolute top-5 left-5 rounded-2xl bg-white border border-[#E2E8F0] shadow-md px-4 py-3 flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-[#E8F5EA] flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-[#1E8E3E]" />
+                  <FontAwesomeIcon icon={faCircleCheck} className="text-lg text-[#1E8E3E]" />
                 </div>
                 <div>
                   <div className="text-sm font-semibold text-[#14213D]">Conductor verificado</div>
@@ -75,14 +76,14 @@ export default function InicioPage() {
           <p className="text-[#CFE0FF] text-lg mb-12 max-w-xl">Tres pasos, y pagas solo S/ 1.50 de garantía cuando pides.</p>
           <ol className="grid md:grid-cols-3 gap-5">
             {[
-              { icon: Search, t: 'Mira los taxis cerca de ti', d: 'Ves en el mapa los conductores verificados que están libres en este momento.' },
-              { icon: Smartphone, t: 'Pide y sigue a tu conductor', d: 'Ves su nombre, placa y cuánto falta. Puedes compartir el viaje con tu familia.' },
-              { icon: Car, t: 'Sube y viaja tranquilo', d: 'Al terminar calificas el viaje. Si cancelas antes de que salga, te devolvemos tu S/ 1.50.' },
+              { icon: faMagnifyingGlass, t: 'Mira los taxis cerca de ti', d: 'Ves en el mapa los conductores verificados que están libres en este momento.' },
+              { icon: faMobileScreenButton, t: 'Pide y sigue a tu conductor', d: 'Ves su nombre, placa y cuánto falta. Puedes compartir el viaje con tu familia.' },
+              { icon: faTaxi, t: 'Sube y viaja tranquilo', d: 'Al terminar calificas el viaje. Si cancelas antes de que salga, te devolvemos tu S/ 1.50.' },
             ].map((p, i) => (
               <li key={i} className="rounded-2xl bg-white/10 border border-white/20 p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="w-8 h-8 rounded-full bg-[#FFC21A] text-[#14213D] text-sm font-bold flex items-center justify-center">{i + 1}</span>
-                  <p.icon className="w-5 h-5 text-[#CFE0FF]" />
+                  <FontAwesomeIcon icon={p.icon} className="text-lg text-[#CFE0FF]" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2">{p.t}</h3>
                 <p className="text-[#CFE0FF] text-sm leading-relaxed">{p.d}</p>
@@ -101,14 +102,14 @@ export default function InicioPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: Shield, color: '#0A66E0', bg: '#EAF2FE', title: 'Conductores verificados', desc: 'DNI, licencia y antecedentes revisados antes de activar cualquier conductor.' },
-              { icon: Star, color: '#B45309', bg: '#FEF3E2', title: 'Calificaciones reales', desc: 'Califica tu viaje. Los conductores con malas calificaciones son suspendidos.' },
-              { icon: Clock, color: '#1E8E3E', bg: '#E8F5EA', title: 'Seguimiento en tiempo real', desc: 'Comparte tu viaje con un familiar. Siempre sabemos dónde estás.' },
-              { icon: CheckCircle, color: '#7C5CFC', bg: '#F1EEFF', title: 'Garantía de viaje', desc: 'Si cancelas antes de que el conductor salga, te devolvemos tu S/ 1.50.' },
+              { icon: faShieldHalved, color: '#0A66E0', bg: '#EAF2FE', title: 'Conductores verificados', desc: 'DNI, licencia y antecedentes revisados antes de activar cualquier conductor.' },
+              { icon: faStar, color: '#B45309', bg: '#FEF3E2', title: 'Calificaciones reales', desc: 'Califica tu viaje. Los conductores con malas calificaciones son suspendidos.' },
+              { icon: faClock, color: '#1E8E3E', bg: '#E8F5EA', title: 'Seguimiento en tiempo real', desc: 'Comparte tu viaje con un familiar. Siempre sabemos dónde estás.' },
+              { icon: faCircleCheck, color: '#7C5CFC', bg: '#F1EEFF', title: 'Garantía de viaje', desc: 'Si cancelas antes de que el conductor salga, te devolvemos tu S/ 1.50.' },
             ].map((b, i) => (
               <div key={i} className="rounded-2xl p-6 border border-[#E2E2E7] hover:shadow-md transition">
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4" style={{ background: b.bg }}>
-                  <b.icon className="w-6 h-6" style={{ color: b.color }} />
+                  <FontAwesomeIcon icon={b.icon} className="text-xl" style={{ color: b.color }} />
                 </div>
                 <h3 className="font-semibold text-[#14213D] mb-2">{b.title}</h3>
                 <p className="text-[#6E6E73] text-sm leading-relaxed">{b.desc}</p>
@@ -122,19 +123,21 @@ export default function InicioPage() {
       <section className="py-20 px-6 bg-[#F6F8FB]">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-5 gap-10 items-center">
           <div className="lg:col-span-2">
-            <h2 className="text-4xl font-semibold text-[#14213D] mb-4 tracking-tight">Hecho para Huánuco</h2>
+            <h2 className="text-4xl font-semibold text-[#14213D] mb-4 tracking-tight"><FontAwesomeIcon icon={faPeopleRoof} className="text-[#0A4FD6] text-3xl mr-3 align-middle" />Hecho para Huánuco</h2>
             <p className="text-[#4B5873] text-lg leading-relaxed mb-6">
               Conocemos las calles del centro, los cerros y el río de nuestra ciudad. SafO nace aquí, con conductores de aquí.
             </p>
             <a href={MAPA_URL} target="_blank" rel="noreferrer"
               className="inline-flex items-center gap-2 text-[#0A66E0] font-semibold hover:underline">
+              <FontAwesomeIcon icon={faMapLocationDot} />
               Abrir el mapa completo
+              <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="text-xs" />
             </a>
           </div>
           <div className="lg:col-span-3 relative rounded-3xl overflow-hidden border border-[#E2E8F0] shadow-[0_24px_60px_-32px_rgba(20,33,61,.35)] h-[360px] md:h-[420px] bg-white">
             <MapaHuanuco className="absolute inset-0" interactivo />
             <div className="absolute left-4 bottom-4 rounded-xl bg-white/95 backdrop-blur border border-[#E2E8F0] px-4 py-2.5 pointer-events-none">
-              <div className="text-sm font-semibold text-[#14213D]">Plaza de Armas</div>
+              <div className="text-sm font-semibold text-[#14213D]"><FontAwesomeIcon icon={faLocationDot} className="text-[#0A4FD6] mr-1.5" />Plaza de Armas</div>
               <div className="text-xs text-[#6B7894]">Centro de Huánuco · 1 894 m s. n. m.</div>
             </div>
           </div>
@@ -149,7 +152,7 @@ export default function InicioPage() {
             <p className="text-[#CFE0FF] mb-8 text-lg max-w-md">Crea tu cuenta gratis y pide un taxi verificado en minutos.</p>
             <button onClick={() => router.push('/registro/pasajero')}
               className="px-9 py-4 rounded-full font-semibold text-[#14213D] text-lg transition bg-[#FFC21A] hover:bg-[#FFD04D]">
-              Registrarme gratis
+              <FontAwesomeIcon icon={faUserPlus} className="mr-2.5" />Registrarme gratis
             </button>
           </div>
           <div className="hidden md:block md:col-span-2 relative min-h-[240px]">
@@ -168,7 +171,7 @@ export default function InicioPage() {
           </div>
           <button onClick={() => router.push('/registro/conductor')}
             className="text-[#A1A1A6] hover:text-[#0A66E0] text-xs transition">
-            ¿Eres conductor? Únete a nuestra red →
+            ¿Eres conductor? Únete a nuestra red <FontAwesomeIcon icon={faArrowRight} className="ml-1" />
           </button>
         </div>
       </footer>

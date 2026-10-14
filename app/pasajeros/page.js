@@ -3,7 +3,8 @@ import { useState, useEffect, useCallback } from 'react'
 import api from '@/lib/api'
 import useAuthGuard from '@/lib/useAuthGuard'
 import toast, { Toaster } from 'react-hot-toast'
-import { Users, Search } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faUsers, faMagnifyingGlass, faUserSlash, faUserCheck } from '@fortawesome/free-solid-svg-icons'
 import AdminNavbar from '@/components/AdminNavbar'
 
 const FILTROS = [
@@ -77,7 +78,7 @@ export default function PasajerosPage() {
             ))}
           </div>
           <div className="relative flex-1 min-w-[220px] max-w-sm">
-            <Search className="w-4 h-4 text-[#A1A1A6] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <FontAwesomeIcon icon={faMagnifyingGlass} className="text-sm text-[#A1A1A6] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input value={busqueda} onChange={e => setBusqueda(e.target.value)}
               placeholder="Buscar por nombre o celular"
               className="w-full pl-10 pr-4 py-2.5 rounded-full text-sm bg-[#F5F5F7] border border-transparent focus:bg-white focus:border-[#0A66E0] focus:outline-none" />
@@ -88,7 +89,7 @@ export default function PasajerosPage() {
           <div className="text-[#A1A1A6] text-center py-20">Cargando...</div>
         ) : pasajeros.length === 0 ? (
           <div className="rounded-2xl border border-[#E2E2E7] bg-[#F5F5F7] py-20 text-center">
-            <Users className="w-10 h-10 text-[#A1A1A6] mx-auto mb-3" />
+            <FontAwesomeIcon icon={faUsers} className="text-4xl text-[#A1A1A6] mx-auto mb-3" />
             <div className="text-[#6E6E73]">No hay pasajeros</div>
           </div>
         ) : (
@@ -117,7 +118,7 @@ export default function PasajerosPage() {
                       className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                         suspendido ? 'text-white bg-[#1E8E3E] hover:bg-[#177530]' : 'text-[#D92D20] bg-[#FCEAE9] hover:bg-[#F9D9D6]'
                       }`}>
-                      {suspendido ? 'Reactivar' : 'Suspender'}
+                      <FontAwesomeIcon icon={suspendido ? faUserCheck : faUserSlash} className="text-xs mr-1.5" />{suspendido ? 'Reactivar' : 'Suspender'}
                     </button>
                   </div>
                 </div>

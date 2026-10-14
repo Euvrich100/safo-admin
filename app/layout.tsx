@@ -1,5 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { config } from "@fortawesome/fontawesome-svg-core";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+
+// El CSS de FontAwesome se carga arriba; evita que lo inyecte otra vez en el navegador
+config.autoAddCss = false;
 
 export const metadata: Metadata = {
   title: {

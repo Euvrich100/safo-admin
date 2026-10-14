@@ -2,7 +2,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast'
-import { Upload, CheckCircle } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCloudArrowUp, faCircleCheck, faTaxi, faHourglassHalf, faCheck, faCircleUser, faIdCard, faAddressCard, faTriangleExclamation, faClipboardList, faUser, faMobileScreenButton, faPaperPlane, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from '@/components/SafoLogo'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://safo-backend.onrender.com'
@@ -12,7 +13,7 @@ const CLASE_INPUT = 'w-full px-4 py-3.5 rounded-xl text-[#1D1D1F] placeholder-[#
 // IMPORTANTE: estos componentes viven FUERA de RegistroConductorPage. Si se
 // definen dentro, React crea un componente nuevo en cada tecla, desmonta el
 // <input> y se pierde el foco (solo dejaba escribir una letra por vez).
-function FileBox({ campo, label, emoji, preview, onArchivo }) {
+function FileBox({ campo, label, icono, preview, onArchivo }) {
   return (
     <div>
       <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">{label}</label>
@@ -24,15 +25,15 @@ function FileBox({ campo, label, emoji, preview, onArchivo }) {
             <div className="relative w-full h-full">
               <img src={preview} alt={label} className="w-full h-full object-cover" />
               <div className="absolute top-2 right-2 bg-[#1E8E3E] rounded-full p-1">
-                <CheckCircle className="w-3 h-3 text-white" />
+                <FontAwesomeIcon icon={faCircleCheck} className="text-xs text-white" />
               </div>
             </div>
           ) : (
             <>
-              <span className="text-2xl mb-1">{emoji}</span>
+              <FontAwesomeIcon icon={icono} className="text-2xl mb-1.5 text-[#6E6E73]" />
               <span className="text-[#6E6E73] text-xs">{label}</span>
               <span className="text-[#A1A1A6] text-xs mt-0.5 flex items-center gap-1">
-                <Upload className="w-3 h-3" /> Subir foto
+                <FontAwesomeIcon icon={faCloudArrowUp} className="text-xs" /> Subir foto
               </span>
             </>
           )}
@@ -125,12 +126,12 @@ export default function RegistroConductorPage() {
   if (completado) return (
     <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="text-center max-w-md">
-        <div className="text-7xl mb-6">🎉</div>
+        <FontAwesomeIcon icon={faCircleCheck} className="text-[#1E8E3E] text-7xl mb-6" />
         <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-4">¡Solicitud enviada!</h1>
         <p className="text-[#6E6E73] mb-6">El administrador revisará tus documentos en menos de 24 horas y te contactará al {form.celular}.</p>
         <div className="p-4 rounded-2xl bg-[#F5F5F7] mb-6">
           <p className="text-[#6E6E73] text-sm">Estado de solicitud</p>
-          <p className="text-[#B45309] text-lg font-semibold mt-1">⏳ En revisión</p>
+          <p className="text-[#B45309] text-lg font-semibold mt-1"><FontAwesomeIcon icon={faHourglassHalf} className="mr-2" />En revisión</p>
         </div>
         <button onClick={() => router.push('/')}
           className="px-8 py-3 rounded-full font-semibold text-white bg-[#0A66E0] hover:bg-[#084FB0]">
@@ -154,7 +155,7 @@ export default function RegistroConductorPage() {
         </button>
 
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2 tracking-tight">Únete como conductor 🚖</h1>
+          <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2 tracking-tight">Únete como conductor <FontAwesomeIcon icon={faTaxi} className="text-[#FFC21A] text-2xl ml-1" /></h1>
           <p className="text-[#6E6E73]">Suscripción S/ 5.00/mes — Empieza a ganar llevando pasajeros seguros</p>
         </div>
 
@@ -163,7 +164,7 @@ export default function RegistroConductorPage() {
           {pasos.map((p, i) => (
             <div key={i} className="flex items-center gap-2 flex-1">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 ${paso > i + 1 ? 'bg-[#1E8E3E] text-white' : paso === i + 1 ? 'bg-[#0A66E0] text-white' : 'bg-[#F5F5F7] text-[#A1A1A6]'}`}>
-                {paso > i + 1 ? '✓' : i + 1}
+                {paso > i + 1 ? <FontAwesomeIcon icon={faCheck} /> : i + 1}
               </div>
               <span className={`text-xs ${paso === i + 1 ? 'text-[#1D1D1F] font-medium' : 'text-[#A1A1A6]'}`}>{p}</span>
               {i < pasos.length - 1 && <div className={`flex-1 h-0.5 ${paso > i + 1 ? 'bg-[#1E8E3E]' : 'bg-[#E2E2E7]'}`}/>}
@@ -185,7 +186,7 @@ export default function RegistroConductorPage() {
             </div>
             <button onClick={irPaso2}
               className="w-full py-4 rounded-full font-semibold text-white mt-2 bg-[#0A66E0] hover:bg-[#084FB0]">
-              Siguiente — Documentos →
+              Siguiente: documentos <FontAwesomeIcon icon={faArrowRight} className="ml-1.5" />
             </button>
           </div>
         )}
@@ -194,20 +195,20 @@ export default function RegistroConductorPage() {
         {paso === 2 && (
           <div className="rounded-2xl p-6 border border-[#E2E2E7] space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <FileBox preview={previews.foto_perfil} onArchivo={subirArchivo} campo="foto_perfil" label="Foto de perfil" emoji="🤳" />
-              <FileBox preview={previews.foto_dni_frontal} onArchivo={subirArchivo} campo="foto_dni_frontal" label="DNI frontal *" emoji="🪪" />
-              <FileBox preview={previews.foto_dni_trasera} onArchivo={subirArchivo} campo="foto_dni_trasera" label="DNI trasero *" emoji="🪪" />
-              <FileBox preview={previews.foto_licencia} onArchivo={subirArchivo} campo="foto_licencia" label="Licencia *" emoji="📋" />
+              <FileBox preview={previews.foto_perfil} onArchivo={subirArchivo} campo="foto_perfil" label="Foto de perfil" icono={faCircleUser} />
+              <FileBox preview={previews.foto_dni_frontal} onArchivo={subirArchivo} campo="foto_dni_frontal" label="DNI frontal *" icono={faIdCard} />
+              <FileBox preview={previews.foto_dni_trasera} onArchivo={subirArchivo} campo="foto_dni_trasera" label="DNI trasero *" icono={faIdCard} />
+              <FileBox preview={previews.foto_licencia} onArchivo={subirArchivo} campo="foto_licencia" label="Licencia *" icono={faAddressCard} />
             </div>
             <div className="p-3 rounded-xl bg-[#FEF3E2]">
-              <p className="text-[#B45309] text-xs">⚠️ Fotos nítidas, sin reflejos y con todos los datos legibles.</p>
+              <p className="text-[#B45309] text-xs"><FontAwesomeIcon icon={faTriangleExclamation} className="mr-1.5" />Fotos nítidas, sin reflejos y con todos los datos legibles.</p>
             </div>
             <div className="flex gap-3">
               <button onClick={() => setPaso(1)}
-                className="flex-1 py-3 rounded-full text-[#6E6E73] border border-[#E2E2E7] hover:bg-[#F5F5F7]">← Volver</button>
+                className="flex-1 py-3 rounded-full text-[#6E6E73] border border-[#E2E2E7] hover:bg-[#F5F5F7]"><FontAwesomeIcon icon={faArrowLeft} className="mr-1.5" />Volver</button>
               <button onClick={irPaso3}
                 className="flex-1 py-3 rounded-full font-semibold text-white bg-[#0A66E0] hover:bg-[#084FB0]">
-                Siguiente →
+                Siguiente <FontAwesomeIcon icon={faArrowRight} className="ml-1.5" />
               </button>
             </div>
           </div>
@@ -216,7 +217,7 @@ export default function RegistroConductorPage() {
         {/* Paso 3 */}
         {paso === 3 && (
           <div className="rounded-2xl p-6 border border-[#E2E2E7] space-y-4">
-            <FileBox preview={previews.foto_vehiculo} onArchivo={subirArchivo} campo="foto_vehiculo" label="Foto del vehículo *" emoji="🚖" />
+            <FileBox preview={previews.foto_vehiculo} onArchivo={subirArchivo} campo="foto_vehiculo" label="Foto del vehículo *" icono={faTaxi} />
             <div className="grid grid-cols-2 gap-4">
               <Campo valor={form.licencia_numero} onCambio={set} label="N° de licencia *" campo="licencia_numero" placeholder="A123456" />
               <Campo valor={form.licencia_categoria} onCambio={set} label="Categoría" campo="licencia_categoria" options={['A-IIb', 'A-IIIb', 'B-IIb']} />
@@ -228,21 +229,21 @@ export default function RegistroConductorPage() {
             <Campo valor={form.vehiculo_color} onCambio={set} label="Color" campo="vehiculo_color" placeholder="Blanco" />
 
             <div className="p-4 rounded-xl bg-[#EAF2FE]">
-              <p className="text-[#0A66E0] text-xs font-semibold mb-2">📋 Resumen</p>
+              <p className="text-[#0A66E0] text-xs font-semibold mb-2"><FontAwesomeIcon icon={faClipboardList} className="mr-1.5" />Resumen</p>
               <div className="grid grid-cols-2 gap-1 text-xs text-[#0A66E0] opacity-80">
-                <span>👤 {form.nombre || '—'}</span>
-                <span>📱 {form.celular || '—'}</span>
-                <span>🪪 {form.dni || '—'}</span>
-                <span>🚖 {form.placa || '—'}</span>
+                <span><FontAwesomeIcon icon={faUser} className="mr-1.5" />{form.nombre || '—'}</span>
+                <span><FontAwesomeIcon icon={faMobileScreenButton} className="mr-1.5" />{form.celular || '—'}</span>
+                <span><FontAwesomeIcon icon={faIdCard} className="mr-1.5" />{form.dni || '—'}</span>
+                <span><FontAwesomeIcon icon={faTaxi} className="mr-1.5" />{form.placa || '—'}</span>
               </div>
             </div>
 
             <div className="flex gap-3">
               <button onClick={() => setPaso(2)}
-                className="flex-1 py-3 rounded-full text-[#6E6E73] border border-[#E2E2E7] hover:bg-[#F5F5F7]">← Volver</button>
+                className="flex-1 py-3 rounded-full text-[#6E6E73] border border-[#E2E2E7] hover:bg-[#F5F5F7]"><FontAwesomeIcon icon={faArrowLeft} className="mr-1.5" />Volver</button>
               <button onClick={registrar} disabled={cargando}
                 className="flex-1 py-4 rounded-full font-semibold text-white disabled:opacity-50 bg-[#1E8E3E] hover:bg-[#177530]">
-                {cargando ? 'Enviando...' : '✅ Enviar solicitud'}
+                {cargando ? 'Enviando...' : <><FontAwesomeIcon icon={faPaperPlane} className="mr-2" />Enviar solicitud</>}
               </button>
             </div>
           </div>

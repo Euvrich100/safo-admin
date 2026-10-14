@@ -1,4 +1,5 @@
-import { ShieldCheck, MapPin, Phone } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faUserShield, faLocationDot, faPhone } from '@fortawesome/free-solid-svg-icons'
 
 // Maqueta ilustrativa de la app del pasajero: mapa con la ruta y la ficha del
 // conductor. Los datos son de ejemplo, solo para mostrar cómo se ve el viaje.
@@ -20,7 +21,7 @@ export default function TelefonoApp({ className = '' }) {
             <circle cx="129" cy="38" r="7" fill="#0A4FD6" stroke="#fff" strokeWidth="3" />
           </svg>
           <div className="absolute top-2.5 left-2.5 right-2.5 rounded-xl bg-white/95 px-3 py-2 flex items-center gap-2 shadow-sm">
-            <MapPin className="w-3.5 h-3.5 text-[#0A4FD6] shrink-0" />
+            <FontAwesomeIcon icon={faLocationDot} className="text-xs text-[#0A4FD6] shrink-0" />
             <span className="text-[11px] font-medium text-[#14213D] truncate">Jr. Dos de Mayo 1060</span>
           </div>
         </div>
@@ -36,11 +37,11 @@ export default function TelefonoApp({ className = '' }) {
               <div className="text-[11px] text-[#6B7894] truncate">Toyota Yaris · ABC-123</div>
             </div>
             <div className="w-8 h-8 rounded-full bg-white border border-[#DCE6F5] flex items-center justify-center">
-              <Phone className="w-3.5 h-3.5 text-[#0A4FD6]" />
+              <FontAwesomeIcon icon={faPhone} className="text-xs text-[#0A4FD6]" />
             </div>
           </div>
           <div className="mt-2.5 flex items-center gap-1.5 text-[11px] text-[#1E8E3E] font-medium">
-            <ShieldCheck className="w-3.5 h-3.5" /> DNI y licencia verificados
+            <FontAwesomeIcon icon={faUserShield} className="text-xs" /> DNI y licencia verificados
           </div>
           <div className="mt-3 rounded-full bg-[#0A4FD6] text-white text-xs font-semibold text-center py-2.5">Compartir mi viaje</div>
         </div>

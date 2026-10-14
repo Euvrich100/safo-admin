@@ -1,14 +1,15 @@
 'use client'
 import { useRouter, usePathname } from 'next/navigation'
-import { LogOut } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faRightFromBracket, faHouse, faTaxi, faUsers, faRoute, faCoins } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from './SafoLogo'
 
 const LINKS = [
-  { href: '/dashboard', label: 'Inicio' },
-  { href: '/conductores', label: 'Conductores' },
-  { href: '/pasajeros', label: 'Pasajeros' },
-  { href: '/viajes', label: 'Viajes' },
-  { href: '/suscripciones', label: 'Pagos' },
+  { href: '/dashboard', label: 'Inicio', icon: faHouse },
+  { href: '/conductores', label: 'Conductores', icon: faTaxi },
+  { href: '/pasajeros', label: 'Pasajeros', icon: faUsers },
+  { href: '/viajes', label: 'Viajes', icon: faRoute },
+  { href: '/suscripciones', label: 'Pagos', icon: faCoins },
 ]
 
 export default function AdminNavbar() {
@@ -36,13 +37,13 @@ export default function AdminNavbar() {
                 className={`px-4 py-2 text-sm font-medium rounded-full transition whitespace-nowrap ${
                   activo ? 'text-[#0A66E0] bg-[#EAF2FE]' : 'text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F5F5F7]'
                 }`}>
-                {l.label}
+                <FontAwesomeIcon icon={l.icon} className="text-xs mr-2" />{l.label}
               </button>
             )
           })}
           <button onClick={cerrarSesion}
             className="flex items-center gap-2 px-4 py-2 text-sm text-[#D92D20] hover:bg-[#FCEAE9] rounded-full transition ml-1">
-            <LogOut className="w-4 h-4" />
+            <FontAwesomeIcon icon={faRightFromBracket} className="text-sm" />
             <span className="hidden sm:inline">Salir</span>
           </button>
         </div>

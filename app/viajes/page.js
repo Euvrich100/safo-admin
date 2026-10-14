@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react'
 import api from '@/lib/api'
 import useAuthGuard from '@/lib/useAuthGuard'
 import toast, { Toaster } from 'react-hot-toast'
-import { MapPin as RouteIcon } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faRoute, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
 import AdminNavbar from '@/components/AdminNavbar'
 
 const FILTROS = [
@@ -78,7 +79,7 @@ export default function ViajesPage() {
           <div className="text-[#A1A1A6] text-center py-20">Cargando...</div>
         ) : viajes.length === 0 ? (
           <div className="rounded-2xl border border-[#E2E2E7] bg-[#F5F5F7] py-20 text-center">
-            <RouteIcon className="w-10 h-10 text-[#A1A1A6] mx-auto mb-3" />
+            <FontAwesomeIcon icon={faRoute} className="text-4xl text-[#A1A1A6] mx-auto mb-3" />
             <div className="text-[#6E6E73]">No hay viajes</div>
           </div>
         ) : (
@@ -119,7 +120,7 @@ export default function ViajesPage() {
                       <div className="mt-3 rounded-xl p-3 bg-[#FCEAE9]">
                         <div className="text-xs text-[#D92D20]">Motivo de cancelación: {v.cancelacion_motivo}</div>
                         {v.conductor_fue_despachado && (
-                          <div className="text-xs mt-1 text-[#B0453B]">⚠️ Conductor fue despachado — S/ 1.00 compensado al conductor</div>
+                          <div className="text-xs mt-1 text-[#B0453B]"><FontAwesomeIcon icon={faTriangleExclamation} className="mr-1.5" />Conductor fue despachado — S/ 1.00 compensado al conductor</div>
                         )}
                       </div>
                     )}

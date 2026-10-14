@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPaperPlane, faArrowLeft, faHand, faFlagCheckered, faMobileScreenButton, faRightToBracket } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from '@/components/SafoLogo'
 import MapaHuanuco, { MAPA_URL } from '@/components/MapaHuanuco'
 
@@ -119,7 +121,9 @@ export default function LoginPage() {
 
         <div className="mb-8">
           <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2">
-            {paso === 1 ? 'Hola, Admin 👋' : '¡Casi listo! 🎉'}
+            {paso === 1
+              ? <>Hola, Admin <FontAwesomeIcon icon={faHand} className="text-[#FFC21A] text-2xl ml-1" /></>
+              : <>¡Casi listo! <FontAwesomeIcon icon={faFlagCheckered} className="text-[#0A66E0] text-2xl ml-1" /></>}
           </h1>
           <p className="text-[#6E6E73] text-sm">
             {paso === 1
@@ -135,14 +139,14 @@ export default function LoginPage() {
                 Número de celular
               </label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A1A1A6] text-sm font-medium">+51</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A1A1A6] text-sm font-medium"><FontAwesomeIcon icon={faMobileScreenButton} className="mr-1.5" />+51</span>
                 <input
                   type="tel"
                   placeholder="999 000 001"
                   value={celular}
                   onChange={e => setCelular(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && solicitarOTP()}
-                  className="w-full pl-14 pr-4 py-4 rounded-2xl text-[#1D1D1F] text-lg font-medium placeholder-[#A1A1A6] bg-[#F5F5F7] border border-transparent focus:bg-white focus:border-[#0A66E0] focus:outline-none transition"
+                  className="w-full pl-[5.5rem] pr-4 py-4 rounded-2xl text-[#1D1D1F] text-lg font-medium placeholder-[#A1A1A6] bg-[#F5F5F7] border border-transparent focus:bg-white focus:border-[#0A66E0] focus:outline-none transition"
                 />
               </div>
             </div>
@@ -152,7 +156,7 @@ export default function LoginPage() {
               disabled={cargando}
               className="w-full py-4 rounded-2xl font-semibold text-white text-lg transition disabled:opacity-50 bg-[#0A66E0] hover:bg-[#084FB0]"
             >
-              {cargando ? 'Enviando...' : 'Enviar código →'}
+              {cargando ? 'Enviando...' : <><FontAwesomeIcon icon={faPaperPlane} className="mr-2.5" />Enviar código</>}
             </button>
 
             {GOOGLE_CLIENT_ID && (
@@ -204,14 +208,14 @@ export default function LoginPage() {
               disabled={cargando || codigo.length < 6}
               className="w-full py-4 rounded-2xl font-semibold text-white text-lg transition disabled:opacity-40 bg-[#0A66E0] hover:bg-[#084FB0]"
             >
-              {cargando ? 'Verificando...' : 'Ingresar al panel →'}
+              {cargando ? 'Verificando...' : <><FontAwesomeIcon icon={faRightToBracket} className="mr-2.5" />Ingresar al panel</>}
             </button>
 
             <button
               onClick={() => { setPaso(1); setCodigo('') }}
               className="w-full py-3 text-[#6E6E73] hover:text-[#1D1D1F] text-sm transition"
             >
-              ← Cambiar número
+              <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />Cambiar número
             </button>
           </div>
         )}

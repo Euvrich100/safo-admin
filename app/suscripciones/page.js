@@ -3,7 +3,8 @@ import { useState, useEffect, useCallback } from 'react'
 import api from '@/lib/api'
 import useAuthGuard from '@/lib/useAuthGuard'
 import toast, { Toaster } from 'react-hot-toast'
-import { CheckCircle, DollarSign } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCircleCheck, faDollarSign, faLightbulb, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
 import AdminNavbar from '@/components/AdminNavbar'
 
 export default function SuscripcionesPage() {
@@ -33,7 +34,7 @@ export default function SuscripcionesPage() {
     setProcesando(conductor_id)
     try {
       await api.post('/api/admin/suscripciones/confirmar', { conductor_id, metodo_pago })
-      toast.success('✅ Pago de S/ 5.00 confirmado')
+      toast.success('Pago de S/ 5.00 confirmado')
       cargarConductores()
     } catch (err) {
       toast.error(err.response?.data?.error || 'Error al confirmar pago')
@@ -62,7 +63,7 @@ export default function SuscripcionesPage() {
 
         <div className="rounded-2xl p-4 mb-6 bg-[#EAF2FE]">
           <p className="text-[#0A66E0] text-sm">
-            💡 Cuando un conductor pague su suscripción por Yape o Plin, confirma el pago aquí para activarlo.
+            <FontAwesomeIcon icon={faLightbulb} className="mr-2" />Cuando un conductor pague su suscripción por Yape o Plin, confirma el pago aquí para activarlo.
           </p>
         </div>
 
@@ -70,7 +71,7 @@ export default function SuscripcionesPage() {
           <div className="text-[#A1A1A6] text-center py-20">Cargando...</div>
         ) : conductores.length === 0 ? (
           <div className="rounded-2xl border border-[#E2E2E7] bg-[#F5F5F7] py-20 text-center">
-            <DollarSign className="w-10 h-10 text-[#A1A1A6] mx-auto mb-3" />
+            <FontAwesomeIcon icon={faDollarSign} className="text-4xl text-[#A1A1A6] mx-auto mb-3" />
             <div className="text-[#6E6E73]">No hay conductores aprobados</div>
           </div>
         ) : (
@@ -87,8 +88,8 @@ export default function SuscripcionesPage() {
                       <div className="text-[#6E6E73] text-sm">{c.celular} — {c.placa}</div>
                       <div className="text-xs mt-1" style={{ color: suscripcionVencida(c.suscripcion_vence) ? '#D92D20' : '#1E8E3E' }}>
                         {suscripcionVencida(c.suscripcion_vence)
-                          ? '⚠️ Suscripción vencida'
-                          : `✅ Activo hasta ${new Date(c.suscripcion_vence).toLocaleDateString('es-PE')}`
+                          ? <><FontAwesomeIcon icon={faTriangleExclamation} className="mr-1.5" />Suscripción vencida</>
+                          : <><FontAwesomeIcon icon={faCircleCheck} className="mr-1.5" />Activo hasta {new Date(c.suscripcion_vence).toLocaleDateString('es-PE')}</>
                         }
                       </div>
                     </div>
@@ -102,7 +103,7 @@ export default function SuscripcionesPage() {
                           disabled={procesando === c.id}
                           className="flex items-center gap-2 text-white px-4 py-2 rounded-full text-sm font-medium transition disabled:opacity-50 capitalize bg-[#1E8E3E] hover:bg-[#177530]"
                         >
-                          <CheckCircle className="w-4 h-4" />
+                          <FontAwesomeIcon icon={faCircleCheck} className="text-sm" />
                           {metodo}
                         </button>
                       ))}
