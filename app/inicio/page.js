@@ -1,7 +1,8 @@
 'use client'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faShieldHalved, faStar, faClock, faCircleCheck, faMobileScreenButton, faMagnifyingGlass, faTaxi, faUserPlus, faArrowRight, faLocationDot, faArrowUpRightFromSquare, faCircleDot, faMapLocationDot, faPeopleRoof } from '@fortawesome/free-solid-svg-icons'
+import { faShieldHalved, faStar, faClock, faCircleCheck, faMobileScreenButton, faMagnifyingGlass, faTaxi, faUserPlus, faArrowRight, faLocationDot, faArrowUpRightFromSquare, faCircleDot, faMapLocationDot, faPeopleRoof, faRightToBracket } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from '@/components/SafoLogo'
 import EscenaHuanuco from '@/components/EscenaHuanuco'
 import MapaHuanuco, { MAPA_URL } from '@/components/MapaHuanuco'
@@ -9,6 +10,16 @@ import TelefonoApp from '@/components/TelefonoApp'
 
 export default function InicioPage() {
   const router = useRouter()
+  const [sesion, setSesion] = useState(null)
+
+  // Si ya inició sesión, el botón lleva a su panel en vez de pedir registrarse otra vez
+  useEffect(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('safo_usuario') || 'null')
+      if (u && localStorage.getItem('safo_token') && (u.rol === 'pasajero' || u.rol === 'admin')) setSesion(u)
+    } catch { /* sin sesión */ }
+  }, [])
+  const irAlPanel = () => router.push(sesion?.rol === 'admin' ? '/dashboard' : '/pasajero')
 
   return (
     <div className="min-h-screen bg-white text-[#14213D]">
@@ -17,10 +28,23 @@ export default function InicioPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#E2E2E7] bg-white/90 backdrop-blur px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <SafoLogo size={52} priority />
-          <button onClick={() => router.push('/registro/pasajero')}
-            className="px-5 py-2.5 rounded-full text-sm font-semibold text-white transition bg-[#0A66E0] hover:bg-[#084FB0]">
-            <FontAwesomeIcon icon={faTaxi} className="mr-2" />Pedir mi taxi
-          </button>
+          {sesion ? (
+            <button onClick={irAlPanel}
+              className="px-5 py-2.5 rounded-full text-sm font-semibold text-white transition bg-[#0A66E0] hover:bg-[#084FB0]">
+              <FontAwesomeIcon icon={faTaxi} className="mr-2" />Ir a mi panel
+            </button>
+          ) : (
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button onClick={() => router.push('/login')}
+                className="px-4 sm:px-5 py-2.5 rounded-full text-sm font-semibold text-[#0A66E0] border border-[#C7D9F8] hover:bg-[#EAF2FE] transition">
+                <FontAwesomeIcon icon={faRightToBracket} className="mr-2" />Iniciar sesión
+              </button>
+              <button onClick={() => router.push('/registro/pasajero')}
+                className="px-4 sm:px-5 py-2.5 rounded-full text-sm font-semibold text-white transition bg-[#0A66E0] hover:bg-[#084FB0]">
+                <FontAwesomeIcon icon={faUserPlus} className="mr-2" />Registrarme
+              </button>
+            </div>
+          )}
         </div>
       </nav>
 
@@ -39,11 +63,24 @@ export default function InicioPage() {
               Sabes quién te lleva antes de subir: cada conductor presenta su DNI, licencia y vehículo, y la plataforma los revisa.
             </p>
             <div className="flex flex-wrap items-center gap-4">
-              <button onClick={() => router.push('/registro/pasajero')}
-                className="px-8 py-4 rounded-full font-semibold text-white text-lg transition bg-[#0A66E0] hover:bg-[#084FB0]">
-                <FontAwesomeIcon icon={faUserPlus} className="mr-2.5" />Registrarme gratis
-              </button>
-              <span className="text-[#6B7894] text-sm">Sin costo de registro. Solo pagas S/ 1.50 al pedir tu taxi.</span>
+              {sesion ? (
+                <button onClick={irAlPanel}
+                  className="px-8 py-4 rounded-full font-semibold text-white text-lg transition bg-[#0A66E0] hover:bg-[#084FB0]">
+                  <FontAwesomeIcon icon={faTaxi} className="mr-2.5" />Ir a mi panel
+                </button>
+              ) : (
+                <>
+                  <button onClick={() => router.push('/registro/pasajero')}
+                    className="px-8 py-4 rounded-full font-semibold text-white text-lg transition bg-[#0A66E0] hover:bg-[#084FB0]">
+                    <FontAwesomeIcon icon={faUserPlus} className="mr-2.5" />Registrarme gratis
+                  </button>
+                  <button onClick={() => router.push('/login')}
+                    className="px-8 py-4 rounded-full font-semibold text-[#0A66E0] text-lg border-2 border-[#C7D9F8] bg-white hover:bg-[#EAF2FE] transition">
+                    <FontAwesomeIcon icon={faRightToBracket} className="mr-2.5" />Iniciar sesión
+                  </button>
+                </>
+              )}
+              <span className="text-[#6B7894] text-sm w-full">Sin costo de registro. Solo pagas S/ 1.50 al pedir tu taxi.</span>
             </div>
           </div>
 
@@ -150,10 +187,25 @@ export default function InicioPage() {
           <div className="md:col-span-3 p-10 md:p-14">
             <h2 className="text-3xl md:text-4xl font-semibold mb-4 tracking-tight">¿Listo para tu primer viaje?</h2>
             <p className="text-[#CFE0FF] mb-8 text-lg max-w-md">Crea tu cuenta gratis y pide un taxi verificado en minutos.</p>
-            <button onClick={() => router.push('/registro/pasajero')}
-              className="px-9 py-4 rounded-full font-semibold text-[#14213D] text-lg transition bg-[#FFC21A] hover:bg-[#FFD04D]">
-              <FontAwesomeIcon icon={faUserPlus} className="mr-2.5" />Registrarme gratis
-            </button>
+            <div className="flex flex-wrap items-center gap-3">
+              {sesion ? (
+                <button onClick={irAlPanel}
+                  className="px-9 py-4 rounded-full font-semibold text-[#14213D] text-lg transition bg-[#FFC21A] hover:bg-[#FFD04D]">
+                  <FontAwesomeIcon icon={faTaxi} className="mr-2.5" />Ir a mi panel
+                </button>
+              ) : (
+                <>
+                  <button onClick={() => router.push('/registro/pasajero')}
+                    className="px-9 py-4 rounded-full font-semibold text-[#14213D] text-lg transition bg-[#FFC21A] hover:bg-[#FFD04D]">
+                    <FontAwesomeIcon icon={faUserPlus} className="mr-2.5" />Registrarme gratis
+                  </button>
+                  <button onClick={() => router.push('/login')}
+                    className="px-8 py-4 rounded-full font-semibold text-white text-lg border-2 border-white/40 hover:bg-white/10 transition">
+                    <FontAwesomeIcon icon={faRightToBracket} className="mr-2.5" />Iniciar sesión
+                  </button>
+                </>
+              )}
+            </div>
           </div>
           <div className="hidden md:block md:col-span-2 relative min-h-[240px]">
             <MapaHuanuco className="absolute inset-0 opacity-90" zoom={16} />
@@ -169,10 +221,13 @@ export default function InicioPage() {
             <SafoLogo size={36} />
             <span className="text-[#A1A1A6] text-sm">SafO — Huánuco, Perú</span>
           </div>
+          <div className="flex items-center gap-5">
+          <button onClick={() => router.push('/login')} className="text-[#6E6E73] hover:text-[#0A66E0] text-sm font-medium transition">Iniciar sesión</button>
           <button onClick={() => router.push('/registro/conductor')}
             className="text-[#A1A1A6] hover:text-[#0A66E0] text-xs transition">
             ¿Eres conductor? Únete a nuestra red <FontAwesomeIcon icon={faArrowRight} className="ml-1" />
           </button>
+          </div>
         </div>
       </footer>
 

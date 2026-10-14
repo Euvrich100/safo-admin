@@ -5,6 +5,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCloudArrowUp, faCircleCheck, faTaxi, faHourglassHalf, faCheck, faCircleUser, faIdCard, faAddressCard, faTriangleExclamation, faClipboardList, faUser, faMobileScreenButton, faPaperPlane, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from '@/components/SafoLogo'
+import ClaveInput from '@/components/ClaveInput'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://safo-backend.onrender.com'
 
@@ -69,6 +70,7 @@ export default function RegistroConductorPage() {
     direccion: '', licencia_numero: '', licencia_categoria: 'A-IIb',
     placa: '', vehiculo_marca: '', vehiculo_modelo: '',
     vehiculo_color: '', vehiculo_anno: '',
+    password: '', repetir: '',
   })
   const [archivos, setArchivos] = useState({
     foto_perfil: null, foto_dni_frontal: null,
@@ -88,6 +90,8 @@ export default function RegistroConductorPage() {
     if (!form.nombre.trim()) return toast.error('Escribe tu nombre completo')
     if (!/^\d{9}$/.test(form.celular)) return toast.error('El celular debe tener 9 dígitos')
     if (!/^\d{8}$/.test(form.dni)) return toast.error('El DNI debe tener 8 dígitos')
+    if (form.password.length < 6) return toast.error('La contraseña debe tener al menos 6 caracteres')
+    if (form.password !== form.repetir) return toast.error('Las contraseñas no coinciden')
     setPaso(2)
   }
 
@@ -108,7 +112,7 @@ export default function RegistroConductorPage() {
     setCargando(true)
     try {
       const formData = new FormData()
-      Object.entries(form).forEach(([k, v]) => formData.append(k, v))
+      Object.entries(form).forEach(([k, v]) => { if (k !== 'repetir') formData.append(k, v) })
       Object.entries(archivos).forEach(([k, v]) => { if (v) formData.append(k, v) })
       const res = await fetch(`${API}/api/auth/registrar-conductor`, {
         method: 'POST', body: formData
@@ -128,7 +132,7 @@ export default function RegistroConductorPage() {
       <div className="text-center max-w-md">
         <FontAwesomeIcon icon={faCircleCheck} className="text-[#1E8E3E] text-7xl mb-6" />
         <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-4">¡Solicitud enviada!</h1>
-        <p className="text-[#6E6E73] mb-6">El administrador revisará tus documentos en menos de 24 horas y te contactará al {form.celular}.</p>
+        <p className="text-[#6E6E73] mb-6">El administrador revisará tus documentos en menos de 24 horas y te avisará al {form.celular}. Cuando te aprueben, entra a la app de SafO con tu celular y tu contraseña.</p>
         <div className="p-4 rounded-2xl bg-[#F5F5F7] mb-6">
           <p className="text-[#6E6E73] text-sm">Estado de solicitud</p>
           <p className="text-[#B45309] text-lg font-semibold mt-1"><FontAwesomeIcon icon={faHourglassHalf} className="mr-2" />En revisión</p>
@@ -183,6 +187,14 @@ export default function RegistroConductorPage() {
                 <Campo valor={form.fecha_nacimiento} onCambio={set} label="Fecha de nacimiento" campo="fecha_nacimiento" placeholder="" type="date" />
               </div>
               <Campo valor={form.direccion} onCambio={set} label="Dirección" campo="direccion" placeholder="Jr. Huánuco 123" />
+              <div>
+                <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">Contraseña * <span className="normal-case tracking-normal font-normal">(para entrar a la app)</span></label>
+                <ClaveInput value={form.password} onChange={v => set('password', v)} autoComplete="new-password" placeholder="Mínimo 6 caracteres" />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">Repite la contraseña *</label>
+                <ClaveInput value={form.repetir} onChange={v => set('repetir', v)} autoComplete="new-password" placeholder="Repite tu contraseña" />
+              </div>
             </div>
             <button onClick={irPaso2}
               className="w-full py-4 rounded-full font-semibold text-white mt-2 bg-[#0A66E0] hover:bg-[#084FB0]">

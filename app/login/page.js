@@ -1,12 +1,13 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPaperPlane, faArrowLeft, faHand, faFlagCheckered, faMobileScreenButton, faRightToBracket } from '@fortawesome/free-solid-svg-icons'
+import { faPaperPlane, faArrowLeft, faHand, faFlagCheckered, faMobileScreenButton, faRightToBracket, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from '@/components/SafoLogo'
+import ClaveInput from '@/components/ClaveInput'
 import MapaHuanuco, { MAPA_URL } from '@/components/MapaHuanuco'
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
@@ -17,6 +18,36 @@ export default function LoginPage() {
   const [codigo, setCodigo] = useState('')
   const [paso, setPaso] = useState(1)
   const [cargando, setCargando] = useState(false)
+  const [modo, setModo] = useState('clave') // 'clave' | 'otp'
+  const [clave, setClave] = useState('')
+  const [ayudaClave, setAyudaClave] = useState(false)
+
+  // Si ya hay una sesión abierta, entrar directo al panel que corresponde
+  useEffect(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('safo_usuario') || 'null')
+      if (u && localStorage.getItem('safo_token')) {
+        if (u.rol === 'admin') router.replace('/dashboard')
+        else if (u.rol === 'pasajero') router.replace('/pasajero')
+      }
+    } catch { /* sin sesión válida */ }
+  }, [router])
+
+  const entrarConClave = async () => {
+    const cel = celular.replace(/\D/g, '')
+    if (cel.length !== 9) return toast.error('Ingresa tu celular de 9 dígitos')
+    if (!clave) return toast.error('Ingresa tu contraseña')
+    setCargando(true)
+    try {
+      const { data } = await api.post('/api/auth/login', { celular: cel, password: clave })
+      ingresar(data)
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'No se pudo iniciar sesión')
+      if (err.response?.data?.codigo === 'SIN_CLAVE') setAyudaClave(true)
+    } finally {
+      setCargando(false)
+    }
+  }
 
   // Admin → panel de administración; pasajero → su panel con el mapa.
   // Los conductores usan la app del celular.
@@ -126,18 +157,72 @@ export default function LoginPage() {
 
         <div className="mb-8">
           <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2">
-            {paso === 1
+            {modo === 'clave' || paso === 1
               ? <>Hola de nuevo <FontAwesomeIcon icon={faHand} className="text-[#FFC21A] text-2xl ml-1" /></>
               : <>¡Casi listo! <FontAwesomeIcon icon={faFlagCheckered} className="text-[#0A66E0] text-2xl ml-1" /></>}
           </h1>
           <p className="text-[#6E6E73] text-sm">
-            {paso === 1
-              ? 'Ingresa tu número para continuar'
-              : `Código enviado al ${celular}`}
+            {modo === 'clave'
+              ? 'Ingresa con tu celular y tu contraseña'
+              : paso === 1
+                ? 'Te enviaremos un código de verificación'
+                : `Código enviado al ${celular}`}
           </p>
         </div>
 
-        {paso === 1 ? (
+        {modo === 'clave' ? (
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">Número de celular</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A1A1A6] text-sm font-medium"><FontAwesomeIcon icon={faMobileScreenButton} className="mr-1.5" />+51</span>
+                <input type="tel" inputMode="numeric" placeholder="999 000 001" value={celular} autoComplete="tel-national"
+                  onChange={e => setCelular(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && entrarConClave()}
+                  className="w-full pl-[5.5rem] pr-4 py-4 rounded-2xl text-[#1D1D1F] text-lg font-medium placeholder-[#A1A1A6] bg-[#F5F5F7] border border-transparent focus:bg-white focus:border-[#0A66E0] focus:outline-none transition" />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">Contraseña</label>
+              <ClaveInput value={clave} onChange={setClave} onEnter={entrarConClave} className="!py-4 !rounded-2xl text-lg" />
+            </div>
+
+            <button onClick={entrarConClave} disabled={cargando}
+              className="w-full py-4 rounded-2xl font-semibold text-white text-lg transition disabled:opacity-50 bg-[#0A66E0] hover:bg-[#084FB0]">
+              {cargando ? 'Ingresando...' : <><FontAwesomeIcon icon={faRightToBracket} className="mr-2.5" />Iniciar sesión</>}
+            </button>
+
+            <div className="flex items-center justify-between text-sm pt-1">
+              <button onClick={() => setAyudaClave(v => !v)} className="text-[#6E6E73] hover:text-[#0A66E0] transition">¿Olvidaste tu contraseña?</button>
+              <button onClick={() => { setModo('otp'); setPaso(1) }} className="text-[#6E6E73] hover:text-[#0A66E0] transition">Entrar con código SMS</button>
+            </div>
+            {ayudaClave && (
+              <div className="rounded-xl bg-[#F3F8FF] p-3.5 text-sm text-[#4B5873]">
+                <FontAwesomeIcon icon={faCircleInfo} className="mr-1.5 text-[#0A66E0]" />
+                Comunícate con el administrador de SafO: te dará una contraseña temporal que podrás cambiar en «Mi cuenta».
+              </div>
+            )}
+
+            <div className="rounded-2xl border border-[#E2E8F0] p-4 text-center">
+              <span className="text-[#6E6E73] text-sm">¿Eres nuevo en SafO? </span>
+              <button onClick={() => router.push('/registro/pasajero')} className="text-[#0A66E0] font-semibold text-sm hover:underline">Crea tu cuenta gratis</button>
+            </div>
+
+            {GOOGLE_CLIENT_ID && (
+              <>
+                <div className="flex items-center gap-3 pt-1">
+                  <div className="flex-1 h-px bg-[#E2E2E7]" />
+                  <span className="text-[#A1A1A6] text-xs uppercase tracking-widest">o continúa con</span>
+                  <div className="flex-1 h-px bg-[#E2E2E7]" />
+                </div>
+                <div className="flex justify-center">
+                  <GoogleLogin onSuccess={conGoogle} onError={() => toast.error('No se pudo iniciar sesión con Google')}
+                    theme="outline" shape="pill" size="large" text="signin_with" locale="es" />
+                </div>
+              </>
+            )}
+          </div>
+        ) : paso === 1 ? (
           <div className="space-y-4">
             <div>
               <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">
@@ -164,31 +249,11 @@ export default function LoginPage() {
               {cargando ? 'Enviando...' : <><FontAwesomeIcon icon={faPaperPlane} className="mr-2.5" />Enviar código</>}
             </button>
 
-            <button onClick={() => router.push('/registro/pasajero')}
+            <button onClick={() => setModo('clave')}
               className="w-full py-3 text-sm text-[#0A66E0] font-semibold hover:underline transition">
-              ¿No tienes cuenta? Regístrate gratis
+              <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />Entrar con contraseña
             </button>
 
-            {GOOGLE_CLIENT_ID && (
-              <>
-                <div className="flex items-center gap-3 pt-2">
-                  <div className="flex-1 h-px bg-[#E2E2E7]" />
-                  <span className="text-[#A1A1A6] text-xs uppercase tracking-widest">o continúa con</span>
-                  <div className="flex-1 h-px bg-[#E2E2E7]" />
-                </div>
-                <div className="flex justify-center">
-                  <GoogleLogin
-                    onSuccess={conGoogle}
-                    onError={() => toast.error('No se pudo iniciar sesión con Google')}
-                    theme="outline"
-                    shape="pill"
-                    size="large"
-                    text="signin_with"
-                    locale="es"
-                  />
-                </div>
-              </>
-            )}
           </div>
         ) : (
           <div className="space-y-4">

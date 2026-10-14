@@ -4,9 +4,10 @@ import api from '@/lib/api'
 import useAuthGuard from '@/lib/useAuthGuard'
 import toast, { Toaster } from 'react-hot-toast'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCircleCheck, faCircleXmark, faTaxi, faMagnifyingGlass, faXmark, faFileLines, faArrowRight } from '@fortawesome/free-solid-svg-icons'
+import { faCircleCheck, faCircleXmark, faTaxi, faMagnifyingGlass, faXmark, faFileLines, faArrowRight, faKey } from '@fortawesome/free-solid-svg-icons'
 import AdminNavbar from '@/components/AdminNavbar'
 import DocImagen from '@/components/DocImagen'
+import ClaveTemporalModal from '@/components/ClaveTemporalModal'
 
 const FILTROS = [
   { val: 'pendiente', label: 'Pendientes' },
@@ -37,6 +38,7 @@ function FichaConductor({ id, onCerrar, onDecidido }) {
   const [rechazando, setRechazando] = useState(false)
   const [motivo, setMotivo] = useState('')
   const [enviando, setEnviando] = useState(false)
+  const [claveTemp, setClaveTemp] = useState(null)
 
   useEffect(() => {
     api.get(`/api/admin/conductores/${id}`)
@@ -56,6 +58,16 @@ function FichaConductor({ id, onCerrar, onDecidido }) {
       toast.error(err.response?.data?.error || 'Error al procesar')
     } finally {
       setEnviando(false)
+    }
+  }
+
+  const restablecerClave = async () => {
+    if (!window.confirm(`¿Generar una contraseña temporal para ${c.nombre}? La contraseña actual dejará de funcionar.`)) return
+    try {
+      const { data } = await api.post(`/api/admin/usuarios/${c.usuario_id}/restablecer-clave`)
+      setClaveTemp(data)
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'No se pudo restablecer la contraseña')
     }
   }
 
@@ -83,6 +95,12 @@ function FichaConductor({ id, onCerrar, onDecidido }) {
 
         {c && (
           <>
+            <ClaveTemporalModal datos={claveTemp} onCerrar={() => setClaveTemp(null)} />
+            <div className="flex justify-end -mt-2 mb-3">
+              <button onClick={restablecerClave} className="px-4 py-2 rounded-full text-sm font-medium text-[#0A66E0] bg-[#EAF2FE] hover:bg-[#D9E8FC] transition">
+                <FontAwesomeIcon icon={faKey} className="text-xs mr-1.5" />Restablecer contraseña
+              </button>
+            </div>
             <h3 className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-3">Datos personales</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
               <Dato label="Celular" valor={c.celular} />

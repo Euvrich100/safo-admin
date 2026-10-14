@@ -3,8 +3,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUser, faMobileScreenButton, faIdCard, faCircleCheck, faUserPlus, faUserCheck } from '@fortawesome/free-solid-svg-icons'
+import { faUser, faMobileScreenButton, faLock, faCircleCheck, faUserPlus, faUserCheck } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from '@/components/SafoLogo'
+import ClaveInput from '@/components/ClaveInput'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://safo-backend.onrender.com'
 
@@ -12,18 +13,22 @@ export default function RegistroPasajeroPage() {
   const router = useRouter()
   const [cargando, setCargando] = useState(false)
   const [completado, setCompletado] = useState(false)
-  const [form, setForm] = useState({ nombre: '', celular: '', dni: '' })
+  const [form, setForm] = useState({ nombre: '', celular: '', password: '', repetir: '' })
 
   const actualizar = (campo, valor) => setForm(f => ({ ...f, [campo]: valor }))
 
   const registrar = async () => {
-    if (!form.nombre || !form.celular) return toast.error('Nombre y celular son obligatorios')
+    const celular = form.celular.replace(/\D/g, '')
+    if (!form.nombre.trim() || !celular) return toast.error('Nombre y celular son obligatorios')
+    if (celular.length !== 9) return toast.error('El celular debe tener 9 dígitos')
+    if (form.password.length < 6) return toast.error('La contraseña debe tener al menos 6 caracteres')
+    if (form.password !== form.repetir) return toast.error('Las contraseñas no coinciden')
     setCargando(true)
     try {
       const res = await fetch(`${API}/api/auth/registrar-pasajero`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify({ nombre: form.nombre.trim(), celular, password: form.password })
       })
       const data = await res.json()
       if (!res.ok) return toast.error(data.error)
@@ -52,9 +57,9 @@ export default function RegistroPasajeroPage() {
           <p className="text-[#6E6E73] text-sm font-medium"><FontAwesomeIcon icon={faMobileScreenButton} className="mr-1.5" />Número registrado</p>
           <p className="text-[#1D1D1F] text-xl font-semibold mt-1">{form.celular}</p>
         </div>
-        <button onClick={() => router.push('/')}
+        <button onClick={() => router.push('/login')}
           className="px-8 py-3 rounded-full font-semibold text-white bg-[#0A66E0] hover:bg-[#084FB0]">
-          Volver al inicio
+          Iniciar sesión
         </button>
       </div>
     </div>
@@ -100,12 +105,16 @@ export default function RegistroPasajeroPage() {
 
           <div>
             <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">
-              <FontAwesomeIcon icon={faIdCard} className="mr-1.5" />DNI (opcional)
+              <FontAwesomeIcon icon={faLock} className="mr-1.5" />Contraseña * <span className="normal-case tracking-normal font-normal">(mínimo 6 caracteres)</span>
             </label>
-            <input type="text" placeholder="12345678" maxLength={8}
-              value={form.dni} onChange={e => actualizar('dni', e.target.value)}
-              className="w-full px-4 py-3.5 rounded-xl text-[#1D1D1F] placeholder-[#A1A1A6] focus:outline-none bg-[#F5F5F7] border border-transparent focus:bg-white focus:border-[#0A66E0] transition"
-            />
+            <ClaveInput value={form.password} onChange={v => actualizar('password', v)} autoComplete="new-password" placeholder="Crea tu contraseña" />
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">
+              <FontAwesomeIcon icon={faLock} className="mr-1.5" />Repite la contraseña *
+            </label>
+            <ClaveInput value={form.repetir} onChange={v => actualizar('repetir', v)} autoComplete="new-password" placeholder="Repite tu contraseña" onEnter={registrar} />
           </div>
 
           <div className="p-4 rounded-xl bg-[#E8F5EA]">
@@ -118,6 +127,11 @@ export default function RegistroPasajeroPage() {
             {cargando ? 'Creando cuenta...' : <><FontAwesomeIcon icon={faUserPlus} className="mr-2.5" />Crear cuenta gratis</>}
           </button>
         </div>
+
+        <p className="text-center text-sm text-[#6E6E73] mt-6">
+          ¿Ya tienes cuenta?{' '}
+          <button onClick={() => router.push('/login')} className="text-[#0A66E0] font-semibold hover:underline">Inicia sesión</button>
+        </p>
       </div>
     </div>
   )

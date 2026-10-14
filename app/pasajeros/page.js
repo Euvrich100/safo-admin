@@ -4,8 +4,9 @@ import api from '@/lib/api'
 import useAuthGuard from '@/lib/useAuthGuard'
 import toast, { Toaster } from 'react-hot-toast'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUsers, faMagnifyingGlass, faUserSlash, faUserCheck } from '@fortawesome/free-solid-svg-icons'
+import { faUsers, faMagnifyingGlass, faUserSlash, faUserCheck, faKey } from '@fortawesome/free-solid-svg-icons'
 import AdminNavbar from '@/components/AdminNavbar'
+import ClaveTemporalModal from '@/components/ClaveTemporalModal'
 
 const FILTROS = [
   { val: '', label: 'Todos' },
@@ -19,6 +20,7 @@ export default function PasajerosPage() {
   const [cargando, setCargando] = useState(true)
   const [filtro, setFiltro] = useState('')
   const [busqueda, setBusqueda] = useState('')
+  const [claveTemp, setClaveTemp] = useState(null)
 
   const cargar = useCallback(async () => {
     setCargando(true)
@@ -53,12 +55,23 @@ export default function PasajerosPage() {
     }
   }
 
+  const restablecer = async (p) => {
+    if (!window.confirm(`¿Generar una contraseña temporal para ${p.nombre}? La contraseña actual dejará de funcionar.`)) return
+    try {
+      const { data } = await api.post(`/api/admin/usuarios/${p.usuario_id}/restablecer-clave`)
+      setClaveTemp(data)
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'No se pudo restablecer la contraseña')
+    }
+  }
+
   if (!listo) return null
 
   return (
     <div className="min-h-screen bg-white">
       <Toaster position="top-center" />
       <AdminNavbar />
+      <ClaveTemporalModal datos={claveTemp} onCerrar={() => setClaveTemp(null)} />
 
       <main className="p-6 max-w-6xl mx-auto">
         <div className="mb-6 mt-2">
@@ -114,6 +127,10 @@ export default function PasajerosPage() {
                       style={suspendido ? { color: '#D92D20', background: '#FCEAE9' } : { color: '#1E8E3E', background: '#E8F5EA' }}>
                       {suspendido ? 'Suspendido' : 'Activo'}
                     </span>
+                    <button onClick={() => restablecer(p)}
+                      className="px-4 py-2 rounded-full text-sm font-medium text-[#0A66E0] bg-[#EAF2FE] hover:bg-[#D9E8FC] transition">
+                      <FontAwesomeIcon icon={faKey} className="text-xs mr-1.5" />Restablecer clave
+                    </button>
                     <button onClick={() => cambiarEstado(p)}
                       className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                         suspendido ? 'text-white bg-[#1E8E3E] hover:bg-[#177530]' : 'text-[#D92D20] bg-[#FCEAE9] hover:bg-[#F9D9D6]'
