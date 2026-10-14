@@ -151,7 +151,7 @@ export default function RegistroConductorPage() {
 
       <div className="max-w-xl mx-auto">
         <button onClick={() => router.push('/')} className="flex items-center mb-8">
-          <SafoLogo size={34} priority />
+          <SafoLogo size={64} priority />
         </button>
 
         <div className="mb-8">

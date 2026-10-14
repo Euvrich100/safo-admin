@@ -69,7 +69,7 @@ export default function DashboardPage() {
   if (!listo || cargando) return (
     <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
-        <SafoLogo size={40} />
+        <SafoLogo size={72} />
         <div className="text-[#6E6E73] text-sm">Cargando SafO...</div>
       </div>
     </div>

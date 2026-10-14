@@ -27,6 +27,13 @@ export default function RegistroPasajeroPage() {
       })
       const data = await res.json()
       if (!res.ok) return toast.error(data.error)
+      // El registro ya inicia sesión: directo al panel con el mapa
+      if (data.token && data.usuario) {
+        localStorage.setItem('safo_token', data.token)
+        localStorage.setItem('safo_usuario', JSON.stringify(data.usuario))
+        router.push('/pasajero')
+        return
+      }
       setCompletado(true)
     } catch (e) {
       toast.error('Error al conectar con el servidor')
@@ -61,7 +68,7 @@ export default function RegistroPasajeroPage() {
 
       <div className="w-full max-w-md">
         <button onClick={() => router.push('/')} className="flex items-center mb-8">
-          <SafoLogo size={34} priority />
+          <SafoLogo size={64} priority />
         </button>
 
         <div className="mb-8">

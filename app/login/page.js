@@ -18,17 +18,23 @@ export default function LoginPage() {
   const [paso, setPaso] = useState(1)
   const [cargando, setCargando] = useState(false)
 
+  // Admin → panel de administración; pasajero → su panel con el mapa.
+  // Los conductores usan la app del celular.
   const ingresar = (data) => {
+    const rol = data.usuario?.rol
+    if (rol !== 'admin' && rol !== 'pasajero') {
+      return toast.error('Los conductores ingresan desde la app SafO')
+    }
     localStorage.setItem('safo_token', data.token)
     localStorage.setItem('safo_usuario', JSON.stringify(data.usuario))
-    router.push('/dashboard')
+    router.push(rol === 'admin' ? '/dashboard' : '/pasajero')
   }
 
   const conGoogle = async (credentialResponse) => {
     setCargando(true)
     try {
       const { data } = await api.post('/api/auth/google', { credential: credentialResponse.credential })
-      if (data.nuevo || data.usuario?.rol !== 'admin') return toast.error('Solo administradores')
+      if (data.nuevo) return toast.error('Esa cuenta aún no está registrada. Crea tu cuenta gratis primero.')
       ingresar(data)
     } catch (err) {
       toast.error(err.response?.data?.error || 'No se pudo iniciar sesión con Google')
@@ -56,7 +62,6 @@ export default function LoginPage() {
     setCargando(true)
     try {
       const { data } = await api.post('/api/auth/verificar-otp', { celular, codigo })
-      if (data.usuario.rol !== 'admin') return toast.error('Solo administradores')
       ingresar(data)
     } catch (err) {
       toast.error(err.response?.data?.error || 'Código incorrecto')
@@ -79,14 +84,14 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-white/60" />
 
         <div className="relative h-full flex flex-col justify-between p-12">
-          <SafoLogo size={40} showText priority />
+          <SafoLogo size={64} showText priority />
 
           <div className="max-w-md">
             <h2 className="text-4xl xl:text-5xl font-semibold text-[#14213D] mb-5 leading-[1.1] tracking-tight">
-              Los taxis de Huánuco, bajo control.
+              Taxis seguros para cada calle de Huánuco.
             </h2>
             <p className="text-[#4B5873] text-lg leading-relaxed">
-              Aprueba conductores, sigue los viajes y confirma pagos desde un solo panel.
+              Pide tu taxi, mira quién viene y viaja tranquilo. Los administradores gestionan la plataforma desde aquí.
             </p>
           </div>
 
@@ -116,13 +121,13 @@ export default function LoginPage() {
 
         {/* Logo mobile */}
         <div className="flex justify-center mb-8 lg:hidden">
-          <SafoLogo size={44} priority />
+          <SafoLogo size={72} priority />
         </div>
 
         <div className="mb-8">
           <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2">
             {paso === 1
-              ? <>Hola, Admin <FontAwesomeIcon icon={faHand} className="text-[#FFC21A] text-2xl ml-1" /></>
+              ? <>Hola de nuevo <FontAwesomeIcon icon={faHand} className="text-[#FFC21A] text-2xl ml-1" /></>
               : <>¡Casi listo! <FontAwesomeIcon icon={faFlagCheckered} className="text-[#0A66E0] text-2xl ml-1" /></>}
           </h1>
           <p className="text-[#6E6E73] text-sm">
@@ -157,6 +162,11 @@ export default function LoginPage() {
               className="w-full py-4 rounded-2xl font-semibold text-white text-lg transition disabled:opacity-50 bg-[#0A66E0] hover:bg-[#084FB0]"
             >
               {cargando ? 'Enviando...' : <><FontAwesomeIcon icon={faPaperPlane} className="mr-2.5" />Enviar código</>}
+            </button>
+
+            <button onClick={() => router.push('/registro/pasajero')}
+              className="w-full py-3 text-sm text-[#0A66E0] font-semibold hover:underline transition">
+              ¿No tienes cuenta? Regístrate gratis
             </button>
 
             {GOOGLE_CLIENT_ID && (

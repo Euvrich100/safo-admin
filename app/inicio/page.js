@@ -16,7 +16,7 @@ export default function InicioPage() {
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#E2E2E7] bg-white/90 backdrop-blur px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <SafoLogo size={28} priority />
+          <SafoLogo size={52} priority />
           <button onClick={() => router.push('/registro/pasajero')}
             className="px-5 py-2.5 rounded-full text-sm font-semibold text-white transition bg-[#0A66E0] hover:bg-[#084FB0]">
             <FontAwesomeIcon icon={faTaxi} className="mr-2" />Pedir mi taxi
@@ -166,7 +166,7 @@ export default function InicioPage() {
       <footer className="border-t border-[#E2E2E7] py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <SafoLogo size={20} />
+            <SafoLogo size={36} />
             <span className="text-[#A1A1A6] text-sm">SafO — Huánuco, Perú</span>
           </div>
           <button onClick={() => router.push('/registro/conductor')}
