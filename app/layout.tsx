@@ -1,9 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SafO Admin",
-  description: "Panel de administración SafO",
+  title: {
+    default: "SafO — Taxi seguro en Huánuco",
+    template: "%s · SafO",
+  },
+  description: "Plataforma de taxis seguros y verificados en Huánuco, Perú.",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -13,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className="bg-[#060B18] text-white antialiased">
+      <body className="bg-white text-[#1D1D1F] antialiased">
         {children}
       </body>
     </html>

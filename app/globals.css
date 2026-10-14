@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
+/* Paleta SafO — elegante, predominio de blanco, azul solo como acento */
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1d1d1f;
 }
 
 @theme inline {
@@ -12,15 +13,19 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif;
+}
+
+/* Mapa de Huánuco (Leaflet): tonos suaves para que el texto encima se lea */
+.mapa-suave .leaflet-container { background: transparent; font-family: inherit; }
+.mapa-suave .leaflet-tile-pane { filter: saturate(.7) brightness(1.04); }
+.mapa-suave .leaflet-control-attribution { font-size: 10px; background: rgba(255,255,255,.8); }
+.safo-pin-wrap { background: none; border: 0; }
+.safo-pin {
+  display: block; width: 28px; height: 28px; border-radius: 9999px;
+  background: #FFC21A; border: 5px solid #fff;
+  box-shadow: 0 0 0 2px #14213D, 0 6px 14px rgba(20,33,61,.35);
 }

@@ -1,12 +1,13 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
+import useAuthGuard from '@/lib/useAuthGuard'
 import toast, { Toaster } from 'react-hot-toast'
-import { ArrowLeft, CheckCircle } from 'lucide-react'
+import { CheckCircle, DollarSign } from 'lucide-react'
+import AdminNavbar from '@/components/AdminNavbar'
 
 export default function SuscripcionesPage() {
-  const router = useRouter()
+  const { listo } = useAuthGuard()
   const [conductores, setConductores] = useState([])
   const [cargando, setCargando] = useState(true)
   const [procesando, setProcesando] = useState(null)
@@ -23,7 +24,10 @@ export default function SuscripcionesPage() {
     }
   }, [])
 
-  useEffect(() => { cargarConductores() }, [cargarConductores])
+  useEffect(() => {
+    if (!listo) return
+    cargarConductores()
+  }, [listo, cargarConductores])
 
   const confirmarPago = async (conductor_id, metodo_pago) => {
     setProcesando(conductor_id)
@@ -43,40 +47,45 @@ export default function SuscripcionesPage() {
     return new Date(fecha) < new Date()
   }
 
+  if (!listo) return null
+
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <Toaster />
-      <nav className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center gap-4">
-        <button onClick={() => router.push('/dashboard')} className="text-gray-400 hover:text-white transition">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <span className="font-semibold text-lg">Confirmar pagos — S/ 5.00</span>
-      </nav>
+    <div className="min-h-screen bg-white">
+      <Toaster position="top-center" />
+      <AdminNavbar />
 
       <main className="p-6 max-w-6xl mx-auto">
-        <div className="bg-blue-900/20 border border-blue-800/30 rounded-2xl p-4 mb-6">
-          <p className="text-blue-300 text-sm">
+        <div className="mb-6 mt-2">
+          <h1 className="text-2xl font-semibold text-[#1D1D1F]">Confirmar pagos</h1>
+          <p className="text-[#6E6E73] text-sm mt-1">Suscripción mensual de S/ 5.00 por conductor</p>
+        </div>
+
+        <div className="rounded-2xl p-4 mb-6 bg-[#EAF2FE]">
+          <p className="text-[#0A66E0] text-sm">
             💡 Cuando un conductor pague su suscripción por Yape o Plin, confirma el pago aquí para activarlo.
           </p>
         </div>
 
         {cargando ? (
-          <div className="text-gray-400 text-center py-20">Cargando...</div>
+          <div className="text-[#A1A1A6] text-center py-20">Cargando...</div>
         ) : conductores.length === 0 ? (
-          <div className="text-gray-400 text-center py-20">No hay conductores aprobados</div>
+          <div className="rounded-2xl border border-[#E2E2E7] bg-[#F5F5F7] py-20 text-center">
+            <DollarSign className="w-10 h-10 text-[#A1A1A6] mx-auto mb-3" />
+            <div className="text-[#6E6E73]">No hay conductores aprobados</div>
+          </div>
         ) : (
           <div className="space-y-4">
             {conductores.map(c => (
-              <div key={c.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-                <div className="flex items-center justify-between gap-4">
+              <div key={c.id} className="rounded-2xl p-5 border border-[#E2E2E7] bg-white">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-white bg-[#0A66E0]">
                       {c.nombre?.charAt(0)}
                     </div>
                     <div>
-                      <div className="font-medium">{c.nombre}</div>
-                      <div className="text-gray-400 text-sm">{c.celular} — {c.placa}</div>
-                      <div className={`text-xs mt-1 ${suscripcionVencida(c.suscripcion_vence) ? 'text-red-400' : 'text-green-400'}`}>
+                      <div className="font-medium text-[#1D1D1F]">{c.nombre}</div>
+                      <div className="text-[#6E6E73] text-sm">{c.celular} — {c.placa}</div>
+                      <div className="text-xs mt-1" style={{ color: suscripcionVencida(c.suscripcion_vence) ? '#D92D20' : '#1E8E3E' }}>
                         {suscripcionVencida(c.suscripcion_vence)
                           ? '⚠️ Suscripción vencida'
                           : `✅ Activo hasta ${new Date(c.suscripcion_vence).toLocaleDateString('es-PE')}`
@@ -85,13 +94,13 @@ export default function SuscripcionesPage() {
                     </div>
                   </div>
                   {suscripcionVencida(c.suscripcion_vence) && (
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       {['yape', 'plin', 'efectivo'].map(metodo => (
                         <button
                           key={metodo}
                           onClick={() => confirmarPago(c.id, metodo)}
                           disabled={procesando === c.id}
-                          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-4 py-2 rounded-xl text-sm transition capitalize"
+                          className="flex items-center gap-2 text-white px-4 py-2 rounded-full text-sm font-medium transition disabled:opacity-50 capitalize bg-[#1E8E3E] hover:bg-[#177530]"
                         >
                           <CheckCircle className="w-4 h-4" />
                           {metodo}
