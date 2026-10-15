@@ -30,15 +30,15 @@ const ESTADO_VIAJE = {
   aceptado: { t: 'El conductor va hacia ti', c: '#0A66E0', bg: '#EAF2FE' },
   en_camino: { t: 'Conductor en camino', c: '#0A66E0', bg: '#EAF2FE' },
   recogido: { t: 'Viaje en curso', c: '#0A66E0', bg: '#EAF2FE' },
-  completado: { t: 'Completado', c: '#1E8E3E', bg: '#E8F5EA' },
+  completado: { t: 'Completado', c: '#1D1D1F', bg: '#F1F1F3' },
   cancelado_pasajero: { t: 'Cancelado por ti', c: '#6E6E73', bg: '#F5F5F7' },
   cancelado_conductor: { t: 'Sin respuesta / cancelado', c: '#D92D20', bg: '#FCEAE9' },
   no_show: { t: 'No te encontró', c: '#D92D20', bg: '#FCEAE9' },
 }
 const ESTADO_PAGO = {
   retenido: { t: 'Garantía retenida', c: '#B45309' },
-  liberado_plataforma: { t: 'Viaje realizado', c: '#1E8E3E' },
-  devuelto: { t: 'Devuelto a ti', c: '#1E8E3E' },
+  liberado_plataforma: { t: 'Viaje realizado', c: '#1D1D1F' },
+  devuelto: { t: 'Devuelto a ti', c: '#1D1D1F' },
   compensado_conductor: { t: 'Retenido por cancelación', c: '#D92D20' },
 }
 const PASOS = ['solicitado', 'aceptado', 'recogido', 'completado']
@@ -565,7 +565,7 @@ export default function PasajeroPage() {
             <FontAwesomeIcon icon={faUserPlus} className="mr-2.5" />Crear cuenta gratis
           </button>
         </div>
-        <p className="text-xs text-[#A1A1A6] mt-8">Registro gratis · solo pagas S/ 1.50 de garantía al pedir</p>
+        <p className="text-xs text-[#A1A1A6] mt-8">Registro gratis · pide tu taxi cuando quieras</p>
         <button onClick={() => router.push('/')} className="text-xs text-[#6E6E73] hover:text-[#0A66E0] mt-3">Volver al inicio</button>
       </div>
     </div>
@@ -690,7 +690,7 @@ export default function PasajeroPage() {
                     {modoDestino
                       ? <><FontAwesomeIcon icon={faFlagCheckered} className="text-[#14213D] mr-1.5" />Toca el mapa para marcar tu destino</>
                       : permiso === 'concedido' && siguiendo
-                        ? <><FontAwesomeIcon icon={faLocationDot} className="text-[#1E8E3E] mr-1.5" />Usando tu ubicación{precision ? ` · ±${precision} m` : ''}</>
+                        ? <><FontAwesomeIcon icon={faLocationDot} className="text-[#1D1D1F] mr-1.5" />Usando tu ubicación{precision ? ` · ±${precision} m` : ''}</>
                         : <><FontAwesomeIcon icon={faLocationDot} className="text-[#0A66E0] mr-1.5" />Arrastra el pin azul o toca el mapa para elegir dónde te recogen</>}
                   </div>
                   <button onClick={centrarEnMi} aria-label="Ir a mi ubicación"
@@ -722,7 +722,7 @@ export default function PasajeroPage() {
               {/* Calificar viaje terminado */}
               {!viaje && porCalificar && (
                 <div className="rounded-3xl bg-white border border-[#E2E8F0] p-5">
-                  <div className="flex items-center gap-2 text-[#1E8E3E] font-semibold mb-1">
+                  <div className="flex items-center gap-2 text-[#1D1D1F] font-semibold mb-1">
                     <FontAwesomeIcon icon={faCircleCheck} />Viaje completado
                   </div>
                   <p className="text-sm text-[#6E6E73] mb-4">¿Cómo te fue con {porCalificar.conductor_nombre}?</p>
@@ -870,7 +870,7 @@ export default function PasajeroPage() {
 
                   {viaje.conductor_celular && (
                     <a href={`tel:+51${viaje.conductor_celular}`}
-                      className="mt-4 flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#E8F5EA] text-[#1E8E3E] font-semibold hover:bg-[#d8eedb] transition">
+                      className="mt-4 flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#F1F1F3] text-[#1D1D1F] font-semibold hover:bg-[#E4E4E8] transition">
                       <FontAwesomeIcon icon={faPhone} />Llamar al conductor · +51 {viaje.conductor_celular}
                     </a>
                   )}
@@ -971,7 +971,7 @@ export default function PasajeroPage() {
                             </div>
                             <div className="mt-2.5 flex items-center justify-between gap-2 flex-wrap">
                               <DatosVehiculo c={c} />
-                              {marcas.length > 0 && <span className="flex gap-1.5 flex-wrap">{marcas.map((m) => <span key={m.k} className="px-2 py-0.5 rounded-full bg-[#E8F5EA] text-[#1E8E3E] text-[11px] font-semibold"><FontAwesomeIcon icon={m.i} className="mr-1" />{m.t}</span>)}</span>}
+                              {marcas.length > 0 && <span className="flex gap-1.5 flex-wrap">{marcas.map((m) => <span key={m.k} className="px-2 py-0.5 rounded-full bg-[#F1F1F3] text-[#1D1D1F] text-[11px] font-semibold"><FontAwesomeIcon icon={m.i} className="mr-1" />{m.t}</span>)}</span>}
                             </div>
                           </button>
                         </li>
@@ -1017,7 +1017,7 @@ export default function PasajeroPage() {
                     className="w-full px-4 py-3 rounded-xl bg-[#F5F5F7] border border-transparent focus:bg-white focus:border-[#0A66E0] focus:outline-none text-sm mb-3" />
 
                   <p className="text-xs text-[#6E6E73] mb-4 leading-relaxed">
-                    <FontAwesomeIcon icon={faShieldHalved} className="mr-1.5 text-[#1E8E3E]" />
+                    <FontAwesomeIcon icon={faShieldHalved} className="mr-1.5 text-[#1D1D1F]" />
                     Si cancelas antes de que el conductor salga, te devolvemos los {soles(GARANTIA)}. Si ya salió, {soles(ajustes.compensacion_conductor)} es para el conductor y {soles(ajustes.compensacion_plataforma)} para SafO.
                   </p>
 

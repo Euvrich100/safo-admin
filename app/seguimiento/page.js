@@ -14,7 +14,7 @@ const ESTADOS = {
   aceptado: ['El conductor va a recoger al pasajero', '#0A66E0', '#EAF2FE'],
   en_camino: ['El conductor va a recoger al pasajero', '#0A66E0', '#EAF2FE'],
   recogido: ['Viaje en curso', '#0A66E0', '#EAF2FE'],
-  completado: ['El viaje terminó. Llegó a su destino.', '#1E8E3E', '#E8F5EA'],
+  completado: ['El viaje terminó. Llegó a su destino.', '#1D1D1F', '#F1F1F3'],
   cancelado_pasajero: ['El viaje fue cancelado', '#6E6E73', '#F5F5F7'],
   cancelado_conductor: ['El viaje fue cancelado', '#6E6E73', '#F5F5F7'],
   no_show: ['El viaje fue cancelado', '#6E6E73', '#F5F5F7'],
@@ -60,7 +60,7 @@ function Seguimiento() {
       <header className="bg-white border-b border-[#E6E8EF]">
         <div className="max-w-xl mx-auto px-4 py-2.5 flex items-center justify-between">
           <SafoLogo size={48} priority />
-          <span className="text-xs font-semibold text-[#1E8E3E] bg-[#E8F5EA] px-3 py-1.5 rounded-full"><FontAwesomeIcon icon={faShieldHalved} className="mr-1.5" />Seguimiento seguro</span>
+          <span className="text-xs font-semibold text-[#1D1D1F] bg-[#F1F1F3] px-3 py-1.5 rounded-full"><FontAwesomeIcon icon={faShieldHalved} className="mr-1.5" />Seguimiento seguro</span>
         </div>
       </header>
 

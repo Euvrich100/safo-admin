@@ -67,7 +67,7 @@ export default function MapaVivoPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2 items-center">
-            <Capa id="libres" texto="Taxis libres" color="#1E8E3E" />
+            <Capa id="libres" texto="Taxis libres" color="#1D1D1F" />
             <Capa id="viaje" texto="Taxis en viaje" color="#FFC21A" />
             <Capa id="viajes" texto="Viajes" color="#0A66E0" />
             <Capa id="sos" texto="SOS" color="#D92D20" />
@@ -121,7 +121,7 @@ export default function MapaVivoPage() {
             {datos.conductores.length === 0 && <p className="text-sm text-[#A1A1A6]">Ningún conductor conectado con GPS.</p>}
             {datos.conductores.map(c => (
               <div key={c.id} className="flex items-center gap-3 py-2 border-b border-[#F0F1F5] last:border-0 text-sm">
-                <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${c.en_viaje ? 'bg-[#FFC21A]' : 'bg-[#1E8E3E]'}`} />
+                <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${c.en_viaje ? 'bg-[#FFC21A]' : 'bg-[#1D1D1F]'}`} />
                 <div className="min-w-0">
                   <div className="font-medium text-[#14213D] truncate">{c.nombre}</div>
                   <div className="text-xs text-[#8A8F9C] truncate">{c.placa} · {c.en_viaje ? 'En viaje' : 'Disponible'} · GPS {hace(c.actualizado_en)}</div>

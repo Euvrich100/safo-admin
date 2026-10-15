@@ -15,7 +15,7 @@ const FILTROS = [
 ]
 
 const estadoEstilo = (estado) => {
-  if (estado === 'completado') return { color: '#1E8E3E', bg: '#E8F5EA' }
+  if (estado === 'completado') return { color: '#1D1D1F', bg: '#F1F1F3' }
   if (estado?.includes('cancelado')) return { color: '#D92D20', bg: '#FCEAE9' }
   if (estado === 'en_camino') return { color: '#0A66E0', bg: '#EAF2FE' }
   return { color: '#B45309', bg: '#FEF3E2' }

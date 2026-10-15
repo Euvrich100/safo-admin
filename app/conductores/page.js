@@ -16,7 +16,7 @@ const FILTROS = [
 ]
 
 const ESTADO_ESTILO = {
-  aprobado: { color: '#1E8E3E', bg: '#E8F5EA' },
+  aprobado: { color: '#1D1D1F', bg: '#F1F1F3' },
   rechazado: { color: '#D92D20', bg: '#FCEAE9' },
   pendiente: { color: '#B45309', bg: '#FEF3E2' },
 }
@@ -159,7 +159,7 @@ function FichaConductor({ id, onCerrar, onDecidido }) {
                     </button>
                   )}
                   <button onClick={() => decidir('aprobado')} disabled={enviando}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium text-white bg-[#1E8E3E] hover:bg-[#177530] disabled:opacity-50">
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium text-white bg-[#1D1D1F] hover:bg-[#000000] disabled:opacity-50">
                     <FontAwesomeIcon icon={faCircleCheck} className="text-sm" /> {c.estado_doc === 'rechazado' ? 'Aprobar de todos modos' : 'Aprobar conductor'}
                   </button>
                 </div>

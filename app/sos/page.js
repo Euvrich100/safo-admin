@@ -77,7 +77,7 @@ export default function SOSPage() {
           <div className="py-20 text-center text-[#6E6E73] text-sm">Cargando...</div>
         ) : lista.length === 0 ? (
           <div className="tarjeta py-20 text-center">
-            <FontAwesomeIcon icon={faShieldHalved} className="text-4xl text-[#1E8E3E] mb-3" />
+            <FontAwesomeIcon icon={faShieldHalved} className="text-4xl text-[#1D1D1F] mb-3" />
             <p className="text-[#14213D] font-medium">{filtro === 'activa' ? 'No hay alertas activas' : 'No hay alertas para mostrar'}</p>
             <p className="text-sm text-[#8A8F9C] mt-1">Todo tranquilo por ahora.</p>
           </div>
@@ -89,7 +89,7 @@ export default function SOSPage() {
                 <article key={a.id} className={`tarjeta p-5 ${activa ? 'border-[#D92D20] ring-2 ring-[#D92D20]/20' : ''}`}>
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="flex items-start gap-3 min-w-0">
-                      <span className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${activa ? 'bg-[#D92D20] text-white' : 'bg-[#E8F5EA] text-[#1E8E3E]'}`}>
+                      <span className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${activa ? 'bg-[#D92D20] text-white' : 'bg-[#F1F1F3] text-[#1D1D1F]'}`}>
                         <FontAwesomeIcon icon={activa ? faTriangleExclamation : faCircleCheck} />
                       </span>
                       <div className="min-w-0">
@@ -129,12 +129,12 @@ export default function SOSPage() {
                         placeholder="Nota: qué se hizo (opcional)" maxLength={500}
                         className="flex-1 px-4 py-2.5 rounded-xl bg-[#F4F6FA] text-sm focus:outline-none focus:ring-2 focus:ring-[#0A66E0]/40" />
                       <button onClick={() => atender(a.id)} disabled={enviando === a.id}
-                        className="px-5 py-2.5 rounded-xl bg-[#1E8E3E] text-white text-sm font-semibold disabled:opacity-50">
+                        className="px-5 py-2.5 rounded-xl bg-[#1D1D1F] text-white text-sm font-semibold disabled:opacity-50">
                         {enviando === a.id ? 'Guardando...' : 'Marcar como atendida'}
                       </button>
                     </div>
                   ) : (
-                    <p className="mt-3 text-xs text-[#1E8E3E]">
+                    <p className="mt-3 text-xs text-[#1D1D1F]">
                       Atendida {hace(a.atendida_en)}{a.nota_admin ? ` · ${a.nota_admin}` : ''}
                     </p>
                   )}

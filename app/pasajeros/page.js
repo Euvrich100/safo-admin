@@ -112,7 +112,7 @@ export default function PasajerosPage() {
               return (
                 <div key={p.id} className="rounded-2xl p-5 border border-[#E2E2E7] bg-white">
                   <div className="flex items-center gap-4 flex-wrap">
-                    <div className="w-11 h-11 rounded-full flex items-center justify-center font-semibold text-white bg-[#1E8E3E] shrink-0">
+                    <div className="w-11 h-11 rounded-full flex items-center justify-center font-semibold text-white bg-[#1D1D1F] shrink-0">
                       {p.nombre?.charAt(0)}
                     </div>
                     <div className="flex-1 min-w-[200px]">
@@ -124,7 +124,7 @@ export default function PasajerosPage() {
                       <div>{p.cancelaciones_mes} cancelaciones este mes</div>
                     </div>
                     <span className="text-xs px-3 py-1 rounded-full font-medium"
-                      style={suspendido ? { color: '#D92D20', background: '#FCEAE9' } : { color: '#1E8E3E', background: '#E8F5EA' }}>
+                      style={suspendido ? { color: '#D92D20', background: '#FCEAE9' } : { color: '#1D1D1F', background: '#F1F1F3' }}>
                       {suspendido ? 'Suspendido' : 'Activo'}
                     </span>
                     <button onClick={() => restablecer(p)}
@@ -133,7 +133,7 @@ export default function PasajerosPage() {
                     </button>
                     <button onClick={() => cambiarEstado(p)}
                       className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                        suspendido ? 'text-white bg-[#1E8E3E] hover:bg-[#177530]' : 'text-[#D92D20] bg-[#FCEAE9] hover:bg-[#F9D9D6]'
+                        suspendido ? 'text-white bg-[#1D1D1F] hover:bg-[#000000]' : 'text-[#D92D20] bg-[#FCEAE9] hover:bg-[#F9D9D6]'
                       }`}>
                       <FontAwesomeIcon icon={suspendido ? faUserCheck : faUserSlash} className="text-xs mr-1.5" />{suspendido ? 'Reactivar' : 'Suspender'}
                     </button>

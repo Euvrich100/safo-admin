@@ -21,11 +21,11 @@ function FileBox({ campo, label, icono, preview, onArchivo }) {
       <label className="cursor-pointer block">
         <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
           onChange={e => onArchivo(campo, e.target.files[0])} />
-        <div className={`w-full h-28 rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition overflow-hidden bg-[#F5F5F7] ${preview ? 'border-[#1E8E3E]' : 'border-[#D2D2D7] hover:border-[#0A66E0]'}`}>
+        <div className={`w-full h-28 rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition overflow-hidden bg-[#F5F5F7] ${preview ? 'border-[#1D1D1F]' : 'border-[#D2D2D7] hover:border-[#0A66E0]'}`}>
           {preview ? (
             <div className="relative w-full h-full">
               <img src={preview} alt={label} className="w-full h-full object-cover" />
-              <div className="absolute top-2 right-2 bg-[#1E8E3E] rounded-full p-1">
+              <div className="absolute top-2 right-2 bg-[#1D1D1F] rounded-full p-1">
                 <FontAwesomeIcon icon={faCircleCheck} className="text-xs text-white" />
               </div>
             </div>
@@ -130,7 +130,7 @@ export default function RegistroConductorPage() {
   if (completado) return (
     <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="text-center max-w-md">
-        <FontAwesomeIcon icon={faCircleCheck} className="text-[#1E8E3E] text-7xl mb-6" />
+        <FontAwesomeIcon icon={faCircleCheck} className="text-[#1D1D1F] text-7xl mb-6" />
         <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-4">¡Solicitud enviada!</h1>
         <p className="text-[#6E6E73] mb-6">El administrador revisará tus documentos en menos de 24 horas y te avisará al {form.celular}. Cuando te aprueben, entra a la app de SafO con tu celular y tu contraseña.</p>
         <div className="p-4 rounded-2xl bg-[#F5F5F7] mb-6">
@@ -160,18 +160,18 @@ export default function RegistroConductorPage() {
 
         <div className="mb-8">
           <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2 tracking-tight">Únete como conductor <FontAwesomeIcon icon={faTaxi} className="text-[#FFC21A] text-2xl ml-1" /></h1>
-          <p className="text-[#6E6E73]">Suscripción S/ 5.00/mes — Empieza a ganar llevando pasajeros seguros</p>
+          <p className="text-[#6E6E73]">Empieza a ganar llevando pasajeros de tu ciudad</p>
         </div>
 
         {/* Indicador de pasos */}
         <div className="flex items-center gap-2 mb-8">
           {pasos.map((p, i) => (
             <div key={i} className="flex items-center gap-2 flex-1">
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 ${paso > i + 1 ? 'bg-[#1E8E3E] text-white' : paso === i + 1 ? 'bg-[#0A66E0] text-white' : 'bg-[#F5F5F7] text-[#A1A1A6]'}`}>
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 ${paso > i + 1 ? 'bg-[#1D1D1F] text-white' : paso === i + 1 ? 'bg-[#0A66E0] text-white' : 'bg-[#F5F5F7] text-[#A1A1A6]'}`}>
                 {paso > i + 1 ? <FontAwesomeIcon icon={faCheck} /> : i + 1}
               </div>
               <span className={`text-xs ${paso === i + 1 ? 'text-[#1D1D1F] font-medium' : 'text-[#A1A1A6]'}`}>{p}</span>
-              {i < pasos.length - 1 && <div className={`flex-1 h-0.5 ${paso > i + 1 ? 'bg-[#1E8E3E]' : 'bg-[#E2E2E7]'}`}/>}
+              {i < pasos.length - 1 && <div className={`flex-1 h-0.5 ${paso > i + 1 ? 'bg-[#1D1D1F]' : 'bg-[#E2E2E7]'}`}/>}
             </div>
           ))}
         </div>
@@ -254,7 +254,7 @@ export default function RegistroConductorPage() {
               <button onClick={() => setPaso(2)}
                 className="flex-1 py-3 rounded-full text-[#6E6E73] border border-[#E2E2E7] hover:bg-[#F5F5F7]"><FontAwesomeIcon icon={faArrowLeft} className="mr-1.5" />Volver</button>
               <button onClick={registrar} disabled={cargando}
-                className="flex-1 py-4 rounded-full font-semibold text-white disabled:opacity-50 bg-[#1E8E3E] hover:bg-[#177530]">
+                className="flex-1 py-4 rounded-full font-semibold text-white disabled:opacity-50 bg-[#1D1D1F] hover:bg-[#000000]">
                 {cargando ? 'Enviando...' : <><FontAwesomeIcon icon={faPaperPlane} className="mr-2" />Enviar solicitud</>}
               </button>
             </div>

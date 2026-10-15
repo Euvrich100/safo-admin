@@ -9,7 +9,7 @@ import { hace } from '@/lib/formato'
 const ETIQUETA = {
   abierto: ['Recibido', 'bg-[#FEF3E2] text-[#B45309]'],
   en_revision: ['En revisión', 'bg-[#EAF2FE] text-[#0A66E0]'],
-  resuelto: ['Resuelto', 'bg-[#E8F5EA] text-[#1E8E3E]'],
+  resuelto: ['Resuelto', 'bg-[#F1F1F3] text-[#1D1D1F]'],
   rechazado: ['Rechazado', 'bg-[#FCEAE9] text-[#D92D20]'],
 }
 

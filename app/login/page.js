@@ -104,15 +104,15 @@ export default function LoginPage() {
               Taxis seguros para cada calle de Huánuco.
             </h2>
             <p className="text-[#4B5873] text-lg leading-relaxed">
-              Pide tu taxi, mira quién viene y viaja tranquilo. Los administradores gestionan la plataforma desde aquí.
+              Pide tu taxi, mira quién viene y viaja tranquilo.
             </p>
           </div>
 
           <div className="flex items-end justify-between gap-6">
             <div className="flex gap-8 text-[#14213D]">
               {[
-                { n: 'S/ 5', label: 'por conductor al mes' },
-                { n: 'S/ 1.50', label: 'garantía por viaje' },
+                { n: 'Verificados', label: 'DNI, licencia y vehículo' },
+                { n: 'En vivo', label: 'sigue tu viaje en el mapa' },
               ].map((s, i) => (
                 <div key={i}>
                   <div className="text-2xl font-semibold">{s.n}</div>
@@ -271,7 +271,7 @@ export default function LoginPage() {
         )}
 
         <p className="text-center text-[#A1A1A6] text-xs mt-12">
-          SafO — Safe + On · Huánuco, Perú
+          SafO · Movilidad segura en Huánuco
         </p>
       </div>
     </div>

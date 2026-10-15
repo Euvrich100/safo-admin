@@ -20,7 +20,7 @@ const soles = (n) => `S/ ${Number(n || 0).toFixed(2)}`
 
 function Cambio({ pct }) {
   const icono = pct > 0 ? faArrowUp : pct < 0 ? faArrowDown : faMinus
-  const color = pct > 0 ? 'text-[#1E8E3E] bg-[#E8F5EA]' : pct < 0 ? 'text-[#D92D20] bg-[#FCEAE9]' : 'text-[#6E6E73] bg-[#F1F2F5]'
+  const color = pct > 0 ? 'text-[#1D1D1F] bg-[#F1F1F3]' : pct < 0 ? 'text-[#D92D20] bg-[#FCEAE9]' : 'text-[#6E6E73] bg-[#F1F2F5]'
   return (
     <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[11px] font-semibold ${color}`}>
       <FontAwesomeIcon icon={icono} className="text-[9px]" />{Math.abs(pct)}%
@@ -190,7 +190,7 @@ export default function DashboardPage() {
             <div className="relative flex-1 min-h-[260px] rounded-xl overflow-hidden border border-[#E6E8EF]">
               <MapaAdmin className="absolute inset-0" conductores={mapa.conductores} viajes={mapa.viajes} sos={mapa.sos} ajustarKey={1} />
               <div className="absolute left-3 bottom-3 z-[500] bg-white/90 rounded-lg px-2.5 py-1.5 text-xs text-[#4B4F5C] shadow flex gap-3">
-                <span><span className="inline-block w-2 h-2 rounded-full bg-[#1E8E3E] mr-1" />Libres {mapa.conductores.filter(c => !c.en_viaje).length}</span>
+                <span><span className="inline-block w-2 h-2 rounded-full bg-[#1D1D1F] mr-1" />Libres {mapa.conductores.filter(c => !c.en_viaje).length}</span>
                 <span><span className="inline-block w-2 h-2 rounded-full bg-[#FFC21A] mr-1" />En viaje {mapa.conductores.filter(c => c.en_viaje).length}</span>
               </div>
             </div>

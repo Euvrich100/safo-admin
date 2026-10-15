@@ -51,7 +51,7 @@ export default function RegistroPasajeroPage() {
   if (completado) return (
     <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="text-center max-w-md">
-        <FontAwesomeIcon icon={faCircleCheck} className="text-[#1E8E3E] text-7xl mb-6" />
+        <FontAwesomeIcon icon={faCircleCheck} className="text-[#1D1D1F] text-7xl mb-6" />
         <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-4">¡Bienvenido a SafO!</h1>
         <p className="text-[#6E6E73] mb-6">Tu cuenta fue creada. Ya puedes pedir taxis seguros y verificados en Huánuco.</p>
         <div className="p-4 rounded-2xl bg-[#F5F5F7] mb-6">
@@ -79,7 +79,7 @@ export default function RegistroPasajeroPage() {
 
         <div className="mb-8">
           <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2 tracking-tight">Regístrate gratis <FontAwesomeIcon icon={faUserCheck} className="text-[#0A66E0] text-2xl ml-1" /></h1>
-          <p className="text-[#6E6E73]">Registro gratis — solo pagas S/ 1.50 al pedir tu taxi</p>
+          <p className="text-[#6E6E73]">Crea tu cuenta en un minuto y empieza a pedir taxis verificados</p>
         </div>
 
         <div className="rounded-2xl p-6 border border-[#E2E2E7] space-y-4">
@@ -126,9 +126,9 @@ export default function RegistroPasajeroPage() {
             <ClaveInput value={form.repetir} onChange={v => actualizar('repetir', v)} autoComplete="new-password" placeholder="Repite tu contraseña" onEnter={registrar} />
           </div>
 
-          <div className="p-4 rounded-xl bg-[#E8F5EA]">
-            <p className="text-[#1E8E3E] text-xs font-medium"><FontAwesomeIcon icon={faCircleCheck} className="mr-1.5" />Registro simple y rápido</p>
-            <p className="text-[#1E8E3E] text-xs mt-1 opacity-80">Tu seguridad está garantizada por los conductores verificados de SafO.</p>
+          <div className="p-4 rounded-xl bg-[#F5F5F7] border border-[#E9E9ED]">
+            <p className="text-[#1D1D1F] text-xs font-medium"><FontAwesomeIcon icon={faCircleCheck} className="mr-1.5 text-[#6E6E73]" />Conductores verificados</p>
+            <p className="text-[#6E6E73] text-xs mt-1">Cada conductor presenta su DNI, licencia y vehículo antes de poder recibir viajes.</p>
           </div>
 
           <button onClick={registrar} disabled={cargando}

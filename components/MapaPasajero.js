@@ -91,7 +91,7 @@ export default function MapaPasajero({
       st.zonasCapa?.clearLayers()
       zonas.forEach((z) => {
         if (z.activa === false || !valido([z.lat, z.lng])) return
-        L.circle([Number(z.lat), Number(z.lng)], { radius: Number(z.radio_km) * 1000, color: '#1E8E3E', weight: 2, dashArray: '8 8', fillColor: '#1E8E3E', fillOpacity: 0.03, interactive: false }).addTo(st.zonasCapa)
+        L.circle([Number(z.lat), Number(z.lng)], { radius: Number(z.radio_km) * 1000, color: '#1D1D1F', weight: 2, dashArray: '8 8', fillColor: '#1D1D1F', fillOpacity: 0.03, interactive: false }).addTo(st.zonasCapa)
       })
 
       // destino

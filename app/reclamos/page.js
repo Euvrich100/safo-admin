@@ -18,7 +18,7 @@ const FILTROS = [
 const ETIQUETA = {
   abierto: { texto: 'Abierto', clase: 'bg-[#FEF3E2] text-[#B45309]' },
   en_revision: { texto: 'En revisión', clase: 'bg-[#EAF2FE] text-[#0A66E0]' },
-  resuelto: { texto: 'Resuelto', clase: 'bg-[#E8F5EA] text-[#1E8E3E]' },
+  resuelto: { texto: 'Resuelto', clase: 'bg-[#F1F1F3] text-[#1D1D1F]' },
   rechazado: { texto: 'Rechazado', clase: 'bg-[#FCEAE9] text-[#D92D20]' },
 }
 
@@ -133,7 +133,7 @@ export default function ReclamosPage() {
                             className="px-4 py-2 rounded-xl bg-[#EAF2FE] text-[#0A66E0] text-sm font-semibold disabled:opacity-50">Pasar a revisión</button>
                         )}
                         <button onClick={() => responder(r, 'resuelto')} disabled={!!enviando}
-                          className="px-4 py-2 rounded-xl bg-[#1E8E3E] text-white text-sm font-semibold disabled:opacity-50">Resolver</button>
+                          className="px-4 py-2 rounded-xl bg-[#1D1D1F] text-white text-sm font-semibold disabled:opacity-50">Resolver</button>
                         <button onClick={() => responder(r, 'rechazado')} disabled={!!enviando}
                           className="px-4 py-2 rounded-xl bg-white border border-[#D92D20] text-[#D92D20] text-sm font-semibold disabled:opacity-50">Rechazar</button>
                       </div>

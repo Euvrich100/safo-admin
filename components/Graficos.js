@@ -2,7 +2,7 @@
 import { useState } from 'react'
 
 // Gráficos livianos hechos con SVG (sin librerías). Colores SafO.
-export const COLORES = { amarillo: '#FFC21A', azul: '#0A66E0', marino: '#14213D', verde: '#1E8E3E', rojo: '#D92D20', gris: '#A1A1A6' }
+export const COLORES = { amarillo: '#FFC21A', azul: '#0A66E0', marino: '#14213D', verde: '#6E6E73', rojo: '#D92D20', gris: '#A1A1A6' }
 
 // Línea doble: reservas vs completados por día, con eje, cuadrícula y tooltip al pasar el mouse
 export function LineaDoble({ datos, alto = 220 }) {

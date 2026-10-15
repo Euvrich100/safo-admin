@@ -33,7 +33,7 @@ const TABS = [
   { id: 'cuenta', texto: 'Cuenta', icono: faUser },
 ]
 const ESTADO_VIAJE = {
-  completado: ['Completado', 'bg-[#E8F5EA] text-[#1E8E3E]'],
+  completado: ['Completado', 'bg-[#F1F1F3] text-[#1D1D1F]'],
   cancelado_pasajero: ['Canceló el pasajero', 'bg-[#FCEAE9] text-[#D92D20]'],
   cancelado_conductor: ['Cancelado', 'bg-[#FEF3E2] text-[#B45309]'],
   no_show: ['No se presentó', 'bg-[#FEF3E2] text-[#B45309]'],
@@ -439,7 +439,7 @@ export default function ConductorPage() {
           )}
         </>
       ) : (
-        <button onClick={completar} disabled={ocupado} className="w-full py-4 rounded-2xl bg-[#1E8E3E] text-white font-semibold text-base disabled:opacity-50">
+        <button onClick={completar} disabled={ocupado} className="w-full py-4 rounded-2xl bg-[#1D1D1F] text-white font-semibold text-base disabled:opacity-50">
           <FontAwesomeIcon icon={faFlagCheckered} className="mr-2" />Finalizar viaje
         </button>
       )}
@@ -469,8 +469,8 @@ export default function ConductorPage() {
             </div>
             <div className="p-5 flex items-center gap-4">
               <span className="relative w-12 h-12 shrink-0 flex items-center justify-center">
-                <span className="absolute inset-0 rounded-full bg-[#1E8E3E]/25 animate-ping" />
-                <span className="relative w-12 h-12 rounded-full bg-[#1E8E3E] text-white flex items-center justify-center"><FontAwesomeIcon icon={faBell} /></span>
+                <span className="absolute inset-0 rounded-full bg-[#1D1D1F]/25 animate-ping" />
+                <span className="relative w-12 h-12 rounded-full bg-[#1D1D1F] text-white flex items-center justify-center"><FontAwesomeIcon icon={faBell} /></span>
               </span>
               <div>
                 <div className="font-semibold text-[#14213D]">Buscando pasajeros cerca de ti…</div>
@@ -615,9 +615,9 @@ export default function ConductorPage() {
           </div>
           <button onClick={() => (conectado ? ejecutarConectar(false) : conectar())} disabled={ocupado || !!viaje || !perfil}
             aria-pressed={conectado} aria-label={conectado ? 'Desconectarme' : 'Conectarme'}
-            className={`flex items-center gap-2.5 pl-3 pr-2 py-1.5 rounded-full text-sm font-semibold transition disabled:opacity-60 ${conectado ? 'bg-[#E8F5EA] text-[#1E8E3E]' : 'bg-[#F1F2F5] text-[#6E6E73]'}`}>
+            className={`flex items-center gap-2.5 pl-3 pr-2 py-1.5 rounded-full text-sm font-semibold transition disabled:opacity-60 ${conectado ? 'bg-[#F1F1F3] text-[#1D1D1F]' : 'bg-[#F1F2F5] text-[#6E6E73]'}`}>
             {conectado ? 'En línea' : 'Desconectado'}
-            <span className={`relative w-11 h-6 rounded-full transition ${conectado ? 'bg-[#1E8E3E]' : 'bg-[#C5C8D2]'}`}>
+            <span className={`relative w-11 h-6 rounded-full transition ${conectado ? 'bg-[#1D1D1F]' : 'bg-[#C5C8D2]'}`}>
               <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${conectado ? 'left-[22px]' : 'left-0.5'}`} />
             </span>
           </button>

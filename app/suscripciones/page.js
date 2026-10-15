@@ -86,7 +86,7 @@ export default function SuscripcionesPage() {
                     <div>
                       <div className="font-medium text-[#1D1D1F]">{c.nombre}</div>
                       <div className="text-[#6E6E73] text-sm">{c.celular} — {c.placa}</div>
-                      <div className="text-xs mt-1" style={{ color: suscripcionVencida(c.suscripcion_vence) ? '#D92D20' : '#1E8E3E' }}>
+                      <div className="text-xs mt-1" style={{ color: suscripcionVencida(c.suscripcion_vence) ? '#D92D20' : '#1D1D1F' }}>
                         {suscripcionVencida(c.suscripcion_vence)
                           ? <><FontAwesomeIcon icon={faTriangleExclamation} className="mr-1.5" />Suscripción vencida</>
                           : <><FontAwesomeIcon icon={faCircleCheck} className="mr-1.5" />Activo hasta {new Date(c.suscripcion_vence).toLocaleDateString('es-PE')}</>
@@ -101,7 +101,7 @@ export default function SuscripcionesPage() {
                           key={metodo}
                           onClick={() => confirmarPago(c.id, metodo)}
                           disabled={procesando === c.id}
-                          className="flex items-center gap-2 text-white px-4 py-2 rounded-full text-sm font-medium transition disabled:opacity-50 capitalize bg-[#1E8E3E] hover:bg-[#177530]"
+                          className="flex items-center gap-2 text-white px-4 py-2 rounded-full text-sm font-medium transition disabled:opacity-50 capitalize bg-[#1D1D1F] hover:bg-[#000000]"
                         >
                           <FontAwesomeIcon icon={faCircleCheck} className="text-sm" />
                           {metodo}

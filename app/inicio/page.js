@@ -53,7 +53,7 @@ export default function InicioPage() {
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#E2E8F0] mb-7">
-              <FontAwesomeIcon icon={faCircleDot} className="text-[#1E8E3E] text-xs animate-pulse" />
+              <FontAwesomeIcon icon={faCircleDot} className="text-[#1D1D1F] text-xs animate-pulse" />
               <span className="text-[#4B5873] text-sm font-medium">Operando en Huánuco, Perú</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-semibold mb-6 leading-[1.05] tracking-tight text-[#14213D]">
@@ -80,7 +80,7 @@ export default function InicioPage() {
                   </button>
                 </>
               )}
-              <span className="text-[#6B7894] text-sm w-full">Sin costo de registro. Solo pagas S/ 1.50 al pedir tu taxi.</span>
+              <span className="text-[#6B7894] text-sm w-full">Registro gratuito. Verás el costo antes de confirmar tu viaje.</span>
             </div>
           </div>
 
@@ -92,8 +92,8 @@ export default function InicioPage() {
                 <EscenaHuanuco className="w-full h-auto block" />
               </div>
               <div className="absolute top-5 left-5 rounded-2xl bg-white border border-[#E2E8F0] shadow-md px-4 py-3 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-[#E8F5EA] flex items-center justify-center">
-                  <FontAwesomeIcon icon={faCircleCheck} className="text-lg text-[#1E8E3E]" />
+                <div className="w-9 h-9 rounded-full bg-[#F1F1F3] flex items-center justify-center">
+                  <FontAwesomeIcon icon={faCircleCheck} className="text-lg text-[#1D1D1F]" />
                 </div>
                 <div>
                   <div className="text-sm font-semibold text-[#14213D]">Conductor verificado</div>
@@ -110,12 +110,12 @@ export default function InicioPage() {
       <section className="py-20 px-6 bg-[#0A4FD6] text-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-semibold tracking-tight mb-3 max-w-xl">Pides, ves quién viene y viajas</h2>
-          <p className="text-[#CFE0FF] text-lg mb-12 max-w-xl">Tres pasos, y pagas solo S/ 1.50 de garantía cuando pides.</p>
+          <p className="text-[#CFE0FF] text-lg mb-12 max-w-xl">Tres pasos, y antes de confirmar siempre ves cuánto costará.</p>
           <ol className="grid md:grid-cols-3 gap-5">
             {[
               { icon: faMagnifyingGlass, t: 'Mira los taxis cerca de ti', d: 'Ves en el mapa los conductores verificados que están libres en este momento.' },
               { icon: faMobileScreenButton, t: 'Pide y sigue a tu conductor', d: 'Ves su nombre, placa y cuánto falta. Puedes compartir el viaje con tu familia.' },
-              { icon: faTaxi, t: 'Sube y viaja tranquilo', d: 'Al terminar calificas el viaje. Si cancelas antes de que salga, te devolvemos tu S/ 1.50.' },
+              { icon: faTaxi, t: 'Sube y viaja tranquilo', d: 'Al terminar calificas el viaje. Si cancelas antes de que el conductor salga, te devolvemos tu garantía.' },
             ].map((p, i) => (
               <li key={i} className="rounded-2xl bg-white/10 border border-white/20 p-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -139,10 +139,10 @@ export default function InicioPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: faShieldHalved, color: '#0A66E0', bg: '#EAF2FE', title: 'Conductores verificados', desc: 'DNI, licencia y antecedentes revisados antes de activar cualquier conductor.' },
-              { icon: faStar, color: '#B45309', bg: '#FEF3E2', title: 'Calificaciones reales', desc: 'Califica tu viaje. Los conductores con malas calificaciones son suspendidos.' },
-              { icon: faClock, color: '#1E8E3E', bg: '#E8F5EA', title: 'Seguimiento en tiempo real', desc: 'Comparte tu viaje con un familiar. Siempre sabemos dónde estás.' },
-              { icon: faCircleCheck, color: '#7C5CFC', bg: '#F1EEFF', title: 'Garantía de viaje', desc: 'Si cancelas antes de que el conductor salga, te devolvemos tu S/ 1.50.' },
+              { icon: faShieldHalved, color: '#1D1D1F', bg: '#F1F1F3', title: 'Conductores verificados', desc: 'DNI, licencia y antecedentes revisados antes de activar cualquier conductor.' },
+              { icon: faStar, color: '#1D1D1F', bg: '#F1F1F3', title: 'Calificaciones reales', desc: 'Califica tu viaje. Los conductores con malas calificaciones son suspendidos.' },
+              { icon: faClock, color: '#1D1D1F', bg: '#F1F1F3', title: 'Seguimiento en tiempo real', desc: 'Comparte tu viaje con un familiar. Siempre sabemos dónde estás.' },
+              { icon: faCircleCheck, color: '#1D1D1F', bg: '#F1F1F3', title: 'Garantía de viaje', desc: 'Si cancelas antes de que el conductor salga, te devolvemos tu garantía.' },
             ].map((b, i) => (
               <div key={i} className="rounded-2xl p-6 border border-[#E2E2E7] hover:shadow-md transition">
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4" style={{ background: b.bg }}>

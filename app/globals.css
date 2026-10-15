@@ -20,8 +20,10 @@ body {
 }
 
 /* Mapa de Huánuco (Leaflet): tonos suaves para que el texto encima se lea */
+/* Los paneles de Leaflet (z-index 400) no deben escapar y tapar lo que va encima del mapa */
+.mapa-suave { isolation: isolate; }
 .mapa-suave .leaflet-container { background: transparent; font-family: inherit; }
-.mapa-suave .leaflet-tile-pane { filter: saturate(.7) brightness(1.04); }
+.mapa-suave .leaflet-tile-pane { filter: grayscale(.85) brightness(1.05) contrast(.95); }
 .mapa-suave .leaflet-control-attribution { font-size: 10px; background: rgba(255,255,255,.8); }
 .safo-pin-wrap { background: none; border: 0; }
 .safo-pin {
@@ -73,7 +75,7 @@ body:has(.safo-sidebar) div.min-h-screen.bg-white { background: transparent; }
 .tarjeta-sombra { box-shadow: 0 1px 2px rgba(20,33,61,.04), 0 8px 24px rgba(20,33,61,.05); }
 
 /* Marcadores del mapa del administrador */
-.safo-taxi.libre { background: #1E8E3E; color: #fff; }
+.safo-taxi.libre { background: #1D1D1F; color: #fff; }
 .safo-taxi.viaje { background: #FFC21A; color: #14213D; }
 .safo-sos-wrap { background: none; border: 0; }
 .safo-sos {

@@ -40,7 +40,7 @@ export default function TelefonoApp({ className = '' }) {
               <FontAwesomeIcon icon={faPhone} className="text-xs text-[#0A4FD6]" />
             </div>
           </div>
-          <div className="mt-2.5 flex items-center gap-1.5 text-[11px] text-[#1E8E3E] font-medium">
+          <div className="mt-2.5 flex items-center gap-1.5 text-[11px] text-[#1D1D1F] font-medium">
             <FontAwesomeIcon icon={faUserShield} className="text-xs" /> DNI y licencia verificados
           </div>
           <div className="mt-3 rounded-full bg-[#0A4FD6] text-white text-xs font-semibold text-center py-2.5">Compartir mi viaje</div>
