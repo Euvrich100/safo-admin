@@ -3,14 +3,12 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faArrowLeft, faHand, faFlagCheckered, faMobileScreenButton, faRightToBracket, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from '@/components/SafoLogo'
 import ClaveInput from '@/components/ClaveInput'
+import AccesoSocial from '@/components/AccesoSocial'
 import MapaHuanuco, { MAPA_URL } from '@/components/MapaHuanuco'
-
-const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
 export default function LoginPage() {
   const router = useRouter()
@@ -56,19 +54,6 @@ export default function LoginPage() {
     localStorage.setItem('safo_token', data.token)
     localStorage.setItem('safo_usuario', JSON.stringify(data.usuario))
     router.push(rol === 'admin' ? '/dashboard' : rol === 'conductor' ? '/conductor' : '/pasajero')
-  }
-
-  const conGoogle = async (credentialResponse) => {
-    setCargando(true)
-    try {
-      const { data } = await api.post('/api/auth/google', { credential: credentialResponse.credential })
-      if (data.nuevo) return toast.error('Esa cuenta aún no está registrada. Crea tu cuenta gratis primero.')
-      ingresar(data)
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'No se pudo iniciar sesión con Google')
-    } finally {
-      setCargando(false)
-    }
   }
 
   const solicitarOTP = async () => {
@@ -205,19 +190,12 @@ export default function LoginPage() {
               <button onClick={() => router.push('/registro/pasajero')} className="text-[#0A66E0] font-semibold text-sm hover:underline">Crea tu cuenta gratis</button>
             </div>
 
-            {GOOGLE_CLIENT_ID && (
-              <>
-                <div className="flex items-center gap-3 pt-1">
-                  <div className="flex-1 h-px bg-[#E2E2E7]" />
-                  <span className="text-[#A1A1A6] text-xs uppercase tracking-widest">o continúa con</span>
-                  <div className="flex-1 h-px bg-[#E2E2E7]" />
-                </div>
-                <div className="flex justify-center">
-                  <GoogleLogin onSuccess={conGoogle} onError={() => toast.error('No se pudo iniciar sesión con Google')}
-                    theme="outline" shape="pill" size="large" text="signin_with" locale="es" />
-                </div>
-              </>
-            )}
+            <div className="flex items-center gap-3 pt-1">
+              <div className="flex-1 h-px bg-[#E2E2E7]" />
+              <span className="text-[#A1A1A6] text-xs uppercase tracking-widest">o continúa con</span>
+              <div className="flex-1 h-px bg-[#E2E2E7]" />
+            </div>
+            <AccesoSocial modo="login" />
           </div>
         ) : paso === 1 ? (
           <div className="space-y-4">
@@ -299,6 +277,5 @@ export default function LoginPage() {
     </div>
   )
 
-  if (!GOOGLE_CLIENT_ID) return pagina
-  return <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>{pagina}</GoogleOAuthProvider>
+  return pagina
 }

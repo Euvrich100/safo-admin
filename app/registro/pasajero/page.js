@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faMobileScreenButton, faLock, faCircleCheck, faUserPlus, faUserCheck } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from '@/components/SafoLogo'
 import ClaveInput from '@/components/ClaveInput'
+import AccesoSocial from '@/components/AccesoSocial'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://safo-backend.onrender.com'
 
@@ -77,11 +78,19 @@ export default function RegistroPasajeroPage() {
         </button>
 
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2 tracking-tight">Registrate gratis <FontAwesomeIcon icon={faUserCheck} className="text-[#0A66E0] text-2xl ml-1" /></h1>
+          <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2 tracking-tight">Regístrate gratis <FontAwesomeIcon icon={faUserCheck} className="text-[#0A66E0] text-2xl ml-1" /></h1>
           <p className="text-[#6E6E73]">Registro gratis — solo pagas S/ 1.50 al pedir tu taxi</p>
         </div>
 
         <div className="rounded-2xl p-6 border border-[#E2E2E7] space-y-4">
+
+          <AccesoSocial modo="registro" />
+
+          <div className="flex items-center gap-3 py-1">
+            <div className="flex-1 h-px bg-[#E2E2E7]" />
+            <span className="text-[#A1A1A6] text-xs uppercase tracking-widest">o con tu celular</span>
+            <div className="flex-1 h-px bg-[#E2E2E7]" />
+          </div>
 
           <div>
             <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">
