@@ -98,6 +98,17 @@ export default function ViajesPage() {
                         {new Date(v.solicitado_en).toLocaleString('es-PE')}
                       </span>
                     </div>
+                    {(v.direccion_origen || v.direccion_destino) && (
+                      <div className="mb-3 text-sm text-[#1D1D1F]">
+                        <span className="text-[#A1A1A6] text-xs mr-2">Recorrido</span>
+                        {v.direccion_origen || 'Origen en el mapa'}{v.direccion_destino ? ` → ${v.direccion_destino}` : ''}
+                        {v.tarifa_estimada && (
+                          <span className="ml-3 text-xs px-2.5 py-1 rounded-full bg-[#FFF6D9] text-[#5C4A00] whitespace-nowrap">
+                            Tarifa estimada S/ {Number(v.tarifa_estimada).toFixed(2)}{v.distancia_km ? ` · ${Number(v.distancia_km).toFixed(1)} km` : ''}{v.duracion_min ? ` · ${v.duracion_min} min` : ''}
+                          </span>
+                        )}
+                      </div>
+                    )}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       <div className="rounded-xl p-3 bg-[#F5F5F7]">
                         <div className="text-[#A1A1A6] text-xs mb-1">Conductor</div>
@@ -120,7 +131,7 @@ export default function ViajesPage() {
                       <div className="mt-3 rounded-xl p-3 bg-[#FCEAE9]">
                         <div className="text-xs text-[#D92D20]">Motivo de cancelación: {v.cancelacion_motivo}</div>
                         {v.conductor_fue_despachado && (
-                          <div className="text-xs mt-1 text-[#B0453B]"><FontAwesomeIcon icon={faTriangleExclamation} className="mr-1.5" />Conductor fue despachado — S/ 1.00 compensado al conductor</div>
+                          <div className="text-xs mt-1 text-[#B0453B]"><FontAwesomeIcon icon={faTriangleExclamation} className="mr-1.5" />Conductor fue despachado — S/ {Number(v.monto_conductor || 0).toFixed(2)} compensado al conductor</div>
                         )}
                       </div>
                     )}

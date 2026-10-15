@@ -29,6 +29,7 @@ export default function LoginPage() {
       if (u && localStorage.getItem('safo_token')) {
         if (u.rol === 'admin') router.replace('/dashboard')
         else if (u.rol === 'pasajero') router.replace('/pasajero')
+        else if (u.rol === 'conductor') router.replace('/conductor')
       }
     } catch { /* sin sesión válida */ }
   }, [router])
@@ -49,16 +50,12 @@ export default function LoginPage() {
     }
   }
 
-  // Admin → panel de administración; pasajero → su panel con el mapa.
-  // Los conductores usan la app del celular.
+  // Admin → panel de administración; pasajero → su panel con el mapa; conductor → su panel móvil.
   const ingresar = (data) => {
     const rol = data.usuario?.rol
-    if (rol !== 'admin' && rol !== 'pasajero') {
-      return toast.error('Los conductores ingresan desde la app SafO')
-    }
     localStorage.setItem('safo_token', data.token)
     localStorage.setItem('safo_usuario', JSON.stringify(data.usuario))
-    router.push(rol === 'admin' ? '/dashboard' : '/pasajero')
+    router.push(rol === 'admin' ? '/dashboard' : rol === 'conductor' ? '/conductor' : '/pasajero')
   }
 
   const conGoogle = async (credentialResponse) => {

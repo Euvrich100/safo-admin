@@ -8,16 +8,19 @@ import {
   faRightFromBracket, faMobileScreenButton, faCircleCheck, faHourglassHalf, faRotate, faXmark,
   faRoute, faWallet, faCarSide, faReceipt, faCircleInfo, faCoins, faTriangleExclamation,
   faMapPin, faRightToBracket, faUserPlus, faLock, faBullseye, faClock, faUser, faKey,
+  faShareNodes, faHeadset, faBolt, faThumbsUp, faCheck,
 } from '@fortawesome/free-solid-svg-icons'
 import api from '@/lib/api'
 import { buscarLugares, direccionDe, rutaEntre, distanciaKm } from '@/lib/geo'
 import SafoLogo from '@/components/SafoLogo'
 import ClaveInput from '@/components/ClaveInput'
 import MapaPasajero from '@/components/MapaPasajero'
+import BotonSOS from '@/components/BotonSOS'
+import ReclamosPanel from '@/components/ReclamosPanel'
 import { PLAZA } from '@/components/MapaHuanuco'
 
 const RADIO_KM = 5
-const GARANTIA = 1.5
+const GARANTIA_BASE = 1.5 // valor por defecto; el real viene de /api/ajustes-publicos
 // Números de SafO que reciben la garantía. Se configuran en Render (variables del web):
 // NEXT_PUBLIC_PAGO_YAPE y NEXT_PUBLIC_PAGO_PLIN
 const NUMERO_PAGO = { yape: process.env.NEXT_PUBLIC_PAGO_YAPE || '', plin: process.env.NEXT_PUBLIC_PAGO_PLIN || '' }
@@ -45,6 +48,13 @@ const fecha = (f) => (f ? new Date(f).toLocaleString('es-PE', { day: '2-digit', 
 const errorDe = (e, porDefecto) => e?.response?.data?.error || porDefecto
 const mmss = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 const coord = (lat, lng) => (Number.isFinite(Number(lat)) && Number.isFinite(Number(lng)) && lat !== null && lng !== null ? [Number(lat), Number(lng)] : null)
+
+const minutosA = (km) => Math.max(1, Math.round(((Number(km) * 1.3) / 25) * 60))
+const ORDENES = [
+  { k: 'recomendado', t: 'Recomendado', i: faThumbsUp },
+  { k: 'cercano', t: 'Más cercano', i: faBolt },
+  { k: 'calificacion', t: 'Mejor calificado', i: faStar },
+]
 
 function Estrellas({ valor }) {
   return (
@@ -173,6 +183,16 @@ export default function PasajeroPage() {
   const [nombreEdit, setNombreEdit] = useState('')
   const [claves, setClaves] = useState({ actual: '', nueva: '', repetir: '' })
   const [guardando, setGuardando] = useState(false)
+  const [ajustes, setAjustes] = useState({ garantia: GARANTIA_BASE, compensacion_conductor: 1, compensacion_plataforma: 0.5, radio_busqueda_km: RADIO_KM })
+  const [zonas, setZonas] = useState([])
+  const [cotizacion, setCotizacion] = useState(null)   // { tarifa, desglose, en_zona, garantia, ... }
+  const [cotizando, setCotizando] = useState(false)
+  const [orden, setOrden] = useState('recomendado')
+  const [verDesglose, setVerDesglose] = useState(false)
+  const [compartiendo, setCompartiendo] = useState(false)
+  const GARANTIA = ajustes.garantia
+  const ajustesRef = useRef(ajustes)
+  useEffect(() => { ajustesRef.current = ajustes }, [ajustes])
 
   // ── sesión ──
   useEffect(() => {
@@ -354,7 +374,7 @@ export default function PasajeroPage() {
         else {
           const h = await cargarHistorial()
           const ult = h?.find((x) => x.id === idPrevio.current) || h?.[0]
-          if (ult?.estado === 'cancelado_conductor') avisar('El conductor no pudo atender tu solicitud. Tu garantía de S/ 1.50 fue devuelta. Elige otro taxi.', { icon: '↩️', duration: 9000 })
+          if (ult?.estado === 'cancelado_conductor') avisar(`El conductor no pudo atender tu solicitud. Tu garantía de ${soles(ajustesRef.current.garantia)} fue devuelta. Elige otro taxi.`, { icon: '↩️', duration: 9000 })
         }
       }
       estadoPrevio.current = act ? act.estado : null
@@ -376,6 +396,38 @@ export default function PasajeroPage() {
     return () => clearInterval(id)
   }, [listo, viaje, cargarConductores])
 
+  // ajustes públicos (garantía, reparto) y zonas de servicio
+  useEffect(() => {
+    if (!listo) return
+    api.get('/api/ajustes-publicos').then((r) => setAjustes((a) => ({ ...a, ...r.data }))).catch(() => {})
+    api.get('/api/zonas').then((r) => setZonas(r.data)).catch(() => {})
+  }, [listo])
+
+  // cotización estimada cuando hay destino (usa la ruta por calles si ya se calculó)
+  const kmRuta = ruta?.km
+  const minRuta = ruta?.min
+  useEffect(() => {
+    if (!listo || viaje || !destino) { setCotizacion(null); setCotizando(false); return }
+    if (!ruta) { setCotizando(true); return } // se cotiza cuando llega la ruta por calles
+    const ctl = new AbortController()
+    setCotizando(true)
+    const t = setTimeout(async () => {
+      try {
+        const { data } = await api.get('/api/viajes/cotizar', {
+          signal: ctl.signal,
+          params: {
+            lat_origen: pos[0], lng_origen: pos[1], lat_destino: destino[0], lng_destino: destino[1],
+            distancia_km: kmRuta ? Number(kmRuta).toFixed(2) : undefined, duracion_min: minRuta || undefined,
+          },
+        })
+        setCotizacion(data)
+        if (data.garantia) setAjustes((a) => (a.garantia === data.garantia ? a : { ...a, garantia: data.garantia }))
+      } catch (e) { if (e?.code !== 'ERR_CANCELED') setCotizacion(null) } finally { if (!ctl.signal.aborted) setCotizando(false) }
+    }, 500)
+    return () => { clearTimeout(t); ctl.abort() }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listo, viaje, destino, pos, kmRuta, minRuta])
+
   const idViaje = viaje?.id
   useEffect(() => { if (listo) cargarHistorial() }, [listo, idViaje, porCalificar?.id, cargarHistorial])
 
@@ -396,6 +448,7 @@ export default function PasajeroPage() {
   // ── acciones ──
   const pedirTaxi = async () => {
     if (!elegido) return
+    if (cotizacion && cotizacion.en_zona === false) return toast.error('Tu punto de recojo está fuera de la zona de servicio de SafO')
     if (pago.referencia.trim().length < 4) return toast.error('Ingresa el código de operación de tu pago')
     setEnviando(true)
     try {
@@ -406,6 +459,8 @@ export default function PasajeroPage() {
         lat_destino: destino ? destino[0] : undefined,
         lng_destino: destino ? destino[1] : undefined,
         direccion_destino: destino ? (destinoTxt.trim() || undefined) : (destinoTxt.trim() || undefined),
+        distancia_km: destino && ruta ? Number(ruta.km.toFixed(2)) : undefined,
+        duracion_min: destino && ruta ? ruta.min : undefined,
         metodo_pago: pago.metodo,
         referencia_pago: pago.referencia.trim(),
       })
@@ -414,7 +469,7 @@ export default function PasajeroPage() {
       setPago((p) => ({ ...p, referencia: '' }))
       await cargarViaje()
     } catch (e) {
-      toast.error(errorDe(e, 'No se pudo solicitar el taxi'))
+      toast.error(errorDe(e, 'No se pudo solicitar el taxi'), { duration: 6000 })
       cargarConductores()
     } finally {
       setEnviando(false)
@@ -433,6 +488,21 @@ export default function PasajeroPage() {
       toast.error(errorDe(e, 'No se pudo cancelar el viaje'))
       setConfirmarCancelar(false)
     }
+  }
+
+  const compartirViaje = async () => {
+    if (!viaje) return
+    setCompartiendo(true)
+    try {
+      const { data } = await api.post(`/api/viajes/${viaje.id}/compartir`)
+      const enlace = `${window.location.origin}/seguimiento?t=${data.token}`
+      const texto = `Sigue mi viaje en SafO (${viaje.conductor_nombre} · placa ${viaje.placa}):`
+      if (navigator.share) {
+        try { await navigator.share({ title: 'Mi viaje en SafO', text: texto, url: enlace }); return } catch (e) { if (e?.name === 'AbortError') return }
+      }
+      try { await navigator.clipboard.writeText(`${texto} ${enlace}`); toast.success('Enlace copiado. Pégalo en WhatsApp para compartirlo.') }
+      catch { window.prompt('Copia este enlace para compartir tu viaje:', enlace) }
+    } catch (e) { toast.error(errorDe(e, 'No se pudo generar el enlace')) } finally { setCompartiendo(false) }
   }
 
   const calificar = async () => {
@@ -507,6 +577,29 @@ export default function PasajeroPage() {
   const despachado = viaje && ['aceptado', 'en_camino'].includes(viaje.estado)
   const segundosRestantes = finSolicitud ? Math.max(0, Math.round((finSolicitud - ahora) / 1000)) : null
   const planificando = !viaje && !porCalificar
+  const etiquetas = (() => {
+    if (conductores.length === 0) return {}
+    const dist = (c) => Number(c.distancia_km)
+    const cal = (c) => Number(c.calificacion_prom || 0)
+    const puntaje = (c) => cal(c) * 2 - dist(c)
+    const masCerca = [...conductores].sort((a, b) => dist(a) - dist(b))[0]
+    const mejor = [...conductores].sort((a, b) => cal(b) - cal(a) || (b.total_viajes || 0) - (a.total_viajes || 0))[0]
+    const recomendado = [...conductores].sort((a, b) => puntaje(b) - puntaje(a))[0]
+    const r = {}
+    const poner = (c, k) => { r[c.id] = [...(r[c.id] || []), k] }
+    if (conductores.length > 1) poner(recomendado, 'recomendado')
+    poner(masCerca, 'cercano')
+    if (cal(mejor) > 0 && conductores.length > 1) poner(mejor, 'calificacion')
+    return r
+  })()
+  const conductoresOrdenados = [...conductores].sort((a, b) => {
+    if (orden === 'cercano') return Number(a.distancia_km) - Number(b.distancia_km)
+    if (orden === 'calificacion') return Number(b.calificacion_prom || 0) - Number(a.calificacion_prom || 0) || (b.total_viajes || 0) - (a.total_viajes || 0)
+    return (Number(b.calificacion_prom || 0) * 2 - Number(b.distancia_km)) - (Number(a.calificacion_prom || 0) * 2 - Number(a.distancia_km))
+  })
+  const fueraDeZona = !!cotizacion && cotizacion.en_zona === false
+  const posConductor = viaje ? coord(viaje.lat_actual, viaje.lng_actual) : null
+  const kmConductor = posConductor && origenViaje && ['aceptado', 'en_camino'].includes(viaje?.estado) ? distanciaKm(posConductor, origenViaje) : null
 
   return (
     <div className="min-h-screen bg-[#F6F8FB] text-[#14213D]">
@@ -556,6 +649,7 @@ export default function PasajeroPage() {
             { k: 'pedir', t: 'Pedir taxi', i: faTaxi },
             { k: 'viajes', t: 'Mis viajes', i: faRoute },
             { k: 'pagos', t: 'Pagos y garantía', i: faWallet },
+            { k: 'ayuda', t: 'Ayuda y reclamos', i: faHeadset },
             { k: 'cuenta', t: 'Mi cuenta', i: faUser },
           ].map((x) => (
             <button key={x.k} onClick={() => setTab(x.k)}
@@ -570,10 +664,10 @@ export default function PasajeroPage() {
 
         {/* ═════════ PEDIR TAXI ═════════ */}
         {tab === 'pedir' && (
-          <div className="grid lg:grid-cols-5 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
 
             {/* Mapa */}
-            <section className="lg:col-span-3 order-1">
+            <section className="lg:col-span-3 order-1 min-w-0">
               <div className="relative rounded-3xl overflow-hidden border border-[#E2E8F0] bg-white shadow-[0_20px_50px_-30px_rgba(20,33,61,.35)]">
                 <MapaPasajero
                   className="h-[340px] sm:h-[460px] lg:h-[600px] w-full"
@@ -587,6 +681,7 @@ export default function PasajeroPage() {
                   onMoverDestino={viaje ? undefined : elegirDestinoEnMapa}
                   modoDestino={modoDestino && !viaje}
                   radioKm={RADIO_KM}
+                  zonas={zonas}
                   conductorViaje={conductorViaje}
                   ajustarKey={ajustarKey}
                 />
@@ -603,6 +698,9 @@ export default function PasajeroPage() {
                     <FontAwesomeIcon icon={faLocationCrosshairs} />
                   </button>
                 </div>
+                {viaje && viaje.estado !== 'solicitado' && (
+                  <div className="absolute left-3 bottom-3" style={{ zIndex: 500 }}><BotonSOS posicion={gpsRef.current || pos} /></div>
+                )}
               </div>
               {permiso === 'denegado' && (
                 <div className="mt-3 rounded-2xl bg-[#FEF3E2] border border-[#F5D9A8] p-4 text-sm text-[#8a4a07]">
@@ -618,7 +716,8 @@ export default function PasajeroPage() {
             </section>
 
             {/* Panel lateral */}
-            <section className="lg:col-span-2 order-2 space-y-4">
+            <section className="lg:col-span-2 order-2 min-w-0 space-y-4 relative z-[600] -mt-8 lg:mt-0 rounded-t-[28px] lg:rounded-none bg-[#F6F8FB] lg:bg-transparent pt-3 lg:pt-0 shadow-[0_-12px_30px_-18px_rgba(20,33,61,.45)] lg:shadow-none">
+              <div className="lg:hidden mx-auto w-11 h-1.5 rounded-full bg-[#D2D2D7]" aria-hidden="true" />
 
               {/* Calificar viaje terminado */}
               {!viaje && porCalificar && (
@@ -676,6 +775,49 @@ export default function PasajeroPage() {
                 </div>
               )}
 
+              {/* Tarifa estimada */}
+              {planificando && (
+                <div className="rounded-3xl bg-[#14213D] text-white p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-xs font-semibold uppercase tracking-widest text-white/60">Tarifa estimada</div>
+                      {cotizacion ? (
+                        <div className="text-4xl font-bold mt-1">{soles(cotizacion.tarifa)}</div>
+                      ) : cotizando ? (
+                        <div className="text-lg mt-2 text-white/70"><FontAwesomeIcon icon={faRotate} className="animate-spin mr-2" />Calculando…</div>
+                      ) : (
+                        <div className="text-base mt-2 text-white/70">Indica tu destino para ver cuánto cuesta.</div>
+                      )}
+                    </div>
+                    {cotizacion && (
+                      <div className="text-right text-sm text-white/80">
+                        <div><FontAwesomeIcon icon={faRoute} className="mr-1.5 text-[#FFC21A]" />{Number(cotizacion.distancia_km).toFixed(1)} km</div>
+                        <div><FontAwesomeIcon icon={faClock} className="mr-1.5 text-[#FFC21A]" />~{cotizacion.duracion_min} min</div>
+                      </div>
+                    )}
+                  </div>
+                  {cotizacion && (
+                    <>
+                      <p className="text-xs text-white/60 mt-2">Se paga en efectivo al conductor al terminar el viaje. El precio final puede variar un poco según el recorrido.</p>
+                      <button onClick={() => setVerDesglose((v) => !v)} className="text-xs font-semibold text-[#FFC21A] mt-2">{verDesglose ? 'Ocultar desglose' : 'Ver desglose'}</button>
+                      {verDesglose && (
+                        <ul className="mt-2 text-sm space-y-1 text-white/85">
+                          <li className="flex justify-between"><span>Tarifa base</span><span>{soles(cotizacion.desglose?.base)}</span></li>
+                          <li className="flex justify-between"><span>Por distancia</span><span>{soles(cotizacion.desglose?.por_km)}</span></li>
+                          <li className="flex justify-between"><span>Por tiempo</span><span>{soles(cotizacion.desglose?.por_tiempo)}</span></li>
+                          {cotizacion.desglose?.minima_aplicada && <li className="text-xs text-[#FFC21A]">Se aplicó la tarifa mínima.</li>}
+                        </ul>
+                      )}
+                    </>
+                  )}
+                  {fueraDeZona && (
+                    <div className="mt-3 rounded-xl bg-[#D92D20] text-white text-sm p-3">
+                      <FontAwesomeIcon icon={faTriangleExclamation} className="mr-2" />Tu punto de recojo está fuera de la zona de servicio de SafO. Mueve el pin hacia el área punteada en verde.
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Viaje en curso */}
               {viaje && (
                 <div className="rounded-3xl bg-white border border-[#E2E8F0] p-5">
@@ -714,12 +856,29 @@ export default function PasajeroPage() {
                   </div>
                   <DatosVehiculo c={viaje} />
 
+                  {kmConductor !== null && (
+                    <div className="mt-3 p-3 rounded-xl bg-[#EAF2FE] text-sm text-[#0A66E0] font-medium">
+                      <FontAwesomeIcon icon={faTaxi} className="mr-2" />Tu conductor llega en ~{minutosA(kmConductor)} min · a {kmConductor.toFixed(1)} km
+                    </div>
+                  )}
+                  {viaje.tarifa_estimada && (
+                    <div className="mt-3 flex items-center justify-between text-sm">
+                      <span className="text-[#6E6E73]">Tarifa estimada (efectivo)</span>
+                      <b className="text-lg">{soles(viaje.tarifa_estimada)}</b>
+                    </div>
+                  )}
+
                   {viaje.conductor_celular && (
                     <a href={`tel:+51${viaje.conductor_celular}`}
                       className="mt-4 flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#E8F5EA] text-[#1E8E3E] font-semibold hover:bg-[#d8eedb] transition">
                       <FontAwesomeIcon icon={faPhone} />Llamar al conductor · +51 {viaje.conductor_celular}
                     </a>
                   )}
+
+                  <button onClick={compartirViaje} disabled={compartiendo}
+                    className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#F5F5F7] text-[#14213D] font-semibold hover:bg-[#E8E8ED] transition disabled:opacity-60">
+                    <FontAwesomeIcon icon={faShareNodes} />{compartiendo ? 'Generando enlace…' : 'Compartir mi viaje'}
+                  </button>
 
                   <div className="mt-4 space-y-2 text-sm">
                     <div className="flex gap-2"><FontAwesomeIcon icon={faLocationDot} className="text-[#0A66E0] mt-1" /><span>{viaje.direccion_origen || 'Punto de recojo'}</span></div>
@@ -745,8 +904,8 @@ export default function PasajeroPage() {
                       <p className="text-[#8a4a07] mb-3">
                         <FontAwesomeIcon icon={faTriangleExclamation} className="mr-1.5" />
                         {despachado
-                          ? 'El conductor ya va hacia ti: si cancelas se retiene tu garantía de S/ 1.50 (S/ 1.00 para el conductor).'
-                          : 'Aún no sale el conductor: si cancelas te devolvemos tus S/ 1.50.'}
+                          ? `El conductor ya va hacia ti: si cancelas se retiene tu garantía de ${soles(GARANTIA)} (${soles(ajustes.compensacion_conductor)} para el conductor).`
+                          : `Aún no sale el conductor: si cancelas te devolvemos tus ${soles(GARANTIA)}.`}
                       </p>
                       <div className="flex gap-2">
                         <button onClick={cancelarViaje} className="flex-1 py-2.5 rounded-xl bg-[#D92D20] text-white font-semibold">Sí, cancelar</button>
@@ -761,7 +920,7 @@ export default function PasajeroPage() {
               {planificando && (
                 <div className="rounded-3xl bg-white border border-[#E2E8F0] p-5">
                   <div className="flex items-center justify-between mb-1">
-                    <h2 className="font-semibold text-lg">Taxis cerca de ti</h2>
+                    <h2 className="font-semibold text-lg">Elige tu taxi</h2>
                     <button onClick={() => { setCargando(true); cargarConductores() }} aria-label="Actualizar"
                       className="text-[#0A66E0] text-sm font-medium hover:underline"><FontAwesomeIcon icon={faRotate} className="mr-1.5" />Actualizar</button>
                   </div>
@@ -777,9 +936,21 @@ export default function PasajeroPage() {
                     </div>
                   )}
 
+                  {conductores.length > 1 && (
+                    <div className="flex gap-2 mb-3 overflow-x-auto pb-1" role="radiogroup" aria-label="Ordenar taxis">
+                      {ORDENES.map((o) => (
+                        <button key={o.k} onClick={() => setOrden(o.k)} role="radio" aria-checked={orden === o.k}
+                          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition ${orden === o.k ? 'bg-[#14213D] text-white border-[#14213D]' : 'bg-white text-[#4B5873] border-[#E2E2E7] hover:border-[#B8D2F7]'}`}>
+                          <FontAwesomeIcon icon={o.i} className="mr-1.5" />{o.t}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                   <ul className="space-y-2.5">
-                    {conductores.map((c) => {
+                    {conductoresOrdenados.map((c) => {
                       const sel = c.id === seleccionado
+                      const marcas = (etiquetas[c.id] || []).map((k) => ORDENES.find((o) => o.k === k)).filter(Boolean)
                       return (
                         <li key={c.id}>
                           <button onClick={() => setSeleccionado(sel ? null : c.id)} aria-pressed={sel}
@@ -794,11 +965,14 @@ export default function PasajeroPage() {
                                 </div>
                               </div>
                               <div className="text-right shrink-0">
-                                <div className="font-semibold text-[#0A66E0]">{Number(c.distancia_km).toFixed(1)} km</div>
-                                <div className="text-[11px] text-[#A1A1A6]">~{Math.max(1, Math.round((Number(c.distancia_km) * 1.3 / 25) * 60))} min</div>
+                                {cotizacion && <div className="font-bold text-[#14213D]">{soles(cotizacion.tarifa)}</div>}
+                                <div className="text-xs font-semibold text-[#0A66E0]">{minutosA(c.distancia_km)} min · {Number(c.distancia_km).toFixed(1)} km</div>
                               </div>
                             </div>
-                            <div className="mt-2.5"><DatosVehiculo c={c} /></div>
+                            <div className="mt-2.5 flex items-center justify-between gap-2 flex-wrap">
+                              <DatosVehiculo c={c} />
+                              {marcas.length > 0 && <span className="flex gap-1.5 flex-wrap">{marcas.map((m) => <span key={m.k} className="px-2 py-0.5 rounded-full bg-[#E8F5EA] text-[#1E8E3E] text-[11px] font-semibold"><FontAwesomeIcon icon={m.i} className="mr-1" />{m.t}</span>)}</span>}
+                            </div>
                           </button>
                         </li>
                       )
@@ -844,12 +1018,17 @@ export default function PasajeroPage() {
 
                   <p className="text-xs text-[#6E6E73] mb-4 leading-relaxed">
                     <FontAwesomeIcon icon={faShieldHalved} className="mr-1.5 text-[#1E8E3E]" />
-                    Si cancelas antes de que el conductor salga, te devolvemos los {soles(GARANTIA)}. Si ya salió, S/ 1.00 es para el conductor y S/ 0.50 para SafO.
+                    Si cancelas antes de que el conductor salga, te devolvemos los {soles(GARANTIA)}. Si ya salió, {soles(ajustes.compensacion_conductor)} es para el conductor y {soles(ajustes.compensacion_plataforma)} para SafO.
                   </p>
 
-                  <button onClick={pedirTaxi} disabled={enviando}
+                  {cotizacion && (
+                    <div className="flex items-center justify-between text-sm mb-3 px-1">
+                      <span className="text-[#6E6E73]">Tarifa estimada (se paga en efectivo)</span><b className="text-lg">{soles(cotizacion.tarifa)}</b>
+                    </div>
+                  )}
+                  <button onClick={pedirTaxi} disabled={enviando || fueraDeZona}
                     className="w-full py-3.5 rounded-2xl font-semibold text-white text-lg bg-[#0A66E0] hover:bg-[#084FB0] disabled:opacity-50 transition">
-                    <FontAwesomeIcon icon={faTaxi} className="mr-2.5" />{enviando ? 'Solicitando…' : 'Pedir taxi'}
+                    <FontAwesomeIcon icon={faTaxi} className="mr-2.5" />{enviando ? 'Solicitando…' : fueraDeZona ? 'Fuera de la zona de servicio' : `Pedir ${elegido.nombre.split(' ')[0]}`}
                   </button>
                 </div>
               )}
@@ -881,8 +1060,9 @@ export default function PasajeroPage() {
                     </div>
                     <div className="mt-3 pt-3 border-t border-[#F0F0F3] flex items-center justify-between text-sm">
                       <span className="text-[#6E6E73]"><FontAwesomeIcon icon={faTaxi} className="mr-1.5" />{v.conductor_nombre} · {v.placa}</span>
-                      <span className="font-semibold">{soles(v.monto_total)}</span>
+                      <span className="font-semibold">{v.tarifa_estimada ? `${soles(v.tarifa_estimada)} · ` : ''}<span className="text-xs font-normal text-[#6E6E73]">garantía {soles(v.monto_total)}</span></span>
                     </div>
+                    {v.distancia_km && <div className="text-xs text-[#6E6E73] mt-1">{Number(v.distancia_km).toFixed(1)} km · ~{v.duracion_min} min</div>}
                   </li>
                 ))}
               </ul>
@@ -904,7 +1084,7 @@ export default function PasajeroPage() {
                 <li><FontAwesomeIcon icon={faCoins} className="mr-2 text-[#FFC21A]" />Pagas {soles(GARANTIA)} por <b className="text-white">Yape</b> o <b className="text-white">Plin</b> al pedir tu taxi. No hay costo de registro.</li>
                 <li><FontAwesomeIcon icon={faCircleCheck} className="mr-2 text-[#FFC21A]" />Si cancelas antes de que el conductor salga, <b className="text-white">te lo devolvemos completo</b>.</li>
                 <li><FontAwesomeIcon icon={faHourglassHalf} className="mr-2 text-[#FFC21A]" />Si el conductor no responde en unos minutos, la solicitud se cancela y <b className="text-white">se te devuelve</b>.</li>
-                <li><FontAwesomeIcon icon={faHourglassHalf} className="mr-2 text-[#FFC21A]" />Si el conductor ya salió y cancelas, S/ 1.00 es para él y S/ 0.50 para SafO.</li>
+                <li><FontAwesomeIcon icon={faHourglassHalf} className="mr-2 text-[#FFC21A]" />Si el conductor ya salió y cancelas, {soles(ajustes.compensacion_conductor)} es para él y {soles(ajustes.compensacion_plataforma)} para SafO.</li>
                 <li><FontAwesomeIcon icon={faTriangleExclamation} className="mr-2 text-[#FFC21A]" />Con 3 cancelaciones tardías en el mes, tu cuenta se suspende.</li>
               </ul>
             </div>
@@ -927,6 +1107,18 @@ export default function PasajeroPage() {
                 </ul>
               )}
             </div>
+          </section>
+        )}
+
+        {/* ═════════ AYUDA Y RECLAMOS ═════════ */}
+        {tab === 'ayuda' && (
+          <section className="max-w-xl mx-auto space-y-5">
+            <h1 className="text-2xl font-semibold">Ayuda y reclamos</h1>
+            <div className="rounded-3xl bg-[#FCEAE9] border border-[#F5C6C2] p-5 text-sm text-[#7A1F17]">
+              <div className="font-semibold mb-1"><FontAwesomeIcon icon={faTriangleExclamation} className="mr-2" />¿Emergencia?</div>
+              Durante un viaje verás el botón rojo <b>SOS</b> sobre el mapa. También puedes llamar directo a la Policía al <a href="tel:105" className="font-bold underline">105</a>.
+            </div>
+            <ReclamosPanel viajes={historial.slice(0, 15).map((v) => ({ id: v.id, texto: `${fecha(v.solicitado_en)} · ${v.conductor_nombre || 'Viaje'}${v.placa ? ` (${v.placa})` : ''}` }))} />
           </section>
         )}
 

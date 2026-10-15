@@ -58,3 +58,40 @@ body {
   box-shadow: 0 6px 14px rgba(20,33,61,.4);
 }
 .safo-bandera svg { width: 17px; height: 17px; }
+
+/* ── Panel de administración: contenido a la derecha de la barra lateral ── */
+@media (min-width: 768px) {
+  body:has(.safo-sidebar) { padding-left: 16rem; }
+}
+body:has(.safo-sidebar) { background: #F4F6FA; }
+/* Las páginas del panel dejan de pintar su propio fondo blanco para mostrar el gris del tablero */
+body:has(.safo-sidebar) > div > div.min-h-screen.bg-white,
+body:has(.safo-sidebar) div.min-h-screen.bg-white { background: transparent; }
+
+/* Tarjetas del tablero */
+.tarjeta { background: #fff; border: 1px solid #E6E8EF; border-radius: 1rem; }
+.tarjeta-sombra { box-shadow: 0 1px 2px rgba(20,33,61,.04), 0 8px 24px rgba(20,33,61,.05); }
+
+/* Marcadores del mapa del administrador */
+.safo-taxi.libre { background: #1E8E3E; color: #fff; }
+.safo-taxi.viaje { background: #FFC21A; color: #14213D; }
+.safo-sos-wrap { background: none; border: 0; }
+.safo-sos {
+  display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 9999px; background: #D92D20; color: #fff;
+  border: 3px solid #fff; box-shadow: 0 0 0 3px #D92D20; position: relative;
+}
+.safo-sos::after {
+  content: ''; position: absolute; inset: -8px; border-radius: 9999px;
+  background: rgba(217,45,32,.3); animation: safo-pulso 1.4s ease-out infinite;
+}
+.safo-sos svg { width: 18px; height: 18px; position: relative; z-index: 1; }
+.safo-origen {
+  display: block; width: 16px; height: 16px; border-radius: 9999px;
+  background: #0A66E0; border: 3px solid #fff; box-shadow: 0 0 0 2px #0A66E0;
+}
+.safo-zona-etiqueta {
+  background: rgba(255,255,255,.85); border: 0; box-shadow: none; color: #14213D;
+  font-weight: 600; font-size: 11px; padding: 1px 6px; border-radius: 9999px;
+}
+.safo-zona-etiqueta::before { display: none; }

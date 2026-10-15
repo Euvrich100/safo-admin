@@ -29,11 +29,12 @@ export default function MapaPasajero({
   onMoverDestino,         // ([lat, lng]) el pasajero movió el destino
   modoDestino = false,    // true: tocar el mapa mueve el destino en vez del recojo
   radioKm = 5,
+  zonas = [],             // zonas de servicio [{ lat, lng, radio_km, activa }]
   conductorViaje = null,  // { lat, lng, nombre } mientras hay un viaje en curso
   ajustarKey = 0,         // al cambiar, el mapa se ajusta para ver todo
 }) {
   const contenedor = useRef(null)
-  const estado = useRef({ L: null, mapa: null, yo: null, bandera: null, linea: null, circulo: null, taxis: new Map(), viaje: null, ultimoAjuste: -1 })
+  const estado = useRef({ L: null, mapa: null, yo: null, bandera: null, linea: null, circulo: null, taxis: new Map(), viaje: null, zonasCapa: null, ultimoAjuste: -1 })
   const cb = useRef({})
   useEffect(() => { cb.current = { onSeleccionar, onMover, onMoverDestino, modoDestino } })
 
@@ -64,13 +65,14 @@ export default function MapaPasajero({
         if (cb.current.modoDestino) cb.current.onMoverDestino?.(p)
         else cb.current.onMover?.(p)
       })
+      st.zonasCapa = L.layerGroup().addTo(st.mapa)
       st.circulo = L.circle(centro, { radius: radioKm * 1000, color: '#0A66E0', weight: 1, fillColor: '#0A66E0', fillOpacity: 0.05, interactive: false }).addTo(st.mapa)
       st.listo?.()
     })
     return () => {
       cancelado = true
-      if (st.mapa) st.mapa.remove()
-      Object.assign(st, { L: null, mapa: null, yo: null, bandera: null, linea: null, circulo: null, viaje: null, ultimoAjuste: -1 })
+      if (st.mapa) { st.mapa.stop(); st.mapa.off(); st.mapa.remove() }
+      Object.assign(st, { L: null, mapa: null, yo: null, bandera: null, linea: null, circulo: null, viaje: null, zonasCapa: null, ultimoAjuste: -1 })
       st.taxis = new Map()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -84,6 +86,13 @@ export default function MapaPasajero({
       if (!L || !mapa) return
       st.yo.setLatLng(centro)
       st.circulo.setLatLng(centro).setRadius(radioKm * 1000)
+
+      // zonas de servicio (contorno discontinuo)
+      st.zonasCapa?.clearLayers()
+      zonas.forEach((z) => {
+        if (z.activa === false || !valido([z.lat, z.lng])) return
+        L.circle([Number(z.lat), Number(z.lng)], { radius: Number(z.radio_km) * 1000, color: '#1E8E3E', weight: 2, dashArray: '8 8', fillColor: '#1E8E3E', fillOpacity: 0.03, interactive: false }).addTo(st.zonasCapa)
+      })
 
       // destino
       if (valido(destino)) {
@@ -140,13 +149,13 @@ export default function MapaPasajero({
         conductores.forEach((c) => { if (valido([c.lat_actual, c.lng_actual])) puntos.push([Number(c.lat_actual), Number(c.lng_actual)]) })
         if (valido(destino)) puntos.push(destino)
         if (conductorViaje && valido([conductorViaje.lat, conductorViaje.lng])) puntos.push([Number(conductorViaje.lat), Number(conductorViaje.lng)])
-        if (puntos.length > 1) mapa.fitBounds(L.latLngBounds(puntos), { padding: [50, 50], maxZoom: 16 })
-        else mapa.setView(centro, 15)
+        if (puntos.length > 1) mapa.fitBounds(L.latLngBounds(puntos), { padding: [50, 50], maxZoom: 16, animate: false })
+        else mapa.setView(centro, 15, { animate: false })
       }
     }
     if (st.mapa) sincronizar()
     else st.listo = sincronizar
-  }, [centro, destino, ruta, conductores, seleccionadoId, radioKm, conductorViaje, ajustarKey])
+  }, [centro, destino, ruta, conductores, seleccionadoId, radioKm, conductorViaje, ajustarKey, zonas])
 
   // Cursor de cruz cuando se está eligiendo el destino
   useEffect(() => { if (contenedor.current) contenedor.current.style.cursor = modoDestino ? 'crosshair' : '' }, [modoDestino])
