@@ -113,7 +113,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-white/60" />
 
         <div className="relative h-full flex flex-col justify-between p-12 xl:p-14">
-          <SafoLogo size={44} showText priority />
+          <SafoLogo size={68} showText priority />
 
           <div className="max-w-[27rem]">
             <h2 className="titulo text-[2.9rem] xl:text-[3.4rem] font-semibold text-[#16181D] leading-[1.03] mb-5">
@@ -142,7 +142,7 @@ export default function LoginPage() {
       <div className="flex-1 lg:flex-none lg:w-[30rem] flex flex-col justify-center px-7 py-10 sm:px-12 lg:px-14">
         <div className="w-full max-w-[22rem] mx-auto lg:mx-0">
 
-          <div className="lg:hidden mb-9"><SafoLogo size={40} showText priority /></div>
+          <div className="lg:hidden mb-9"><SafoLogo size={64} showText priority /></div>
 
           <div className="mb-8">
             <span className="insignia-taxi mb-5" aria-hidden="true"><FontAwesomeIcon icon={faTaxi} /></span>

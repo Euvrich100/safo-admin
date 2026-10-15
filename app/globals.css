@@ -6,6 +6,13 @@
   --background: #ffffff;
   --foreground: #16181d;
   --tinta: #16181d;
+  --texto: #16181d;
+  --campo: #ffffff;
+  --azul-texto: #0a66e0;
+  --graf-marino: #14213d;
+  --graf-linea: #edeff4;
+  --graf-texto: #14213d;
+  --graf-sub: #6e6e73;
   --tinta-2: #4a4f5c;
   --tinta-3: #7a7f8c;
   --linea: #d9dce3;
@@ -45,8 +52,8 @@ h1, h2 { font-family: var(--fuente-titulo); letter-spacing: -0.022em; }
 
 .f-input {
   display: block; width: 100%; height: 46px; padding: 0 14px;
-  font: inherit; font-size: 15px; color: var(--tinta);
-  background: #fff; border: 1px solid var(--linea); border-radius: 10px;
+  font: inherit; font-size: 15px; color: var(--texto);
+  background: var(--campo); border: 1px solid var(--linea); border-radius: 10px;
   transition: border-color .15s, box-shadow .15s;
 }
 .f-input::placeholder { color: #a3a8b3; }
@@ -60,7 +67,7 @@ select.f-input {
 
 /* Campo con prefijo (+51) pegado a la izquierda */
 .f-grupo {
-  display: flex; align-items: stretch; height: 46px; background: #fff;
+  display: flex; align-items: stretch; height: 46px; background: var(--campo);
   border: 1px solid var(--linea); border-radius: 10px; overflow: hidden;
   transition: border-color .15s, box-shadow .15s;
 }
@@ -72,7 +79,7 @@ select.f-input {
   font-variant-numeric: tabular-nums;
 }
 .f-grupo > input {
-  flex: 1; min-width: 0; padding: 0 14px; font: inherit; font-size: 15px; color: var(--tinta);
+  flex: 1; min-width: 0; padding: 0 14px; font: inherit; font-size: 15px; color: var(--texto);
   background: transparent; border: 0; outline: none; font-variant-numeric: tabular-nums;
 }
 .f-grupo > input::placeholder { color: #a3a8b3; }
@@ -87,14 +94,14 @@ select.f-input {
 .f-btn:hover { background: var(--azul-osc); }
 .f-btn:active { transform: translateY(1px); }
 .f-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-.f-btn-sec { color: var(--tinta); background: #fff; border-color: var(--linea); }
+.f-btn-sec { color: var(--texto); background: var(--campo); border-color: var(--linea); }
 .f-btn-sec:hover { background: var(--superficie); border-color: #c2c6d0; }
 .f-btn:focus-visible, .f-input:focus-visible, .f-link:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
 
-.f-link { color: var(--azul); font-weight: 600; background: none; border: 0; padding: 0; cursor: pointer; }
+.f-link { color: var(--azul-texto); font-weight: 600; background: none; border: 0; padding: 0; cursor: pointer; }
 .f-link:hover { text-decoration: underline; text-underline-offset: 3px; }
 .f-link-suave { color: var(--tinta-2); font-weight: 500; background: none; border: 0; padding: 0; cursor: pointer; }
-.f-link-suave:hover { color: var(--tinta); text-decoration: underline; text-underline-offset: 3px; }
+.f-link-suave:hover { color: var(--texto); text-decoration: underline; text-underline-offset: 3px; }
 
 .f-divisor { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--tinta-3); }
 .f-divisor::before, .f-divisor::after { content: ""; flex: 1; height: 1px; background: var(--linea-suave); }
@@ -185,3 +192,146 @@ body:has(.safo-sidebar) div.min-h-screen.bg-white { background: transparent; }
   font-weight: 600; font-size: 11px; padding: 1px 6px; border-radius: 9999px;
 }
 .safo-zona-etiqueta::before { display: none; }
+
+/* ===== MODO OSCURO (generado: scripts/generar-tema-oscuro.py) ===== */
+/* Modo oscuro automático (según el dispositivo del cliente).
+   GENERADO con las clases que usa la app: los colores claros se reasignan aquí,
+   sin tocar cada pantalla. Las reglas sin capa ganan a las utilidades de Tailwind. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --background: #13161B;
+    --foreground: #ECEEF2;
+    --tinta: #2B313C;
+    --texto: #ECEEF2;
+    --tinta-2: #B8BDC9;
+    --tinta-3: #8B91A0;
+    --linea: #2C323C;
+    --linea-suave: #272C35;
+    --superficie: #1C2027;
+    --campo: #171A20;
+    --azul-texto: #6AA6FF;
+    --graf-marino: #9FB4E8;
+    --graf-linea: #272C35;
+    --graf-texto: #ECEEF2;
+    --graf-sub: #A0A6B4;
+  }
+  body { background: #13161B; color: #ECEEF2; }
+
+  .bg-\[\#14213D\] { background-color:#2A3550; }
+  .bg-\[\#16181D\] { background-color:#2B313C; }
+  .bg-\[\#1D1D1F\] { background-color:#2B313C; }
+  .bg-\[\#C5C8D2\] { background-color:#4A5160; }
+  .bg-\[\#E2E2E7\] { background-color:#272C35; }
+  .bg-\[\#E8EAEE\] { background-color:#272C35; }
+  .bg-\[\#EAF2FE\] { background-color:rgba(106,166,255,.16); }
+  .bg-\[\#EEF3F8\] { background-color:#1C2027; }
+  .bg-\[\#F1F1F3\] { background-color:#1C2027; }
+  .bg-\[\#F1F2F5\] { background-color:#1C2027; }
+  .bg-\[\#F3F8FF\] { background-color:#1C2027; }
+  .bg-\[\#F4F6FA\] { background-color:#1C2027; }
+  .bg-\[\#F5F5F7\] { background-color:#1C2027; }
+  .bg-\[\#F6F7F9\] { background-color:#1C2027; }
+  .bg-\[\#F6F8FB\] { background-color:#1C2027; }
+  .bg-\[\#FCEAE9\] { background-color:rgba(255,116,104,.16); }
+  .bg-\[\#FEF3E2\] { background-color:rgba(245,184,75,.16); }
+  .bg-\[\#FFF6D9\] { background-color:rgba(245,184,75,.16); }
+  .bg-white { background-color:#13161B; }
+  .bg-white\/90 { background-color:rgba(19,22,27,0.9); }
+  .bg-white\/95 { background-color:rgba(19,22,27,0.95); }
+  .border-\[\#C2C6D0\] { border-color:#3A414D; }
+  .border-\[\#C7D9F8\] { border-color:#2C323C; }
+  .border-\[\#D9DCE3\] { border-color:#2C323C; }
+  .border-\[\#DCE6F5\] { border-color:#2C323C; }
+  .border-\[\#E2E2E7\] { border-color:#2C323C; }
+  .border-\[\#E2E8F0\] { border-color:#2C323C; }
+  .border-\[\#E6E8EF\] { border-color:#2C323C; }
+  .border-\[\#E8EAEE\] { border-color:#2C323C; }
+  .border-\[\#F0F0F3\] { border-color:#2C323C; }
+  .border-\[\#F0F1F5\] { border-color:#2C323C; }
+  .border-\[\#F5C6C2\] { border-color:#2C323C; }
+  .border-\[\#F5D9A8\] { border-color:#2C323C; }
+  .border-white { border-color:#13161B; }
+  .focus-within\:bg-white:focus-within { background-color:#13161B; }
+  .focus\:bg-white:focus { background-color:#13161B; }
+  .from-\[\#F3F8FF\] { --tw-gradient-from:#1C2027; }
+  .from-white { --tw-gradient-from:rgba(19,22,27,1); }
+  .hover\:bg-\[\#000000\]:hover { background-color:#3A4150; }
+  .hover\:bg-\[\#D9E8FC\]:hover { background-color:rgba(106,166,255,.24); }
+  .hover\:bg-\[\#E4E4E8\]:hover { background-color:#272C35; }
+  .hover\:bg-\[\#E8E8ED\]:hover { background-color:#272C35; }
+  .hover\:bg-\[\#EAF2FE\]:hover { background-color:rgba(106,166,255,.16); }
+  .hover\:bg-\[\#F3F8FF\]:hover { background-color:#1C2027; }
+  .hover\:bg-\[\#F5F5F7\]:hover { background-color:#1C2027; }
+  .hover\:bg-\[\#F6F7F9\]:hover { background-color:#1C2027; }
+  .hover\:bg-\[\#F9D9D6\]:hover { background-color:rgba(255,116,104,.26); }
+  .hover\:bg-\[\#FAFBFD\]:hover { background-color:#1C2027; }
+  .hover\:bg-\[\#FCEAE9\]:hover { background-color:rgba(255,116,104,.16); }
+  .hover\:bg-\[\#dbe9fd\]:hover { background-color:rgba(106,166,255,.24); }
+  .hover\:bg-white:hover { background-color:#1C2027; }
+  .hover\:border-\[\#B8D2F7\]:hover { border-color:#2C323C; }
+  .hover\:border-\[\#C2C6D0\]:hover { border-color:#3A414D; }
+  .hover\:border-\[\#C7D6EA\]:hover { border-color:#2C323C; }
+  .hover\:text-\[\#0A66E0\]:hover { color:#6AA6FF; }
+  .hover\:text-\[\#14213D\]:hover { color:#ECEEF2; }
+  .hover\:text-\[\#16181D\]:hover { color:#ECEEF2; }
+  .hover\:text-\[\#1D1D1F\]:hover { color:#ECEEF2; }
+  .text-\[\#0A4FD6\] { color:#7BB0FF; }
+  .text-\[\#0A66E0\] { color:#6AA6FF; }
+  .text-\[\#14213D\] { color:#ECEEF2; }
+  .text-\[\#16181D\] { color:#ECEEF2; }
+  .text-\[\#1877F2\] { color:#5B9DFF; }
+  .text-\[\#1D1D1F\] { color:#ECEEF2; }
+  .text-\[\#4A4F5C\] { color:#B8BDC9; }
+  .text-\[\#4B4F5C\] { color:#B8BDC9; }
+  .text-\[\#4B5873\] { color:#B8BDC9; }
+  .text-\[\#5C4A00\] { color:#F5D36B; }
+  .text-\[\#6B7894\] { color:#A0A6B4; }
+  .text-\[\#6E6E73\] { color:#A0A6B4; }
+  .text-\[\#7A1F17\] { color:#FFB3AB; }
+  .text-\[\#7A7F8C\] { color:#9AA0AE; }
+  .text-\[\#7C5CFC\] { color:#A892FF; }
+  .text-\[\#8A6A00\] { color:#F5D36B; }
+  .text-\[\#8A8F9C\] { color:#8B91A0; }
+  .text-\[\#8a4a07\] { color:#F5B84B; }
+  .text-\[\#92400E\] { color:#F5B84B; }
+  .text-\[\#9A9EAB\] { color:#8B91A0; }
+  .text-\[\#A1A1A6\] { color:#8B91A0; }
+  .text-\[\#A3A8B3\] { color:#7B8190; }
+  .text-\[\#B0453B\] { color:#FF8A80; }
+  .text-\[\#B42318\] { color:#FF8A80; }
+  .text-\[\#B45309\] { color:#F5B84B; }
+  .text-\[\#B58900\] { color:#F5D36B; }
+  .text-\[\#C5C8D2\] { color:#5A6070; }
+  .text-\[\#CFE0FF\] { color:#CFE0FF; }
+  .text-\[\#D2D2D7\] { color:#5A6070; }
+  .text-\[\#D5D8E0\] { color:#5A6070; }
+  .text-\[\#D92D20\] { color:#FF7468; }
+  .to-white { --tw-gradient-to:rgba(19,22,27,1); }
+  .to-white\/0 { --tw-gradient-to:rgba(19,22,27,0.0); }
+  .to-white\/60 { --tw-gradient-to:rgba(19,22,27,0.6); }
+  .via-white\/85 { --tw-gradient-via:rgba(19,22,27,0.85); }
+
+  .f-input::placeholder, .f-grupo > input::placeholder { color: #6B7180; }
+  select.f-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' stroke='%238b91a0' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+
+  /* Panel de administración */
+  body:has(.safo-sidebar) { background: #0F1115; }
+  .tarjeta { background: #171A20; border-color: #2C323C; }
+  .tarjeta-sombra { box-shadow: none; }
+  .safo-zona-etiqueta { background: rgba(19,22,27,.85); color: #ECEEF2; }
+  .mapa-suave .leaflet-control-attribution { background: rgba(19,22,27,.8); }
+
+  /* Mapas: mosaicos de OpenStreetMap en versión oscura */
+  .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.7); }
+  .mapa-suave .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) grayscale(.7) brightness(.8) contrast(.9); }
+  .leaflet-container { background: #1A1D23; }
+  .leaflet-control-attribution { background: rgba(19,22,27,.8) !important; color: #8B91A0 !important; }
+  .leaflet-control-attribution a { color: #6AA6FF !important; }
+  .leaflet-bar a, .leaflet-bar a:hover { background: #171A20; color: #ECEEF2; border-color: #2C323C; }
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #171A20; color: #ECEEF2; }
+
+  /* Ilustraciones claras: un poco más tenues para que no deslumbren */
+  svg[role="img"][aria-label^="Ilustración"] { filter: brightness(.88) saturate(.95); }
+  img { color-scheme: normal; }
+}

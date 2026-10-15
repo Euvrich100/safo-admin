@@ -2,7 +2,7 @@
 import { useState } from 'react'
 
 // Gráficos livianos hechos con SVG (sin librerías). Colores SafO.
-export const COLORES = { amarillo: '#FFC21A', azul: '#0A66E0', marino: '#14213D', verde: '#6E6E73', rojo: '#D92D20', gris: '#A1A1A6' }
+export const COLORES = { amarillo: '#FFC21A', azul: '#0A66E0', marino: 'var(--graf-marino)', verde: '#6E6E73', rojo: '#D92D20', gris: '#A1A1A6' }
 
 // Línea doble: reservas vs completados por día, con eje, cuadrícula y tooltip al pasar el mouse
 export function LineaDoble({ datos, alto = 220 }) {
@@ -25,7 +25,7 @@ export function LineaDoble({ datos, alto = 220 }) {
           const v = (techo / 4) * i
           return (
             <g key={i}>
-              <line x1={M.l} x2={W - M.r} y1={y(v)} y2={y(v)} stroke="#EDEFF4" />
+              <line x1={M.l} x2={W - M.r} y1={y(v)} y2={y(v)} stroke="var(--graf-linea)" />
               <text x={M.l - 8} y={y(v) + 4} textAnchor="end" fontSize="11" fill="#8A8F9C">{Math.round(v)}</text>
             </g>
           )
@@ -62,7 +62,7 @@ export function Dona({ partes, centroTitulo, centroValor, tam = 170 }) {
   let acum = 0
   return (
     <svg viewBox="0 0 170 170" width={tam} height={tam} role="img" aria-label="Viajes por estado">
-      <circle cx="85" cy="85" r={R} fill="none" stroke="#EDEFF4" strokeWidth="20" />
+      <circle cx="85" cy="85" r={R} fill="none" stroke="var(--graf-linea)" strokeWidth="20" />
       {total > 0 && partes.map((p) => {
         const largo = (p.valor / total) * C
         const el = (
@@ -73,8 +73,8 @@ export function Dona({ partes, centroTitulo, centroValor, tam = 170 }) {
         acum += largo
         return el
       })}
-      <text x="85" y="82" textAnchor="middle" fontSize="12" fill="#6E6E73">{centroTitulo}</text>
-      <text x="85" y="104" textAnchor="middle" fontSize="26" fontWeight="700" fill="#14213D">{centroValor}</text>
+      <text x="85" y="82" textAnchor="middle" fontSize="12" fill="var(--graf-sub)">{centroTitulo}</text>
+      <text x="85" y="104" textAnchor="middle" fontSize="26" fontWeight="700" fill="var(--graf-texto)">{centroValor}</text>
     </svg>
   )
 }

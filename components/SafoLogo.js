@@ -9,7 +9,7 @@ export default function SafoLogo({ size = 32, showText = false, className = '', 
         <Image src="/logo-square.png" alt="SafO" width={size} height={size} priority={priority} />
       </div>
       {showText && (
-        <span className="font-semibold tracking-tight" style={{ fontSize: size * 0.6, color: '#1D1D1F' }}>
+        <span className="font-semibold tracking-tight text-[#1D1D1F]" style={{ fontSize: size * 0.6 }}>
           SafO
         </span>
       )}

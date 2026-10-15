@@ -53,7 +53,7 @@ export default function RegistroPasajeroPage() {
     <div className="min-h-screen bg-white flex flex-col items-center px-6 py-10 sm:py-14">
       <Toaster position="top-center" toastOptions={{ style: { background: '#16181D', color: 'white', fontSize: 14 } }} />
       <div className="w-full max-w-[24rem]">
-        <button onClick={() => router.push('/')} className="mb-10 block" aria-label="Ir al inicio"><SafoLogo size={40} showText priority /></button>
+        <button onClick={() => router.push('/')} className="mb-10 block" aria-label="Ir al inicio"><SafoLogo size={64} showText priority /></button>
         {hijos}
       </div>
     </div>

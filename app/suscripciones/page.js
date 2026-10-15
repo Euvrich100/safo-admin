@@ -86,7 +86,7 @@ export default function SuscripcionesPage() {
                     <div>
                       <div className="font-medium text-[#1D1D1F]">{c.nombre}</div>
                       <div className="text-[#6E6E73] text-sm">{c.celular} — {c.placa}</div>
-                      <div className="text-xs mt-1" style={{ color: suscripcionVencida(c.suscripcion_vence) ? '#D92D20' : '#1D1D1F' }}>
+                      <div className={`text-xs mt-1 ${suscripcionVencida(c.suscripcion_vence) ? 'text-[#D92D20]' : 'text-[#1D1D1F]'}`}>
                         {suscripcionVencida(c.suscripcion_vence)
                           ? <><FontAwesomeIcon icon={faTriangleExclamation} className="mr-1.5" />Suscripción vencida</>
                           : <><FontAwesomeIcon icon={faCircleCheck} className="mr-1.5" />Activo hasta {new Date(c.suscripcion_vence).toLocaleDateString('es-PE')}</>
