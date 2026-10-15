@@ -146,7 +146,7 @@ export default function AccesoSocial({ modo = 'login' }) {
           className={`${base} bg-black text-white hover:bg-[#1D1D1F] disabled:opacity-60`}>
           <FontAwesomeIcon icon={faApple} className="text-lg" />{cargando === 'apple' ? 'Abriendo Apple…' : `${accion} con Apple`}
         </button>
-      ) : apagado('apple')}
+      ) : null /* Apple se oculta hasta tener la cuenta Apple Developer y su clave en Render */}
 
       {FACEBOOK_ID ? (
         <button type="button" onClick={conFacebook} disabled={!!cargando}
