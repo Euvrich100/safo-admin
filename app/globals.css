@@ -1,25 +1,113 @@
 @import "tailwindcss";
 
 /* Paleta SafO — elegante, predominio de blanco, azul solo como acento */
+/* Tokens de marca: tinta casi negra, grises fríos y el azul de SafO solo como acción */
 :root {
   --background: #ffffff;
-  --foreground: #1d1d1f;
+  --foreground: #16181d;
+  --tinta: #16181d;
+  --tinta-2: #4a4f5c;
+  --tinta-3: #7a7f8c;
+  --linea: #d9dce3;
+  --linea-suave: #e8eaee;
+  --superficie: #f6f7f9;
+  --azul: #0a66e0;
+  --azul-osc: #084fb0;
+  --taxi: #ffc21a;
+  --fuente-texto: "Instrument Sans Variable", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  --fuente-titulo: "Bricolage Grotesque Variable", "Instrument Sans Variable", "Segoe UI", system-ui, sans-serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--fuente-texto);
+  --font-display: var(--fuente-titulo);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif;
+  font-family: var(--fuente-texto);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Mapa de Huánuco (Leaflet): tonos suaves para que el texto encima se lea */
+/* Los títulos usan la fuente de display; el resto del texto, la de lectura */
+h1, h2 { font-family: var(--fuente-titulo); letter-spacing: -0.022em; }
+.titulo { font-family: var(--fuente-titulo); letter-spacing: -0.028em; }
+
+/* ───── Formularios (login y registros) ───── */
+.f-campo { display: grid; gap: 6px; }
+.f-etiqueta { font-size: 13px; line-height: 1.2; font-weight: 600; color: var(--tinta-2); }
+.f-etiqueta small { font-weight: 400; color: var(--tinta-3); margin-left: 4px; font-size: 12.5px; }
+.f-ayuda { font-size: 12.5px; line-height: 1.4; color: var(--tinta-3); }
+
+.f-input {
+  display: block; width: 100%; height: 46px; padding: 0 14px;
+  font: inherit; font-size: 15px; color: var(--tinta);
+  background: #fff; border: 1px solid var(--linea); border-radius: 10px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.f-input::placeholder { color: #a3a8b3; }
+.f-input:hover { border-color: #c2c6d0; }
+.f-input:focus { outline: none; border-color: var(--azul); box-shadow: 0 0 0 3px rgba(10, 102, 224, .14); }
+select.f-input {
+  appearance: none; padding-right: 38px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' stroke='%237a7f8c' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+
+/* Campo con prefijo (+51) pegado a la izquierda */
+.f-grupo {
+  display: flex; align-items: stretch; height: 46px; background: #fff;
+  border: 1px solid var(--linea); border-radius: 10px; overflow: hidden;
+  transition: border-color .15s, box-shadow .15s;
+}
+.f-grupo:hover { border-color: #c2c6d0; }
+.f-grupo:focus-within { border-color: var(--azul); box-shadow: 0 0 0 3px rgba(10, 102, 224, .14); }
+.f-prefijo {
+  display: flex; align-items: center; padding: 0 12px; font-size: 14.5px; font-weight: 500;
+  color: var(--tinta-2); background: var(--superficie); border-right: 1px solid var(--linea-suave);
+  font-variant-numeric: tabular-nums;
+}
+.f-grupo > input {
+  flex: 1; min-width: 0; padding: 0 14px; font: inherit; font-size: 15px; color: var(--tinta);
+  background: transparent; border: 0; outline: none; font-variant-numeric: tabular-nums;
+}
+.f-grupo > input::placeholder { color: #a3a8b3; }
+
+.f-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+  height: 46px; padding: 0 18px; border-radius: 10px; border: 1px solid transparent;
+  font: inherit; font-size: 15px; font-weight: 600; letter-spacing: -0.005em;
+  color: #fff; background: var(--azul); cursor: pointer;
+  transition: background .15s, transform .05s, border-color .15s;
+}
+.f-btn:hover { background: var(--azul-osc); }
+.f-btn:active { transform: translateY(1px); }
+.f-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.f-btn-sec { color: var(--tinta); background: #fff; border-color: var(--linea); }
+.f-btn-sec:hover { background: var(--superficie); border-color: #c2c6d0; }
+.f-btn:focus-visible, .f-input:focus-visible, .f-link:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+
+.f-link { color: var(--azul); font-weight: 600; background: none; border: 0; padding: 0; cursor: pointer; }
+.f-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.f-link-suave { color: var(--tinta-2); font-weight: 500; background: none; border: 0; padding: 0; cursor: pointer; }
+.f-link-suave:hover { color: var(--tinta); text-decoration: underline; text-underline-offset: 3px; }
+
+.f-divisor { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--tinta-3); }
+.f-divisor::before, .f-divisor::after { content: ""; flex: 1; height: 1px; background: var(--linea-suave); }
+
+.f-aviso { padding: 12px 14px; border-radius: 10px; background: var(--superficie); border: 1px solid var(--linea-suave); font-size: 13px; line-height: 1.5; color: var(--tinta-2); }
+
+/* Insignia del taxi: cuadro de tinta con el taxi amarillo */
+.insignia-taxi {
+  display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px;
+  border-radius: 12px; background: var(--tinta); color: var(--taxi); font-size: 19px;
+}
+
+/* Mapa de la ciudad (Leaflet): tonos suaves para que el texto encima se lea */
 /* Los paneles de Leaflet (z-index 400) no deben escapar y tapar lo que va encima del mapa */
 .mapa-suave { isolation: isolate; }
 .mapa-suave .leaflet-container { background: transparent; font-family: inherit; }

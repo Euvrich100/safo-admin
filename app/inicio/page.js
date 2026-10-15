@@ -4,8 +4,9 @@ import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faShieldHalved, faStar, faClock, faCircleCheck, faMobileScreenButton, faMagnifyingGlass, faTaxi, faUserPlus, faArrowRight, faLocationDot, faArrowUpRightFromSquare, faCircleDot, faMapLocationDot, faPeopleRoof, faRightToBracket } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from '@/components/SafoLogo'
-import EscenaHuanuco from '@/components/EscenaHuanuco'
-import MapaHuanuco, { MAPA_URL } from '@/components/MapaHuanuco'
+import EscenaCiudad from '@/components/EscenaCiudad'
+import { CIUDAD } from '@/lib/ciudad'
+import MapaCiudad, { MAPA_URL } from '@/components/MapaCiudad'
 import TelefonoApp from '@/components/TelefonoApp'
 
 export default function InicioPage() {
@@ -48,16 +49,16 @@ export default function InicioPage() {
         </div>
       </nav>
 
-      {/* Hero — enfocado al pasajero: texto a la izquierda, Huánuco a la derecha */}
+      {/* Hero — enfocado al pasajero: texto a la izquierda, la ciudad a la derecha */}
       <section className="pt-28 pb-16 px-6 bg-gradient-to-b from-[#F3F8FF] to-white">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#E2E8F0] mb-7">
               <FontAwesomeIcon icon={faCircleDot} className="text-[#1D1D1F] text-xs animate-pulse" />
-              <span className="text-[#4B5873] text-sm font-medium">Operando en Huánuco, Perú</span>
+              <span className="text-[#4B5873] text-sm font-medium">Operando en {CIUDAD.nombre}, {CIUDAD.pais}</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-semibold mb-6 leading-[1.05] tracking-tight text-[#14213D]">
-              Un taxi seguro para cada calle de Huánuco
+              Un taxi seguro para cada calle de {CIUDAD.nombre}
             </h1>
             <p className="text-[#4B5873] text-xl mb-9 max-w-lg leading-relaxed">
               Sabes quién te lleva antes de subir: cada conductor presenta su DNI, licencia y vehículo, y la plataforma los revisa.
@@ -89,7 +90,7 @@ export default function InicioPage() {
               {/* bloque azul detrás de la ilustración: da profundidad */}
               <div className="absolute -top-4 -right-4 -bottom-4 left-8 rounded-[2.2rem] bg-[#0A4FD6]" aria-hidden="true" />
               <div className="relative rounded-[2rem] overflow-hidden border-4 border-white shadow-[0_24px_60px_-28px_rgba(7,42,122,.55)] bg-white">
-                <EscenaHuanuco className="w-full h-auto block" />
+                <EscenaCiudad className="w-full h-auto block" />
               </div>
               <div className="absolute top-5 left-5 rounded-2xl bg-white border border-[#E2E8F0] shadow-md px-4 py-3 flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-[#F1F1F3] flex items-center justify-center">
@@ -160,7 +161,7 @@ export default function InicioPage() {
       <section className="py-20 px-6 bg-[#F6F8FB]">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-5 gap-10 items-center">
           <div className="lg:col-span-2">
-            <h2 className="text-4xl font-semibold text-[#14213D] mb-4 tracking-tight"><FontAwesomeIcon icon={faPeopleRoof} className="text-[#0A4FD6] text-3xl mr-3 align-middle" />Hecho para Huánuco</h2>
+            <h2 className="text-4xl font-semibold text-[#14213D] mb-4 tracking-tight"><FontAwesomeIcon icon={faPeopleRoof} className="text-[#0A4FD6] text-3xl mr-3 align-middle" />Hecho para {CIUDAD.nombre}</h2>
             <p className="text-[#4B5873] text-lg leading-relaxed mb-6">
               Conocemos las calles del centro, los cerros y el río de nuestra ciudad. SafO nace aquí, con conductores de aquí.
             </p>
@@ -172,10 +173,10 @@ export default function InicioPage() {
             </a>
           </div>
           <div className="lg:col-span-3 relative rounded-3xl overflow-hidden border border-[#E2E8F0] shadow-[0_24px_60px_-32px_rgba(20,33,61,.35)] h-[360px] md:h-[420px] bg-white">
-            <MapaHuanuco className="absolute inset-0" interactivo />
+            <MapaCiudad className="absolute inset-0" interactivo />
             <div className="absolute left-4 bottom-4 rounded-xl bg-white/95 backdrop-blur border border-[#E2E8F0] px-4 py-2.5 pointer-events-none">
-              <div className="text-sm font-semibold text-[#14213D]"><FontAwesomeIcon icon={faLocationDot} className="text-[#0A4FD6] mr-1.5" />Plaza de Armas</div>
-              <div className="text-xs text-[#6B7894]">Centro de Huánuco · 1 894 m s. n. m.</div>
+              <div className="text-sm font-semibold text-[#14213D]"><FontAwesomeIcon icon={faLocationDot} className="text-[#0A4FD6] mr-1.5" />{CIUDAD.lugar}</div>
+              <div className="text-xs text-[#6B7894]">Centro de {CIUDAD.nombre}{CIUDAD.altitud ? ` · ${CIUDAD.altitud}` : ''}</div>
             </div>
           </div>
         </div>
@@ -208,7 +209,7 @@ export default function InicioPage() {
             </div>
           </div>
           <div className="hidden md:block md:col-span-2 relative min-h-[240px]">
-            <MapaHuanuco className="absolute inset-0 opacity-90" zoom={16} />
+            <MapaCiudad className="absolute inset-0 opacity-90" zoom={16} />
             <div className="absolute inset-0 bg-gradient-to-r from-[#072A7A] to-transparent" />
           </div>
         </div>
@@ -219,7 +220,7 @@ export default function InicioPage() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <SafoLogo size={36} />
-            <span className="text-[#A1A1A6] text-sm">SafO — Huánuco, Perú</span>
+            <span className="text-[#A1A1A6] text-sm">SafO · {CIUDAD.nombre}, {CIUDAD.pais}</span>
           </div>
           <div className="flex items-center gap-5">
           <button onClick={() => router.push('/login')} className="text-[#6E6E73] hover:text-[#0A66E0] text-sm font-medium transition">Iniciar sesión</button>

@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import "@fontsource-variable/instrument-sans";
+import "@fontsource-variable/bricolage-grotesque";
 import "./globals.css";
+import { CIUDAD } from "@/lib/ciudad";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 
@@ -8,10 +11,10 @@ config.autoAddCss = false;
 
 export const metadata: Metadata = {
   title: {
-    default: "SafO — Taxi seguro en Huánuco",
+    default: `SafO — Taxi seguro en ${CIUDAD.nombre}`,
     template: "%s · SafO",
   },
-  description: "Plataforma de taxis seguros y verificados en Huánuco, Perú.",
+  description: `Plataforma de taxis seguros y verificados en ${CIUDAD.nombre}, ${CIUDAD.pais}.`,
 };
 
 export const viewport: Viewport = {
@@ -25,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className="bg-white text-[#1D1D1F] antialiased">
+      <body className="bg-white text-[#16181D] antialiased">
         {children}
       </body>
     </html>

@@ -3,10 +3,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUser, faMobileScreenButton, faLock, faCircleCheck, faUserPlus, faUserCheck } from '@fortawesome/free-solid-svg-icons'
+import { faTaxi } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from '@/components/SafoLogo'
 import ClaveInput from '@/components/ClaveInput'
 import AccesoSocial from '@/components/AccesoSocial'
+import { CIUDAD } from '@/lib/ciudad'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://safo-backend.onrender.com'
 
@@ -20,7 +21,7 @@ export default function RegistroPasajeroPage() {
 
   const registrar = async () => {
     const celular = form.celular.replace(/\D/g, '')
-    if (!form.nombre.trim() || !celular) return toast.error('Nombre y celular son obligatorios')
+    if (!form.nombre.trim() || !celular) return toast.error('Escribe tu nombre y tu celular')
     if (celular.length !== 9) return toast.error('El celular debe tener 9 dígitos')
     if (form.password.length < 6) return toast.error('La contraseña debe tener al menos 6 caracteres')
     if (form.password !== form.repetir) return toast.error('Las contraseñas no coinciden')
@@ -41,107 +42,85 @@ export default function RegistroPasajeroPage() {
         return
       }
       setCompletado(true)
-    } catch (e) {
+    } catch {
       toast.error('Error al conectar con el servidor')
     } finally {
       setCargando(false)
     }
   }
 
-  if (completado) return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-6">
-      <div className="text-center max-w-md">
-        <FontAwesomeIcon icon={faCircleCheck} className="text-[#1D1D1F] text-7xl mb-6" />
-        <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-4">¡Bienvenido a SafO!</h1>
-        <p className="text-[#6E6E73] mb-6">Tu cuenta fue creada. Ya puedes pedir taxis seguros y verificados en Huánuco.</p>
-        <div className="p-4 rounded-2xl bg-[#F5F5F7] mb-6">
-          <p className="text-[#6E6E73] text-sm font-medium"><FontAwesomeIcon icon={faMobileScreenButton} className="mr-1.5" />Número registrado</p>
-          <p className="text-[#1D1D1F] text-xl font-semibold mt-1">{form.celular}</p>
-        </div>
-        <button onClick={() => router.push('/login')}
-          className="px-8 py-3 rounded-full font-semibold text-white bg-[#0A66E0] hover:bg-[#084FB0]">
-          Iniciar sesión
-        </button>
+  const marco = (hijos) => (
+    <div className="min-h-screen bg-white flex flex-col items-center px-6 py-10 sm:py-14">
+      <Toaster position="top-center" toastOptions={{ style: { background: '#16181D', color: 'white', fontSize: 14 } }} />
+      <div className="w-full max-w-[24rem]">
+        <button onClick={() => router.push('/')} className="mb-10 block" aria-label="Ir al inicio"><SafoLogo size={40} showText priority /></button>
+        {hijos}
       </div>
     </div>
   )
 
-  return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
-      <Toaster position="top-center" toastOptions={{
-        style: { background: '#1D1D1F', color: 'white' }
-      }}/>
+  if (completado) return marco(
+    <>
+      <span className="insignia-taxi mb-5" aria-hidden="true"><FontAwesomeIcon icon={faTaxi} /></span>
+      <h1 className="text-[1.75rem] leading-tight font-semibold text-[#16181D] mb-1.5">Tu cuenta está lista</h1>
+      <p className="text-[15px] text-[#4A4F5C] mb-7">Ya puedes pedir taxis verificados en {CIUDAD.nombre}.</p>
+      <div className="f-aviso mb-6">
+        Número registrado
+        <div className="text-[1.1rem] font-semibold text-[#16181D] tabular-nums mt-0.5">{CIUDAD.prefijoTelefono} {form.celular}</div>
+      </div>
+      <button onClick={() => router.push('/login')} className="f-btn">Iniciar sesión</button>
+    </>
+  )
 
-      <div className="w-full max-w-md">
-        <button onClick={() => router.push('/')} className="flex items-center mb-8">
-          <SafoLogo size={64} priority />
+  return marco(
+    <>
+      <div className="mb-7">
+        <h1 className="text-[1.75rem] leading-tight font-semibold text-[#16181D] mb-1.5">Crea tu cuenta</h1>
+        <p className="text-[15px] text-[#4A4F5C]">Es gratis y toma un minuto. Pide tu primer taxi en {CIUDAD.nombre} al terminar.</p>
+      </div>
+
+      <div className="space-y-5">
+        <AccesoSocial modo="registro" />
+
+        <div className="f-divisor">o con tu celular</div>
+
+        <div className="f-campo">
+          <label htmlFor="nombre" className="f-etiqueta">Nombre completo</label>
+          <input id="nombre" type="text" autoComplete="name" placeholder="Ej. María García" className="f-input"
+            value={form.nombre} onChange={e => actualizar('nombre', e.target.value)} />
+        </div>
+
+        <div className="f-campo">
+          <label htmlFor="celular" className="f-etiqueta">Celular</label>
+          <div className="f-grupo">
+            <span className="f-prefijo" aria-hidden="true">{CIUDAD.prefijoTelefono}</span>
+            <input id="celular" type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="987 654 321"
+              value={form.celular} onChange={e => actualizar('celular', e.target.value)} />
+          </div>
+          <span className="f-ayuda">El conductor lo usará para encontrarte.</span>
+        </div>
+
+        <div className="f-campo">
+          <label htmlFor="clave" className="f-etiqueta">Contraseña <small>mínimo 6 caracteres</small></label>
+          <ClaveInput id="clave" value={form.password} onChange={v => actualizar('password', v)} autoComplete="new-password" placeholder="Crea una contraseña" />
+        </div>
+
+        <div className="f-campo">
+          <label htmlFor="repetir" className="f-etiqueta">Repite la contraseña</label>
+          <ClaveInput id="repetir" value={form.repetir} onChange={v => actualizar('repetir', v)} autoComplete="new-password" placeholder="Escríbela otra vez" onEnter={registrar} />
+        </div>
+
+        <button onClick={registrar} disabled={cargando} className="f-btn">
+          {cargando ? 'Creando cuenta…' : 'Crear cuenta gratis'}
         </button>
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2 tracking-tight">Regístrate gratis <FontAwesomeIcon icon={faUserCheck} className="text-[#0A66E0] text-2xl ml-1" /></h1>
-          <p className="text-[#6E6E73]">Crea tu cuenta en un minuto y empieza a pedir taxis verificados</p>
-        </div>
-
-        <div className="rounded-2xl p-6 border border-[#E2E2E7] space-y-4">
-
-          <AccesoSocial modo="registro" />
-
-          <div className="flex items-center gap-3 py-1">
-            <div className="flex-1 h-px bg-[#E2E2E7]" />
-            <span className="text-[#A1A1A6] text-xs uppercase tracking-widest">o con tu celular</span>
-            <div className="flex-1 h-px bg-[#E2E2E7]" />
-          </div>
-
-          <div>
-            <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">
-              <FontAwesomeIcon icon={faUser} className="mr-1.5" />Nombre completo *
-            </label>
-            <input type="text" placeholder="María García"
-              value={form.nombre} onChange={e => actualizar('nombre', e.target.value)}
-              className="w-full px-4 py-3.5 rounded-xl text-[#1D1D1F] placeholder-[#A1A1A6] focus:outline-none bg-[#F5F5F7] border border-transparent focus:bg-white focus:border-[#0A66E0] transition"
-            />
-          </div>
-
-          <div>
-            <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">
-              <FontAwesomeIcon icon={faMobileScreenButton} className="mr-1.5" />Celular *
-            </label>
-            <input type="tel" placeholder="999 000 001"
-              value={form.celular} onChange={e => actualizar('celular', e.target.value)}
-              className="w-full px-4 py-3.5 rounded-xl text-[#1D1D1F] placeholder-[#A1A1A6] focus:outline-none bg-[#F5F5F7] border border-transparent focus:bg-white focus:border-[#0A66E0] transition"
-            />
-          </div>
-
-          <div>
-            <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">
-              <FontAwesomeIcon icon={faLock} className="mr-1.5" />Contraseña * <span className="normal-case tracking-normal font-normal">(mínimo 6 caracteres)</span>
-            </label>
-            <ClaveInput value={form.password} onChange={v => actualizar('password', v)} autoComplete="new-password" placeholder="Crea tu contraseña" />
-          </div>
-
-          <div>
-            <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">
-              <FontAwesomeIcon icon={faLock} className="mr-1.5" />Repite la contraseña *
-            </label>
-            <ClaveInput value={form.repetir} onChange={v => actualizar('repetir', v)} autoComplete="new-password" placeholder="Repite tu contraseña" onEnter={registrar} />
-          </div>
-
-          <div className="p-4 rounded-xl bg-[#F5F5F7] border border-[#E9E9ED]">
-            <p className="text-[#1D1D1F] text-xs font-medium"><FontAwesomeIcon icon={faCircleCheck} className="mr-1.5 text-[#6E6E73]" />Conductores verificados</p>
-            <p className="text-[#6E6E73] text-xs mt-1">Cada conductor presenta su DNI, licencia y vehículo antes de poder recibir viajes.</p>
-          </div>
-
-          <button onClick={registrar} disabled={cargando}
-            className="w-full py-4 rounded-full font-semibold text-white transition disabled:opacity-50 bg-[#0A66E0] hover:bg-[#084FB0]">
-            {cargando ? 'Creando cuenta...' : <><FontAwesomeIcon icon={faUserPlus} className="mr-2.5" />Crear cuenta gratis</>}
-          </button>
-        </div>
-
-        <p className="text-center text-sm text-[#6E6E73] mt-6">
-          ¿Ya tienes cuenta?{' '}
-          <button onClick={() => router.push('/login')} className="text-[#0A66E0] font-semibold hover:underline">Inicia sesión</button>
-        </p>
+        <p className="f-ayuda text-center">Cada conductor presenta su DNI, licencia y vehículo antes de recibir viajes.</p>
       </div>
-    </div>
+
+      <p className="text-center text-[14px] text-[#4A4F5C] mt-8">
+        ¿Ya tienes cuenta?{' '}
+        <button onClick={() => router.push('/login')} className="f-link">Inicia sesión</button>
+      </p>
+    </>
   )
 }

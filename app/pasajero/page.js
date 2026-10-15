@@ -17,7 +17,8 @@ import ClaveInput from '@/components/ClaveInput'
 import MapaPasajero from '@/components/MapaPasajero'
 import BotonSOS from '@/components/BotonSOS'
 import ReclamosPanel from '@/components/ReclamosPanel'
-import { PLAZA } from '@/components/MapaHuanuco'
+import { CIUDAD } from '@/lib/ciudad'
+import { PLAZA } from '@/components/MapaCiudad'
 
 const RADIO_KM = 5
 const GARANTIA_BASE = 1.5 // valor por defecto; el real viene de /api/ajustes-publicos
@@ -84,7 +85,7 @@ function DatosVehiculo({ c }) {
   )
 }
 
-// Campo de dirección con sugerencias (OpenStreetMap/Nominatim, solo Huánuco)
+// Campo de dirección con sugerencias (OpenStreetMap/Nominatim, solo la ciudad configurada)
 function CampoLugar({ valor, onTexto, onElegir, placeholder, icono, colorIcono, onLimpiar, ayuda }) {
   const [resultados, setResultados] = useState([])
   const [abierto, setAbierto] = useState(false)
@@ -553,7 +554,7 @@ export default function PasajeroPage() {
     <div className="min-h-screen bg-gradient-to-b from-[#F3F8FF] to-white flex items-center justify-center p-6">
       <div className="w-full max-w-md text-center">
         <div className="flex justify-center mb-8"><SafoLogo size={88} priority /></div>
-        <h1 className="text-3xl font-semibold tracking-tight text-[#14213D] mb-3">Pide tu taxi seguro en Huánuco</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-[#14213D] mb-3">Pide tu taxi seguro en {CIUDAD.nombre}</h1>
         <p className="text-[#6E6E73] mb-9">Entra a tu cuenta o crea una gratis para ver los taxis que tienes cerca.</p>
         <div className="space-y-3">
           <button onClick={() => router.push('/login')}

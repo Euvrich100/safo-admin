@@ -3,39 +3,36 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCloudArrowUp, faCircleCheck, faTaxi, faHourglassHalf, faCheck, faCircleUser, faIdCard, faAddressCard, faTriangleExclamation, faClipboardList, faUser, faMobileScreenButton, faPaperPlane, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faCloudArrowUp, faCircleCheck, faTaxi, faCircleUser, faIdCard, faAddressCard } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from '@/components/SafoLogo'
 import ClaveInput from '@/components/ClaveInput'
+import { CIUDAD } from '@/lib/ciudad'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://safo-backend.onrender.com'
-
-const CLASE_INPUT = 'w-full px-4 py-3.5 rounded-xl text-[#1D1D1F] placeholder-[#A1A1A6] focus:outline-none bg-[#F5F5F7] border border-transparent focus:bg-white focus:border-[#0A66E0] transition'
 
 // IMPORTANTE: estos componentes viven FUERA de RegistroConductorPage. Si se
 // definen dentro, React crea un componente nuevo en cada tecla, desmonta el
 // <input> y se pierde el foco (solo dejaba escribir una letra por vez).
-function FileBox({ campo, label, icono, preview, onArchivo }) {
+function FileBox({ campo, label, icono, preview, onArchivo, opcional = false }) {
   return (
-    <div>
-      <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">{label}</label>
+    <div className="f-campo">
+      <span className="f-etiqueta">{label}{opcional && <small>opcional</small>}</span>
       <label className="cursor-pointer block">
         <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
-          onChange={e => onArchivo(campo, e.target.files[0])} />
-        <div className={`w-full h-28 rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition overflow-hidden bg-[#F5F5F7] ${preview ? 'border-[#1D1D1F]' : 'border-[#D2D2D7] hover:border-[#0A66E0]'}`}>
+          aria-label={label} onChange={e => onArchivo(campo, e.target.files[0])} />
+        <div className={`w-full h-28 rounded-[10px] border flex flex-col items-center justify-center transition overflow-hidden ${preview ? 'border-[#16181D]' : 'border-dashed border-[#C2C6D0] bg-[#F6F7F9] hover:border-[#0A66E0] hover:bg-white'}`}>
           {preview ? (
             <div className="relative w-full h-full">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={preview} alt={label} className="w-full h-full object-cover" />
-              <div className="absolute top-2 right-2 bg-[#1D1D1F] rounded-full p-1">
-                <FontAwesomeIcon icon={faCircleCheck} className="text-xs text-white" />
+              <div className="absolute top-2 right-2 bg-[#16181D] rounded-full w-5 h-5 flex items-center justify-center">
+                <FontAwesomeIcon icon={faCircleCheck} className="text-[11px] text-white" />
               </div>
             </div>
           ) : (
             <>
-              <FontAwesomeIcon icon={icono} className="text-2xl mb-1.5 text-[#6E6E73]" />
-              <span className="text-[#6E6E73] text-xs">{label}</span>
-              <span className="text-[#A1A1A6] text-xs mt-0.5 flex items-center gap-1">
-                <FontAwesomeIcon icon={faCloudArrowUp} className="text-xs" /> Subir foto
-              </span>
+              <FontAwesomeIcon icon={icono} className="text-xl mb-1.5 text-[#7A7F8C]" />
+              <span className="text-[13px] text-[#4A4F5C] font-medium"><FontAwesomeIcon icon={faCloudArrowUp} className="mr-1.5 text-xs" />Subir foto</span>
             </>
           )}
         </div>
@@ -44,18 +41,35 @@ function FileBox({ campo, label, icono, preview, onArchivo }) {
   )
 }
 
-function Campo({ label, campo, valor, onCambio, placeholder, type = 'text', maxLength, options, inputMode }) {
-  return (
-    <div>
-      <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">{label}</label>
-      {options ? (
-        <select value={valor} onChange={e => onCambio(campo, e.target.value)} className={CLASE_INPUT}>
+function Campo({ label, campo, valor, onCambio, placeholder, type = 'text', maxLength, options, inputMode, opcional = false, ayuda, prefijo, autoComplete }) {
+  const id = `c-${campo}`
+  const etiqueta = <label htmlFor={id} className="f-etiqueta">{label}{opcional && <small>opcional</small>}</label>
+  if (options) {
+    return (
+      <div className="f-campo">
+        {etiqueta}
+        <select id={id} value={valor} onChange={e => onCambio(campo, e.target.value)} className="f-input">
           {options.map(o => <option key={o} value={o}>{o}</option>)}
         </select>
+      </div>
+    )
+  }
+  // En los campos numéricos se limpia primero (pegar «987 654 321» con espacios) y luego se recorta al largo máximo
+  const numerico = inputMode === 'numeric'
+  const cambiar = e => onCambio(campo, numerico ? e.target.value.replace(/\D/g, '').slice(0, maxLength || 99) : e.target.value)
+  const largo = numerico ? undefined : maxLength
+  return (
+    <div className="f-campo">
+      {etiqueta}
+      {prefijo ? (
+        <div className="f-grupo">
+          <span className="f-prefijo" aria-hidden="true">{prefijo}</span>
+          <input id={id} type={type} inputMode={inputMode} placeholder={placeholder} value={valor} maxLength={largo} autoComplete={autoComplete} onChange={cambiar} />
+        </div>
       ) : (
-        <input type={type} inputMode={inputMode} placeholder={placeholder} value={valor} maxLength={maxLength}
-          onChange={e => onCambio(campo, inputMode === 'numeric' ? e.target.value.replace(/\D/g, '') : e.target.value)} className={CLASE_INPUT} />
+        <input id={id} type={type} inputMode={inputMode} placeholder={placeholder} value={valor} maxLength={largo} autoComplete={autoComplete} onChange={cambiar} className="f-input" />
       )}
+      {ayuda && <span className="f-ayuda">{ayuda}</span>}
     </div>
   )
 }
@@ -120,147 +134,124 @@ export default function RegistroConductorPage() {
       const data = await res.json()
       if (!res.ok) return toast.error(data.error)
       setCompletado(true)
-    } catch (e) {
+    } catch {
       toast.error('Error al conectar con el servidor')
     } finally {
       setCargando(false)
     }
   }
 
-  if (completado) return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-6">
-      <div className="text-center max-w-md">
-        <FontAwesomeIcon icon={faCircleCheck} className="text-[#1D1D1F] text-7xl mb-6" />
-        <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-4">¡Solicitud enviada!</h1>
-        <p className="text-[#6E6E73] mb-6">El administrador revisará tus documentos en menos de 24 horas y te avisará al {form.celular}. Cuando te aprueben, entra a la app de SafO con tu celular y tu contraseña.</p>
-        <div className="p-4 rounded-2xl bg-[#F5F5F7] mb-6">
-          <p className="text-[#6E6E73] text-sm">Estado de solicitud</p>
-          <p className="text-[#B45309] text-lg font-semibold mt-1"><FontAwesomeIcon icon={faHourglassHalf} className="mr-2" />En revisión</p>
-        </div>
-        <button onClick={() => router.push('/')}
-          className="px-8 py-3 rounded-full font-semibold text-white bg-[#0A66E0] hover:bg-[#084FB0]">
-          Volver al inicio
-        </button>
+  const marco = (hijos, ancho = 'max-w-[26rem]') => (
+    <div className="min-h-screen bg-white flex flex-col items-center px-6 py-10 sm:py-14">
+      <Toaster position="top-center" toastOptions={{ style: { background: '#16181D', color: 'white', fontSize: 14 } }} />
+      <div className={`w-full ${ancho}`}>
+        <button onClick={() => router.push('/')} className="mb-10 block" aria-label="Ir al inicio"><SafoLogo size={40} showText priority /></button>
+        {hijos}
       </div>
     </div>
   )
 
+  if (completado) return marco(
+    <>
+      <span className="insignia-taxi mb-5" aria-hidden="true"><FontAwesomeIcon icon={faTaxi} /></span>
+      <h1 className="text-[1.75rem] leading-tight font-semibold text-[#16181D] mb-1.5">Solicitud enviada</h1>
+      <p className="text-[15px] leading-relaxed text-[#4A4F5C] mb-7">El administrador revisará tus documentos en menos de 24 horas y te avisará al {CIUDAD.prefijoTelefono} {form.celular}. Cuando te aprueben, entra con tu celular y tu contraseña.</p>
+      <div className="f-aviso mb-6">
+        Estado de tu solicitud
+        <div className="text-[1.05rem] font-semibold text-[#16181D] mt-0.5">En revisión</div>
+      </div>
+      <button onClick={() => router.push('/')} className="f-btn">Volver al inicio</button>
+    </>
+  )
+
   const pasos = ['Datos personales', 'Documentos', 'Vehículo']
 
-  return (
-    <div className="min-h-screen bg-white py-10 px-4">
-      <Toaster position="top-center" toastOptions={{
-        style: { background: '#1D1D1F', color: 'white' }
-      }}/>
+  return marco(
+    <>
+      <div className="mb-7">
+        <h1 className="text-[1.75rem] leading-tight font-semibold text-[#16181D] mb-1.5">Conduce con SafO</h1>
+        <p className="text-[15px] text-[#4A4F5C]">Registra tus datos y documentos. Los revisamos antes de activarte.</p>
+      </div>
 
-      <div className="max-w-xl mx-auto">
-        <button onClick={() => router.push('/')} className="flex items-center mb-8">
-          <SafoLogo size={64} priority />
-        </button>
-
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2 tracking-tight">Únete como conductor <FontAwesomeIcon icon={faTaxi} className="text-[#FFC21A] text-2xl ml-1" /></h1>
-          <p className="text-[#6E6E73]">Empieza a ganar llevando pasajeros de tu ciudad</p>
-        </div>
-
-        {/* Indicador de pasos */}
-        <div className="flex items-center gap-2 mb-8">
-          {pasos.map((p, i) => (
-            <div key={i} className="flex items-center gap-2 flex-1">
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 ${paso > i + 1 ? 'bg-[#1D1D1F] text-white' : paso === i + 1 ? 'bg-[#0A66E0] text-white' : 'bg-[#F5F5F7] text-[#A1A1A6]'}`}>
-                {paso > i + 1 ? <FontAwesomeIcon icon={faCheck} /> : i + 1}
-              </div>
-              <span className={`text-xs ${paso === i + 1 ? 'text-[#1D1D1F] font-medium' : 'text-[#A1A1A6]'}`}>{p}</span>
-              {i < pasos.length - 1 && <div className={`flex-1 h-0.5 ${paso > i + 1 ? 'bg-[#1D1D1F]' : 'bg-[#E2E2E7]'}`}/>}
-            </div>
+      {/* Avance: tres tramos y el nombre del paso actual */}
+      <div className="mb-7" role="progressbar" aria-valuemin={1} aria-valuemax={3} aria-valuenow={paso} aria-label="Avance del registro">
+        <div className="flex gap-1.5 mb-2.5">
+          {pasos.map((_, i) => (
+            <span key={i} className={`h-1 flex-1 rounded-full transition-colors ${paso >= i + 1 ? 'bg-[#16181D]' : 'bg-[#E8EAEE]'}`} />
           ))}
         </div>
-
-        {/* Paso 1 */}
-        {paso === 1 && (
-          <div className="rounded-2xl p-6 border border-[#E2E2E7] space-y-4">
-            <div className="grid grid-cols-1 gap-4">
-              <Campo valor={form.nombre} onCambio={set} label="Nombre completo *" campo="nombre" placeholder="Juan Pérez García" />
-              <Campo valor={form.celular} onCambio={set} label="Celular *" campo="celular" placeholder="999000001" type="tel" maxLength={9} inputMode="numeric" />
-              <div className="grid grid-cols-2 gap-4">
-                <Campo valor={form.dni} onCambio={set} label="DNI *" campo="dni" placeholder="12345678" maxLength={8} inputMode="numeric" />
-                <Campo valor={form.fecha_nacimiento} onCambio={set} label="Fecha de nacimiento" campo="fecha_nacimiento" placeholder="" type="date" />
-              </div>
-              <Campo valor={form.direccion} onCambio={set} label="Dirección" campo="direccion" placeholder="Jr. Huánuco 123" />
-              <div>
-                <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">Contraseña * <span className="normal-case tracking-normal font-normal">(para entrar a la app)</span></label>
-                <ClaveInput value={form.password} onChange={v => set('password', v)} autoComplete="new-password" placeholder="Mínimo 6 caracteres" />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">Repite la contraseña *</label>
-                <ClaveInput value={form.repetir} onChange={v => set('repetir', v)} autoComplete="new-password" placeholder="Repite tu contraseña" />
-              </div>
-            </div>
-            <button onClick={irPaso2}
-              className="w-full py-4 rounded-full font-semibold text-white mt-2 bg-[#0A66E0] hover:bg-[#084FB0]">
-              Siguiente: documentos <FontAwesomeIcon icon={faArrowRight} className="ml-1.5" />
-            </button>
-          </div>
-        )}
-
-        {/* Paso 2 */}
-        {paso === 2 && (
-          <div className="rounded-2xl p-6 border border-[#E2E2E7] space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <FileBox preview={previews.foto_perfil} onArchivo={subirArchivo} campo="foto_perfil" label="Foto de perfil" icono={faCircleUser} />
-              <FileBox preview={previews.foto_dni_frontal} onArchivo={subirArchivo} campo="foto_dni_frontal" label="DNI frontal *" icono={faIdCard} />
-              <FileBox preview={previews.foto_dni_trasera} onArchivo={subirArchivo} campo="foto_dni_trasera" label="DNI trasero *" icono={faIdCard} />
-              <FileBox preview={previews.foto_licencia} onArchivo={subirArchivo} campo="foto_licencia" label="Licencia *" icono={faAddressCard} />
-            </div>
-            <div className="p-3 rounded-xl bg-[#FEF3E2]">
-              <p className="text-[#B45309] text-xs"><FontAwesomeIcon icon={faTriangleExclamation} className="mr-1.5" />Fotos nítidas, sin reflejos y con todos los datos legibles.</p>
-            </div>
-            <div className="flex gap-3">
-              <button onClick={() => setPaso(1)}
-                className="flex-1 py-3 rounded-full text-[#6E6E73] border border-[#E2E2E7] hover:bg-[#F5F5F7]"><FontAwesomeIcon icon={faArrowLeft} className="mr-1.5" />Volver</button>
-              <button onClick={irPaso3}
-                className="flex-1 py-3 rounded-full font-semibold text-white bg-[#0A66E0] hover:bg-[#084FB0]">
-                Siguiente <FontAwesomeIcon icon={faArrowRight} className="ml-1.5" />
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Paso 3 */}
-        {paso === 3 && (
-          <div className="rounded-2xl p-6 border border-[#E2E2E7] space-y-4">
-            <FileBox preview={previews.foto_vehiculo} onArchivo={subirArchivo} campo="foto_vehiculo" label="Foto del vehículo *" icono={faTaxi} />
-            <div className="grid grid-cols-2 gap-4">
-              <Campo valor={form.licencia_numero} onCambio={set} label="N° de licencia *" campo="licencia_numero" placeholder="A123456" />
-              <Campo valor={form.licencia_categoria} onCambio={set} label="Categoría" campo="licencia_categoria" options={['A-IIb', 'A-IIIb', 'B-IIb']} />
-              <Campo valor={form.placa} onCambio={set} label="Placa *" campo="placa" placeholder="ABC-123" />
-              <Campo valor={form.vehiculo_anno} onCambio={set} label="Año" campo="vehiculo_anno" placeholder="2020" type="number" />
-              <Campo valor={form.vehiculo_marca} onCambio={set} label="Marca" campo="vehiculo_marca" placeholder="Toyota" />
-              <Campo valor={form.vehiculo_modelo} onCambio={set} label="Modelo" campo="vehiculo_modelo" placeholder="Yaris" />
-            </div>
-            <Campo valor={form.vehiculo_color} onCambio={set} label="Color" campo="vehiculo_color" placeholder="Blanco" />
-
-            <div className="p-4 rounded-xl bg-[#EAF2FE]">
-              <p className="text-[#0A66E0] text-xs font-semibold mb-2"><FontAwesomeIcon icon={faClipboardList} className="mr-1.5" />Resumen</p>
-              <div className="grid grid-cols-2 gap-1 text-xs text-[#0A66E0] opacity-80">
-                <span><FontAwesomeIcon icon={faUser} className="mr-1.5" />{form.nombre || '—'}</span>
-                <span><FontAwesomeIcon icon={faMobileScreenButton} className="mr-1.5" />{form.celular || '—'}</span>
-                <span><FontAwesomeIcon icon={faIdCard} className="mr-1.5" />{form.dni || '—'}</span>
-                <span><FontAwesomeIcon icon={faTaxi} className="mr-1.5" />{form.placa || '—'}</span>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <button onClick={() => setPaso(2)}
-                className="flex-1 py-3 rounded-full text-[#6E6E73] border border-[#E2E2E7] hover:bg-[#F5F5F7]"><FontAwesomeIcon icon={faArrowLeft} className="mr-1.5" />Volver</button>
-              <button onClick={registrar} disabled={cargando}
-                className="flex-1 py-4 rounded-full font-semibold text-white disabled:opacity-50 bg-[#1D1D1F] hover:bg-[#000000]">
-                {cargando ? 'Enviando...' : <><FontAwesomeIcon icon={faPaperPlane} className="mr-2" />Enviar solicitud</>}
-              </button>
-            </div>
-          </div>
-        )}
+        <p className="text-[13px] text-[#4A4F5C]"><span className="font-semibold text-[#16181D]">Paso {paso} de 3</span> · {pasos[paso - 1]}</p>
       </div>
-    </div>
+
+      {paso === 1 && (
+        <div className="space-y-5">
+          <Campo valor={form.nombre} onCambio={set} label="Nombre completo" campo="nombre" placeholder="Ej. Juan Pérez García" autoComplete="name" />
+          <Campo valor={form.celular} onCambio={set} label="Celular" campo="celular" placeholder="987 654 321" type="tel" maxLength={9} inputMode="numeric" prefijo={CIUDAD.prefijoTelefono} autoComplete="tel-national" />
+          <div className="grid grid-cols-2 gap-4">
+            <Campo valor={form.dni} onCambio={set} label="DNI" campo="dni" placeholder="8 dígitos" maxLength={8} inputMode="numeric" />
+            <Campo valor={form.fecha_nacimiento} onCambio={set} label="Nacimiento" campo="fecha_nacimiento" placeholder="" type="date" opcional />
+          </div>
+          <Campo valor={form.direccion} onCambio={set} label="Dirección" campo="direccion" placeholder="Av. Principal 123" opcional />
+          <div className="f-campo">
+            <label htmlFor="clave" className="f-etiqueta">Contraseña <small>mínimo 6 caracteres</small></label>
+            <ClaveInput id="clave" value={form.password} onChange={v => set('password', v)} autoComplete="new-password" placeholder="Con ella entrarás a la app" />
+          </div>
+          <div className="f-campo">
+            <label htmlFor="repetir" className="f-etiqueta">Repite la contraseña</label>
+            <ClaveInput id="repetir" value={form.repetir} onChange={v => set('repetir', v)} autoComplete="new-password" placeholder="Escríbela otra vez" onEnter={irPaso2} />
+          </div>
+          <button onClick={irPaso2} className="f-btn">Continuar con documentos</button>
+        </div>
+      )}
+
+      {paso === 2 && (
+        <div className="space-y-5">
+          <div className="grid grid-cols-2 gap-4">
+            <FileBox preview={previews.foto_dni_frontal} onArchivo={subirArchivo} campo="foto_dni_frontal" label="DNI, frente" icono={faIdCard} />
+            <FileBox preview={previews.foto_dni_trasera} onArchivo={subirArchivo} campo="foto_dni_trasera" label="DNI, reverso" icono={faIdCard} />
+            <FileBox preview={previews.foto_licencia} onArchivo={subirArchivo} campo="foto_licencia" label="Licencia" icono={faAddressCard} />
+            <FileBox preview={previews.foto_perfil} onArchivo={subirArchivo} campo="foto_perfil" label="Tu foto" icono={faCircleUser} opcional />
+          </div>
+          <p className="f-aviso">Usa fotos nítidas, sin reflejos y con todos los datos legibles.</p>
+          <div className="grid grid-cols-[1fr_2fr] gap-3">
+            <button onClick={() => setPaso(1)} className="f-btn f-btn-sec">Volver</button>
+            <button onClick={irPaso3} className="f-btn">Continuar</button>
+          </div>
+        </div>
+      )}
+
+      {paso === 3 && (
+        <div className="space-y-5">
+          <FileBox preview={previews.foto_vehiculo} onArchivo={subirArchivo} campo="foto_vehiculo" label="Foto del vehículo" icono={faTaxi} />
+          <div className="grid grid-cols-2 gap-4">
+            <Campo valor={form.licencia_numero} onCambio={set} label="N.º de licencia" campo="licencia_numero" placeholder="A123456" />
+            <Campo valor={form.licencia_categoria} onCambio={set} label="Categoría" campo="licencia_categoria" options={['A-IIb', 'A-IIIb', 'B-IIb']} />
+            <Campo valor={form.placa} onCambio={set} label="Placa" campo="placa" placeholder="ABC-123" />
+            <Campo valor={form.vehiculo_anno} onCambio={set} label="Año" campo="vehiculo_anno" placeholder="2020" type="number" opcional />
+            <Campo valor={form.vehiculo_marca} onCambio={set} label="Marca" campo="vehiculo_marca" placeholder="Toyota" opcional />
+            <Campo valor={form.vehiculo_modelo} onCambio={set} label="Modelo" campo="vehiculo_modelo" placeholder="Yaris" opcional />
+          </div>
+          <Campo valor={form.vehiculo_color} onCambio={set} label="Color" campo="vehiculo_color" placeholder="Blanco" opcional />
+
+          <dl className="f-aviso grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+            <dt className="text-[#7A7F8C]">Nombre</dt><dd className="text-[#16181D] font-medium truncate">{form.nombre || '—'}</dd>
+            <dt className="text-[#7A7F8C]">Celular</dt><dd className="text-[#16181D] font-medium tabular-nums">{form.celular || '—'}</dd>
+            <dt className="text-[#7A7F8C]">DNI</dt><dd className="text-[#16181D] font-medium tabular-nums">{form.dni || '—'}</dd>
+            <dt className="text-[#7A7F8C]">Placa</dt><dd className="text-[#16181D] font-medium">{form.placa || '—'}</dd>
+          </dl>
+
+          <div className="grid grid-cols-[1fr_2fr] gap-3">
+            <button onClick={() => setPaso(2)} className="f-btn f-btn-sec">Volver</button>
+            <button onClick={registrar} disabled={cargando} className="f-btn">{cargando ? 'Enviando…' : 'Enviar solicitud'}</button>
+          </div>
+        </div>
+      )}
+
+      <p className="text-center text-[14px] text-[#4A4F5C] mt-8">
+        ¿Ya tienes cuenta?{' '}
+        <button onClick={() => router.push('/login')} className="f-link">Inicia sesión</button>
+      </p>
+    </>,
+    'max-w-[28rem]'
   )
 }

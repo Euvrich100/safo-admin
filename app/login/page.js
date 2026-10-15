@@ -4,11 +4,12 @@ import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPaperPlane, faArrowLeft, faHand, faFlagCheckered, faMobileScreenButton, faRightToBracket, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
+import { faTaxi, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from '@/components/SafoLogo'
 import ClaveInput from '@/components/ClaveInput'
 import AccesoSocial from '@/components/AccesoSocial'
-import MapaHuanuco, { MAPA_URL } from '@/components/MapaHuanuco'
+import MapaCiudad, { MAPA_URL } from '@/components/MapaCiudad'
+import { CIUDAD } from '@/lib/ciudad'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -57,10 +58,10 @@ export default function LoginPage() {
   }
 
   const solicitarOTP = async () => {
-    if (!celular) return toast.error('Ingresa tu número de celular')
+    if (celular.replace(/\D/g, '').length !== 9) return toast.error('Ingresa tu celular de 9 dígitos')
     setCargando(true)
     try {
-      await api.post('/api/auth/solicitar-otp', { celular })
+      await api.post('/api/auth/solicitar-otp', { celular: celular.replace(/\D/g, '') })
       toast.success('¡Código enviado!')
       setPaso(2)
     } catch (err) {
@@ -74,7 +75,7 @@ export default function LoginPage() {
     if (!codigo) return toast.error('Ingresa el código')
     setCargando(true)
     try {
-      const { data } = await api.post('/api/auth/verificar-otp', { celular, codigo })
+      const { data } = await api.post('/api/auth/verificar-otp', { celular: celular.replace(/\D/g, ''), codigo })
       ingresar(data)
     } catch (err) {
       toast.error(err.response?.data?.error || 'Código incorrecto')
@@ -83,196 +84,129 @@ export default function LoginPage() {
     }
   }
 
+  const titulo = modo === 'clave' ? 'Tu taxi te espera' : paso === 1 ? 'Entra con un código' : 'Revisa tus mensajes'
+  const subtitulo = modo === 'clave'
+    ? 'Entra con tu celular y tu contraseña.'
+    : paso === 1
+      ? 'Te enviamos un SMS para confirmar que eres tú.'
+      : `Enviamos un código de 6 dígitos al ${celular}.`
+
+  const campoCelular = (alEnter) => (
+    <div className="f-campo">
+      <label htmlFor="celular" className="f-etiqueta">Celular</label>
+      <div className="f-grupo">
+        <span className="f-prefijo" aria-hidden="true">{CIUDAD.prefijoTelefono}</span>
+        <input id="celular" type="tel" inputMode="numeric" placeholder="987 654 321" value={celular} autoComplete="tel-national"
+          onChange={e => setCelular(e.target.value)} onKeyDown={e => e.key === 'Enter' && alEnter()} />
+      </div>
+    </div>
+  )
+
   const pagina = (
     <div className="min-h-screen flex bg-white">
-      <Toaster position="top-center" toastOptions={{
-        style: { background: '#1D1D1F', color: 'white' }
-      }}/>
+      <Toaster position="top-center" toastOptions={{ style: { background: '#16181D', color: 'white', fontSize: 14 } }} />
 
-      {/* Panel izquierdo — mapa de Huánuco sobre fondo blanco */}
+      {/* Panel izquierdo: mapa de la ciudad, con un velo para que el texto se lea */}
       <div className="hidden lg:block relative flex-1 overflow-hidden bg-white">
-        <MapaHuanuco className="absolute inset-0" zoom={15} centro={[-9.9306, -76.2522]} />
-        {/* Velo blanco: deja el texto legible a la izquierda y el mapa a la derecha */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-white/0" />
+        <MapaCiudad className="absolute inset-0" zoom={15} />
+        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/85 to-white/0" />
         <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-white/60" />
 
-        <div className="relative h-full flex flex-col justify-between p-12">
-          <SafoLogo size={64} showText priority />
+        <div className="relative h-full flex flex-col justify-between p-12 xl:p-14">
+          <SafoLogo size={44} showText priority />
 
-          <div className="max-w-md">
-            <h2 className="text-4xl xl:text-5xl font-semibold text-[#14213D] mb-5 leading-[1.1] tracking-tight">
-              Taxis seguros para cada calle de Huánuco.
+          <div className="max-w-[27rem]">
+            <h2 className="titulo text-[2.9rem] xl:text-[3.4rem] font-semibold text-[#16181D] leading-[1.03] mb-5">
+              Taxis verificados en cada calle de {CIUDAD.nombre}.
             </h2>
-            <p className="text-[#4B5873] text-lg leading-relaxed">
-              Pide tu taxi, mira quién viene y viaja tranquilo.
+            <p className="text-[#4A4F5C] text-[1.0625rem] leading-relaxed max-w-[24rem]">
+              Pide tu taxi, mira quién viene por ti y sigue el viaje en el mapa.
             </p>
           </div>
 
           <div className="flex items-end justify-between gap-6">
-            <div className="flex gap-8 text-[#14213D]">
-              {[
-                { n: 'Verificados', label: 'DNI, licencia y vehículo' },
-                { n: 'En vivo', label: 'sigue tu viaje en el mapa' },
-              ].map((s, i) => (
-                <div key={i}>
-                  <div className="text-2xl font-semibold">{s.n}</div>
-                  <div className="text-[#6B7894] text-sm mt-0.5">{s.label}</div>
-                </div>
-              ))}
-            </div>
+            <ul className="space-y-1.5 text-[14px] text-[#4A4F5C]">
+              <li className="flex items-center gap-2.5"><span className="w-1.5 h-1.5 rounded-full bg-[#16181D]" />Conductores con DNI, licencia y vehículo revisados</li>
+              <li className="flex items-center gap-2.5"><span className="w-1.5 h-1.5 rounded-full bg-[#16181D]" />Comparte tu viaje con quien quieras</li>
+            </ul>
             <a href={MAPA_URL} target="_blank" rel="noreferrer"
-              className="rounded-2xl bg-white/95 backdrop-blur px-4 py-3 shadow-sm border border-[#E2E8F0] hover:border-[#0A66E0] transition">
-              <div className="text-sm font-semibold text-[#14213D]">Plaza de Armas, Huánuco</div>
-              <div className="text-xs text-[#6B7894]">1 894 m s. n. m. · Ver mapa completo</div>
+              className="shrink-0 rounded-xl bg-white/95 backdrop-blur px-4 py-2.5 border border-[#E8EAEE] hover:border-[#C2C6D0] transition">
+              <div className="text-[13.5px] font-semibold text-[#16181D]">{CIUDAD.lugar}, {CIUDAD.nombre}</div>
+              <div className="text-xs text-[#7A7F8C]">{CIUDAD.altitud ? `${CIUDAD.altitud} · ` : ''}Ver mapa completo</div>
             </a>
           </div>
         </div>
       </div>
 
-      {/* Panel derecho — formulario */}
-      <div className="flex-1 lg:max-w-md flex flex-col justify-center p-8 lg:p-12">
+      {/* Panel derecho: formulario */}
+      <div className="flex-1 lg:flex-none lg:w-[30rem] flex flex-col justify-center px-7 py-10 sm:px-12 lg:px-14">
+        <div className="w-full max-w-[22rem] mx-auto lg:mx-0">
 
-        {/* Logo mobile */}
-        <div className="flex justify-center mb-8 lg:hidden">
-          <SafoLogo size={72} priority />
+          <div className="lg:hidden mb-9"><SafoLogo size={40} showText priority /></div>
+
+          <div className="mb-8">
+            <span className="insignia-taxi mb-5" aria-hidden="true"><FontAwesomeIcon icon={faTaxi} /></span>
+            <h1 className="text-[1.75rem] leading-tight font-semibold text-[#16181D] mb-1.5">{titulo}</h1>
+            <p className="text-[15px] text-[#4A4F5C]">{subtitulo}</p>
+          </div>
+
+          {modo === 'clave' ? (
+            <div className="space-y-5">
+              {campoCelular(entrarConClave)}
+              <div className="f-campo">
+                <label htmlFor="clave" className="f-etiqueta">Contraseña</label>
+                <ClaveInput id="clave" value={clave} onChange={setClave} onEnter={entrarConClave} />
+              </div>
+
+              <button onClick={entrarConClave} disabled={cargando} className="f-btn">
+                {cargando ? 'Ingresando…' : 'Iniciar sesión'}
+              </button>
+
+              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-[13.5px]">
+                <button onClick={() => setAyudaClave(v => !v)} className="f-link-suave">¿Olvidaste tu contraseña?</button>
+                <button onClick={() => { setModo('otp'); setPaso(1) }} className="f-link-suave">Prefiero un código por SMS</button>
+              </div>
+              {ayudaClave && (
+                <div className="f-aviso">
+                  <FontAwesomeIcon icon={faCircleInfo} className="mr-1.5 text-[#7A7F8C]" />
+                  Escríbenos o habla con el administrador de SafO: te dará una contraseña temporal que podrás cambiar en «Mi cuenta».
+                </div>
+              )}
+
+              <div className="f-divisor">o continúa con</div>
+              <AccesoSocial modo="login" />
+
+              <p className="text-center text-[14px] text-[#4A4F5C] pt-1">
+                ¿Primera vez en SafO?{' '}
+                <button onClick={() => router.push('/registro/pasajero')} className="f-link">Crea tu cuenta</button>
+              </p>
+            </div>
+          ) : paso === 1 ? (
+            <div className="space-y-5">
+              {campoCelular(solicitarOTP)}
+              <button onClick={solicitarOTP} disabled={cargando} className="f-btn">
+                {cargando ? 'Enviando…' : 'Enviar código'}
+              </button>
+              <button onClick={() => setModo('clave')} className="f-btn f-btn-sec">Entrar con contraseña</button>
+            </div>
+          ) : (
+            <div className="space-y-5">
+              <div className="f-campo">
+                <label htmlFor="codigo" className="f-etiqueta">Código de verificación</label>
+                <input id="codigo" type="text" inputMode="numeric" autoComplete="one-time-code" autoFocus placeholder="000000" value={codigo}
+                  onChange={e => setCodigo(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onKeyDown={e => e.key === 'Enter' && verificarOTP()} maxLength={6}
+                  className="f-input !h-14 text-center !text-[1.6rem] font-semibold tracking-[0.45em] tabular-nums" />
+              </div>
+              <button onClick={verificarOTP} disabled={cargando || codigo.length < 6} className="f-btn">
+                {cargando ? 'Verificando…' : 'Ingresar al panel'}
+              </button>
+              <button onClick={() => { setPaso(1); setCodigo('') }} className="f-btn f-btn-sec">Cambiar número</button>
+            </div>
+          )}
+
+          <p className="text-[12.5px] text-[#7A7F8C] mt-10">SafO · Movilidad segura en {CIUDAD.nombre}</p>
         </div>
-
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-[#1D1D1F] mb-2">
-            {modo === 'clave' || paso === 1
-              ? <>Hola de nuevo <FontAwesomeIcon icon={faHand} className="text-[#FFC21A] text-2xl ml-1" /></>
-              : <>¡Casi listo! <FontAwesomeIcon icon={faFlagCheckered} className="text-[#0A66E0] text-2xl ml-1" /></>}
-          </h1>
-          <p className="text-[#6E6E73] text-sm">
-            {modo === 'clave'
-              ? 'Ingresa con tu celular y tu contraseña'
-              : paso === 1
-                ? 'Te enviaremos un código de verificación'
-                : `Código enviado al ${celular}`}
-          </p>
-        </div>
-
-        {modo === 'clave' ? (
-          <div className="space-y-4">
-            <div>
-              <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">Número de celular</label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A1A1A6] text-sm font-medium"><FontAwesomeIcon icon={faMobileScreenButton} className="mr-1.5" />+51</span>
-                <input type="tel" inputMode="numeric" placeholder="999 000 001" value={celular} autoComplete="tel-national"
-                  onChange={e => setCelular(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && entrarConClave()}
-                  className="w-full pl-[5.5rem] pr-4 py-4 rounded-2xl text-[#1D1D1F] text-lg font-medium placeholder-[#A1A1A6] bg-[#F5F5F7] border border-transparent focus:bg-white focus:border-[#0A66E0] focus:outline-none transition" />
-              </div>
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">Contraseña</label>
-              <ClaveInput value={clave} onChange={setClave} onEnter={entrarConClave} className="!py-4 !rounded-2xl text-lg" />
-            </div>
-
-            <button onClick={entrarConClave} disabled={cargando}
-              className="w-full py-4 rounded-2xl font-semibold text-white text-lg transition disabled:opacity-50 bg-[#0A66E0] hover:bg-[#084FB0]">
-              {cargando ? 'Ingresando...' : <><FontAwesomeIcon icon={faRightToBracket} className="mr-2.5" />Iniciar sesión</>}
-            </button>
-
-            <div className="flex items-center justify-between text-sm pt-1">
-              <button onClick={() => setAyudaClave(v => !v)} className="text-[#6E6E73] hover:text-[#0A66E0] transition">¿Olvidaste tu contraseña?</button>
-              <button onClick={() => { setModo('otp'); setPaso(1) }} className="text-[#6E6E73] hover:text-[#0A66E0] transition">Entrar con código SMS</button>
-            </div>
-            {ayudaClave && (
-              <div className="rounded-xl bg-[#F3F8FF] p-3.5 text-sm text-[#4B5873]">
-                <FontAwesomeIcon icon={faCircleInfo} className="mr-1.5 text-[#0A66E0]" />
-                Comunícate con el administrador de SafO: te dará una contraseña temporal que podrás cambiar en «Mi cuenta».
-              </div>
-            )}
-
-            <div className="rounded-2xl border border-[#E2E8F0] p-4 text-center">
-              <span className="text-[#6E6E73] text-sm">¿Eres nuevo en SafO? </span>
-              <button onClick={() => router.push('/registro/pasajero')} className="text-[#0A66E0] font-semibold text-sm hover:underline">Crea tu cuenta gratis</button>
-            </div>
-
-            <div className="flex items-center gap-3 pt-1">
-              <div className="flex-1 h-px bg-[#E2E2E7]" />
-              <span className="text-[#A1A1A6] text-xs uppercase tracking-widest">o continúa con</span>
-              <div className="flex-1 h-px bg-[#E2E2E7]" />
-            </div>
-            <AccesoSocial modo="login" />
-          </div>
-        ) : paso === 1 ? (
-          <div className="space-y-4">
-            <div>
-              <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">
-                Número de celular
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A1A1A6] text-sm font-medium"><FontAwesomeIcon icon={faMobileScreenButton} className="mr-1.5" />+51</span>
-                <input
-                  type="tel"
-                  placeholder="999 000 001"
-                  value={celular}
-                  onChange={e => setCelular(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && solicitarOTP()}
-                  className="w-full pl-[5.5rem] pr-4 py-4 rounded-2xl text-[#1D1D1F] text-lg font-medium placeholder-[#A1A1A6] bg-[#F5F5F7] border border-transparent focus:bg-white focus:border-[#0A66E0] focus:outline-none transition"
-                />
-              </div>
-            </div>
-
-            <button
-              onClick={solicitarOTP}
-              disabled={cargando}
-              className="w-full py-4 rounded-2xl font-semibold text-white text-lg transition disabled:opacity-50 bg-[#0A66E0] hover:bg-[#084FB0]"
-            >
-              {cargando ? 'Enviando...' : <><FontAwesomeIcon icon={faPaperPlane} className="mr-2.5" />Enviar código</>}
-            </button>
-
-            <button onClick={() => setModo('clave')}
-              className="w-full py-3 text-sm text-[#0A66E0] font-semibold hover:underline transition">
-              <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />Entrar con contraseña
-            </button>
-
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div>
-              <label className="text-xs font-semibold text-[#6E6E73] uppercase tracking-widest mb-2 block">
-                Código de verificación
-              </label>
-              <input
-                type="text"
-                placeholder="• • • • • •"
-                value={codigo}
-                onChange={e => setCodigo(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                onKeyDown={e => e.key === 'Enter' && verificarOTP()}
-                maxLength={6}
-                className="w-full px-4 py-5 rounded-2xl text-[#1D1D1F] text-4xl tracking-[0.5em] text-center font-semibold placeholder-[#D2D2D7] bg-[#F5F5F7] border border-transparent focus:bg-white focus:border-[#0A66E0] focus:outline-none transition"
-              />
-              <div className="flex justify-center mt-3">
-                {[0,1,2,3,4,5].map(i => (
-                  <div key={i} className="w-8 h-1 mx-1 rounded-full transition-all"
-                    style={{ background: codigo.length > i ? '#0A66E0' : '#E2E2E7' }}/>
-                ))}
-              </div>
-            </div>
-
-            <button
-              onClick={verificarOTP}
-              disabled={cargando || codigo.length < 6}
-              className="w-full py-4 rounded-2xl font-semibold text-white text-lg transition disabled:opacity-40 bg-[#0A66E0] hover:bg-[#084FB0]"
-            >
-              {cargando ? 'Verificando...' : <><FontAwesomeIcon icon={faRightToBracket} className="mr-2.5" />Ingresar al panel</>}
-            </button>
-
-            <button
-              onClick={() => { setPaso(1); setCodigo('') }}
-              className="w-full py-3 text-[#6E6E73] hover:text-[#1D1D1F] text-sm transition"
-            >
-              <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />Cambiar número
-            </button>
-          </div>
-        )}
-
-        <p className="text-center text-[#A1A1A6] text-xs mt-12">
-          SafO · Movilidad segura en Huánuco
-        </p>
       </div>
     </div>
   )

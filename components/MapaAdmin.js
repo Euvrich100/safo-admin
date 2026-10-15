@@ -1,4 +1,5 @@
 'use client'
+import { CIUDAD } from '@/lib/ciudad'
 import { useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { faTaxi, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
@@ -19,7 +20,7 @@ const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 const num = (v) => (v === null || v === undefined || v === '' ? NaN : Number(v))
 const valido = (a, b) => Number.isFinite(num(a)) && Number.isFinite(num(b))
 
-const CENTRO_HUANUCO = [-9.9306, -76.2422]
+const CENTRO_HUANUCO = CIUDAD.centro
 
 export default function MapaAdmin({
   className = '',
