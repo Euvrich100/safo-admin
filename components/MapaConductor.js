@@ -1,7 +1,9 @@
 'use client'
+import { agregarMapaBase } from '@/lib/mapaBase'
 import { useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
-import { faTaxi, faFlagCheckered } from '@fortawesome/free-solid-svg-icons'
+import { faFlagCheckered } from '@fortawesome/free-solid-svg-icons'
+import { iconoVehiculo, svgDe } from '@/lib/vehiculos'
 
 // Mapa del conductor (OpenStreetMap + Leaflet, sin API key):
 //  - taxi = mi posición (se mueve con el GPS)
@@ -11,11 +13,10 @@ const svg = (icono) => {
   const [ancho, alto, , , trazo] = icono.icon
   return `<svg viewBox="0 0 ${ancho} ${alto}" fill="currentColor" aria-hidden="true"><path d="${trazo}"/></svg>`
 }
-const TAXI_SVG = svg(faTaxi)
 const BANDERA_SVG = svg(faFlagCheckered)
 const valido = (p) => Array.isArray(p) && Number.isFinite(Number(p[0])) && Number.isFinite(Number(p[1]))
 
-export default function MapaConductor({ className = '', yo = null, recojo = null, destino = null, ruta = null, ajustarKey = 0 }) {
+export default function MapaConductor({ className = '', tipo = 'taxi', yo = null, recojo = null, destino = null, ruta = null, ajustarKey = 0 }) {
   const contenedor = useRef(null)
   const st = useRef({ L: null, mapa: null, yo: null, recojo: null, destino: null, linea: null, ultimoAjuste: -1, listo: null })
 
@@ -29,10 +30,7 @@ export default function MapaConductor({ className = '', yo = null, recojo = null
       s.mapa = L.map(contenedor.current, { center: valido(yo) ? yo : [-9.9306, -76.2422], zoom: 15, zoomControl: false })
       L.control.zoom({ position: 'bottomright' }).addTo(s.mapa)
       s.mapa.attributionControl.setPrefix(false)
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>',
-      }).addTo(s.mapa)
+      agregarMapaBase(L, s.mapa)
       s.listo?.()
     })
     return () => {
@@ -53,7 +51,7 @@ export default function MapaConductor({ className = '', yo = null, recojo = null
         if (!s.yo) {
           s.yo = L.marker(yo, {
             zIndexOffset: 1000, title: 'Mi posición',
-            icon: L.divIcon({ className: 'safo-taxi-wrap', html: `<span class="safo-taxi sel">${TAXI_SVG}</span>`, iconSize: [38, 38], iconAnchor: [19, 19] }),
+            icon: L.divIcon({ className: 'safo-taxi-wrap', html: `<span class="safo-taxi sel">${svgDe(iconoVehiculo(tipo))}</span>`, iconSize: [38, 38], iconAnchor: [19, 19] }),
           }).addTo(mapa)
         } else s.yo.setLatLng(yo)
       } else if (s.yo) { s.yo.remove(); s.yo = null }

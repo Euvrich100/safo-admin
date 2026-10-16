@@ -3,7 +3,8 @@ import { Suspense, useEffect, useState, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { useSearchParams } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTaxi, faShieldHalved, faLocationDot, faFlagCheckered, faStar, faCircleCheck, faTriangleExclamation, faLocationCrosshairs } from '@fortawesome/free-solid-svg-icons'
+import { iconoVehiculo } from '@/lib/vehiculos'
+import { faShieldHalved, faLocationDot, faFlagCheckered, faStar, faCircleCheck, faTriangleExclamation, faLocationCrosshairs } from '@fortawesome/free-solid-svg-icons'
 import api from '@/lib/api'
 import SafoLogo from '@/components/SafoLogo'
 
@@ -92,7 +93,7 @@ function Seguimiento() {
 
             <div className="rounded-3xl bg-white border border-[#E6E8EF] p-5 space-y-4">
               <div className="flex items-center gap-3">
-                <span className="w-12 h-12 rounded-full bg-[#14213D] text-[#FFC21A] flex items-center justify-center"><FontAwesomeIcon icon={faTaxi} /></span>
+                <span className="w-12 h-12 rounded-full bg-[#14213D] text-[#FFC21A] flex items-center justify-center"><FontAwesomeIcon icon={iconoVehiculo(viaje.tipo_vehiculo)} /></span>
                 <div className="min-w-0">
                   <div className="font-semibold">{viaje.conductor_nombre}</div>
                   <div className="text-sm text-[#6E6E73]">

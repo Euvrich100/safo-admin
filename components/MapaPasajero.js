@@ -1,7 +1,9 @@
 'use client'
+import { agregarMapaBase } from '@/lib/mapaBase'
 import { useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { faTaxi, faFlagCheckered } from '@fortawesome/free-solid-svg-icons'
+import { iconoVehiculo, svgDe } from '@/lib/vehiculos'
 
 // Mapa interactivo del pasajero (OpenStreetMap + Leaflet, sin API key):
 //  - pin azul = punto de recojo (arrastrable; tocar el mapa lo mueve)
@@ -12,7 +14,6 @@ const svg = (icono) => {
   const [ancho, alto, , , trazo] = icono.icon
   return `<svg viewBox="0 0 ${ancho} ${alto}" fill="currentColor" aria-hidden="true"><path d="${trazo}"/></svg>`
 }
-const TAXI_SVG = svg(faTaxi)
 const BANDERA_SVG = svg(faFlagCheckered)
 
 const valido = (p) => Array.isArray(p) && Number.isFinite(Number(p[0])) && Number.isFinite(Number(p[1]))
@@ -49,10 +50,7 @@ export default function MapaPasajero({
       st.mapa = L.map(contenedor.current, { center: centro, zoom: 15, zoomControl: false, scrollWheelZoom: true })
       L.control.zoom({ position: 'bottomright' }).addTo(st.mapa)
       st.mapa.attributionControl.setPrefix(false)
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>',
-      }).addTo(st.mapa)
+      agregarMapaBase(L, st.mapa)
 
       st.yo = L.marker(centro, {
         draggable: true, zIndexOffset: 1000, title: 'Punto de recojo (arrástralo)',
@@ -107,9 +105,12 @@ export default function MapaPasajero({
 
       // ruta
       if (Array.isArray(ruta) && ruta.length > 1) {
-        if (!st.linea) st.linea = L.polyline(ruta, { color: '#0A66E0', weight: 5, opacity: 0.85, lineJoin: 'round' }).addTo(mapa)
-        else st.linea.setLatLngs(ruta)
-      } else if (st.linea) { st.linea.remove(); st.linea = null }
+        if (!st.linea) {
+          st.borde = L.polyline(ruta, { color: '#FFFFFF', weight: 10, opacity: 0.95, lineJoin: 'round', lineCap: 'round', interactive: false }).addTo(mapa)
+          st.linea = L.polyline(ruta, { color: '#0A66E0', weight: 6, opacity: 1, lineJoin: 'round', lineCap: 'round', interactive: false }).addTo(mapa)
+          st.flujo = L.polyline(ruta, { color: '#FFFFFF', weight: 3, opacity: 0.9, className: 'safo-ruta', interactive: false }).addTo(mapa)
+        } else { st.borde?.setLatLngs(ruta); st.linea.setLatLngs(ruta); st.flujo?.setLatLngs(ruta) }
+      } else if (st.linea) { st.linea.remove(); st.linea = null; st.borde?.remove(); st.borde = null; st.flujo?.remove(); st.flujo = null }
 
       // taxis
       const vigentes = new Set()
@@ -120,7 +121,7 @@ export default function MapaPasajero({
         const sel = c.id === seleccionadoId
         const icono = L.divIcon({
           className: 'safo-taxi-wrap',
-          html: `<span class="safo-taxi${sel ? ' sel' : ''}">${TAXI_SVG}</span>`,
+          html: `<span class="safo-taxi${sel ? ' sel' : ''}">${svgDe(iconoVehiculo(c.tipo_vehiculo))}</span>`,
           iconSize: [38, 38], iconAnchor: [19, 19],
         })
         let m = st.taxis.get(c.id)
@@ -137,7 +138,7 @@ export default function MapaPasajero({
       // conductor del viaje en curso
       if (conductorViaje && Number.isFinite(Number(conductorViaje.lat)) && Number.isFinite(Number(conductorViaje.lng))) {
         const pos = [Number(conductorViaje.lat), Number(conductorViaje.lng)]
-        const icono = L.divIcon({ className: 'safo-taxi-wrap', html: `<span class="safo-taxi sel">${TAXI_SVG}</span>`, iconSize: [38, 38], iconAnchor: [19, 19] })
+        const icono = L.divIcon({ className: 'safo-taxi-wrap', html: `<span class="safo-taxi sel">${svgDe(iconoVehiculo(conductorViaje.tipo))}</span>`, iconSize: [38, 38], iconAnchor: [19, 19] })
         if (!st.viaje) st.viaje = L.marker(pos, { icon: icono, title: conductorViaje.nombre }).addTo(mapa)
         else st.viaje.setLatLng(pos)
       } else if (st.viaje) { st.viaje.remove(); st.viaje = null }

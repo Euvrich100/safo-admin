@@ -103,9 +103,8 @@ css=f'''/* Modo oscuro automático (según el dispositivo del cliente).
   .safo-zona-etiqueta {{ background: rgba(19,22,27,.85); color: #ECEEF2; }}
   .mapa-suave .leaflet-control-attribution {{ background: rgba(19,22,27,.8); }}
 
-  /* Mapas: mosaicos de OpenStreetMap en versión oscura */
-  .leaflet-tile-pane {{ filter: invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.7); }}
-  .mapa-suave .leaflet-tile-pane {{ filter: invert(1) hue-rotate(180deg) grayscale(.7) brightness(.8) contrast(.9); }}
+  /* Mapas: los mosaicos oscuros los trae el propio mapa base (lib/mapaBase.js) */
+  .mapa-suave .leaflet-tile-pane {{ filter: none; }}
   .leaflet-container {{ background: #1A1D23; }}
   .leaflet-control-attribution {{ background: rgba(19,22,27,.8) !important; color: #8B91A0 !important; }}
   .leaflet-control-attribution a {{ color: #6AA6FF !important; }}

@@ -8,6 +8,7 @@ import api from '@/lib/api'
 import useAuthGuard from '@/lib/useAuthGuard'
 import AdminNavbar from '@/components/AdminNavbar'
 import { hace, soles } from '@/lib/formato'
+import { nombreVehiculo } from '@/lib/vehiculos'
 
 const MapaAdmin = dynamic(() => import('@/components/MapaAdmin'), { ssr: false })
 
@@ -67,8 +68,8 @@ export default function MapaVivoPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2 items-center">
-            <Capa id="libres" texto="Taxis libres" color="#1D1D1F" />
-            <Capa id="viaje" texto="Taxis en viaje" color="#FFC21A" />
+            <Capa id="libres" texto="Libres" color="#1D1D1F" />
+            <Capa id="viaje" texto="En viaje" color="#FFC21A" />
             <Capa id="viajes" texto="Viajes" color="#0A66E0" />
             <Capa id="sos" texto="SOS" color="#D92D20" />
             <button onClick={() => setAjuste(a => a + 1)} className="px-3 py-1.5 rounded-full text-xs font-medium bg-[#14213D] text-white">
@@ -109,7 +110,7 @@ export default function MapaVivoPage() {
                   <span className="font-semibold text-[#14213D] truncate">{v.pasajero_nombre}</span>
                   <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#EAF2FE] text-[#0A66E0] whitespace-nowrap">{ESTADO[v.estado] || v.estado}</span>
                 </div>
-                <div className="text-xs text-[#6E6E73] mt-1">Taxi: {v.conductor_nombre}</div>
+                <div className="text-xs text-[#6E6E73] mt-1">{v.servicio === 'moto' ? 'Moto' : 'Taxi'}: {v.conductor_nombre}</div>
                 <div className="text-xs text-[#6E6E73] truncate">{v.direccion_origen || 'Origen en el mapa'}{v.direccion_destino ? ` → ${v.direccion_destino}` : ''}</div>
                 {v.tarifa_estimada && <div className="text-xs text-[#14213D] mt-1">Tarifa estimada {soles(v.tarifa_estimada)}</div>}
               </div>
@@ -124,7 +125,7 @@ export default function MapaVivoPage() {
                 <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${c.en_viaje ? 'bg-[#FFC21A]' : 'bg-[#1D1D1F]'}`} />
                 <div className="min-w-0">
                   <div className="font-medium text-[#14213D] truncate">{c.nombre}</div>
-                  <div className="text-xs text-[#8A8F9C] truncate">{c.placa} · {c.en_viaje ? 'En viaje' : 'Disponible'} · GPS {hace(c.actualizado_en)}</div>
+                  <div className="text-xs text-[#8A8F9C] truncate">{nombreVehiculo(c.tipo_vehiculo)} · {c.placa} · {c.en_viaje ? 'En viaje' : 'Disponible'} · GPS {hace(c.actualizado_en)}</div>
                 </div>
               </div>
             ))}

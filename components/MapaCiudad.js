@@ -1,4 +1,5 @@
 'use client'
+import { agregarMapaBase } from '@/lib/mapaBase'
 import { useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
 
@@ -36,10 +37,7 @@ export default function MapaCiudad({ className = 'relative', interactivo = false
 
       mapa.attributionControl.setPrefix(false) // sin el prefijo "Leaflet"; se conserva © OpenStreetMap
 
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>',
-      }).addTo(mapa)
+      agregarMapaBase(L, mapa)
 
       L.marker(PLAZA, {
         interactive: false,

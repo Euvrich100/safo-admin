@@ -14,6 +14,7 @@ import api from '@/lib/api'
 import { rutaEntre, distanciaKm, minutosPara } from '@/lib/geo'
 import { pitar, vibrar, notificar, pedirPermisoNotificaciones } from '@/lib/avisos'
 import { hace, soles } from '@/lib/formato'
+import { nombreVehiculo } from '@/lib/vehiculos'
 import SafoLogo from '@/components/SafoLogo'
 import ClaveInput from '@/components/ClaveInput'
 import BotonSOS from '@/components/BotonSOS'
@@ -345,7 +346,7 @@ export default function ConductorPage() {
         <div className="flex items-center gap-3">
           <span className="w-12 h-12 rounded-full bg-[#14213D] text-[#FFC21A] flex items-center justify-center text-lg font-bold">{(viaje.pasajero_nombre || '?')[0]}</span>
           <div>
-            <div className="text-xs font-semibold uppercase tracking-wider text-[#0A66E0]">Nueva solicitud</div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-[#0A66E0]">Nueva solicitud{viaje.servicio === 'moto' ? ' · Moto' : ''}</div>
             <div className="font-semibold text-[#14213D] text-lg leading-tight">{viaje.pasajero_nombre}</div>
           </div>
         </div>
@@ -451,7 +452,7 @@ export default function ConductorPage() {
       return (
         <div className="space-y-3">
           <div className="relative h-[42vh] min-h-[260px] rounded-3xl overflow-hidden border border-[#E6E8EF]">
-            <MapaConductor className="absolute inset-0" {...mapaProps} ruta={ruta?.puntos} ajustarKey={ajuste} />
+            <MapaConductor className="absolute inset-0" tipo={perfil?.tipo_vehiculo} {...mapaProps} ruta={ruta?.puntos} ajustarKey={ajuste} />
             <button onClick={() => setAjuste(a => a + 1)} aria-label="Centrar mapa" className="absolute top-3 right-3 z-[500] w-10 h-10 rounded-full bg-white shadow text-[#14213D]"><FontAwesomeIcon icon={faLocationCrosshairs} /></button>
           </div>
           {viaje.estado === 'solicitado' ? Solicitud() : ViajeEnCurso()}
@@ -464,7 +465,7 @@ export default function ConductorPage() {
         {conectado ? (
           <div className="rounded-3xl overflow-hidden bg-white border border-[#E6E8EF]">
             <div className="relative h-[36vh] min-h-[240px]">
-              <MapaConductor className="absolute inset-0" yo={pos} ajustarKey={ajuste} />
+              <MapaConductor className="absolute inset-0" tipo={perfil?.tipo_vehiculo} yo={pos} ajustarKey={ajuste} />
               <button onClick={() => setAjuste(a => a + 1)} aria-label="Centrar mapa" className="absolute top-3 right-3 z-[500] w-10 h-10 rounded-full bg-white shadow text-[#14213D]"><FontAwesomeIcon icon={faLocationCrosshairs} /></button>
             </div>
             <div className="p-5 flex items-center gap-4">
@@ -515,7 +516,7 @@ export default function ConductorPage() {
               </div>
               <div className="text-sm text-[#6E6E73] mt-1 truncate">{v.direccion_origen || 'Origen en el mapa'}{v.direccion_destino ? ` → ${v.direccion_destino}` : ''}</div>
               <div className="flex items-center justify-between mt-2 text-xs text-[#8A8F9C]">
-                <span>{hace(v.solicitado_en)}{v.distancia_km ? ` · ${Number(v.distancia_km).toFixed(1)} km` : ''}</span>
+                <span>{hace(v.solicitado_en)}{v.servicio === 'moto' ? ' · Moto' : ''}{v.distancia_km ? ` · ${Number(v.distancia_km).toFixed(1)} km` : ''}</span>
                 {v.tarifa_estimada && v.estado === 'completado' && <b className="text-sm text-[#14213D]">{soles(v.tarifa_estimada)}</b>}
               </div>
             </article>
@@ -577,7 +578,7 @@ export default function ConductorPage() {
           <div><div className="font-semibold text-[#14213D] text-base">{perfil?.nombre}</div><div className="text-[#6E6E73]">{perfil?.celular}</div></div>
         </div>
         <div className="grid grid-cols-2 gap-2 pt-2">
-          {[['Vehículo', [perfil?.vehiculo_marca, perfil?.vehiculo_modelo].filter(Boolean).join(' ') || '—'], ['Placa', perfil?.placa || '—'], ['Color', perfil?.vehiculo_color || '—'], ['Año', perfil?.vehiculo_anno || '—']].map(([k, v]) => (
+          {[['Tipo', nombreVehiculo(perfil?.tipo_vehiculo)], ['Vehículo', [perfil?.vehiculo_marca, perfil?.vehiculo_modelo].filter(Boolean).join(' ') || '—'], ['Placa', perfil?.placa || '—'], ['Color', perfil?.vehiculo_color || '—'], ['Año', perfil?.vehiculo_anno || '—']].map(([k, v]) => (
             <div key={k} className="rounded-xl bg-[#F4F6FA] p-3"><div className="text-xs text-[#8A8F9C]">{k}</div><div className="font-medium text-[#14213D]">{v}</div></div>
           ))}
         </div>

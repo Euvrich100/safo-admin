@@ -118,8 +118,12 @@ select.f-input {
 /* Los paneles de Leaflet (z-index 400) no deben escapar y tapar lo que va encima del mapa */
 .mapa-suave { isolation: isolate; }
 .mapa-suave .leaflet-container { background: transparent; font-family: inherit; }
-.mapa-suave .leaflet-tile-pane { filter: grayscale(.85) brightness(1.05) contrast(.95); }
+.mapa-suave .leaflet-tile-pane { filter: saturate(1.05); }
 .mapa-suave .leaflet-control-attribution { font-size: 10px; background: rgba(255,255,255,.8); }
+/* Ruta con trazo animado: el recorrido se siente vivo */
+.safo-ruta { stroke-dasharray: 1 12; animation: safo-ruta-mov 1.4s linear infinite; stroke-linecap: round; }
+@keyframes safo-ruta-mov { to { stroke-dashoffset: -26; } }
+@media (prefers-reduced-motion: reduce) { .safo-ruta { animation: none; stroke-dasharray: none; } }
 .safo-pin-wrap { background: none; border: 0; }
 .safo-pin {
   display: block; width: 28px; height: 28px; border-radius: 9999px;
@@ -269,6 +273,7 @@ body:has(.safo-sidebar) div.min-h-screen.bg-white { background: transparent; }
   .hover\:bg-\[\#FCEAE9\]:hover { background-color:rgba(255,116,104,.16); }
   .hover\:bg-\[\#dbe9fd\]:hover { background-color:rgba(106,166,255,.24); }
   .hover\:bg-white:hover { background-color:#1C2027; }
+  .hover\:bg-white\/60:hover { background-color:#1C2027; }
   .hover\:border-\[\#B8D2F7\]:hover { border-color:#2C323C; }
   .hover\:border-\[\#C2C6D0\]:hover { border-color:#3A414D; }
   .hover\:border-\[\#C7D6EA\]:hover { border-color:#2C323C; }
@@ -322,9 +327,8 @@ body:has(.safo-sidebar) div.min-h-screen.bg-white { background: transparent; }
   .safo-zona-etiqueta { background: rgba(19,22,27,.85); color: #ECEEF2; }
   .mapa-suave .leaflet-control-attribution { background: rgba(19,22,27,.8); }
 
-  /* Mapas: mosaicos de OpenStreetMap en versión oscura */
-  .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.7); }
-  .mapa-suave .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) grayscale(.7) brightness(.8) contrast(.9); }
+  /* Mapas: los mosaicos oscuros los trae el propio mapa base (lib/mapaBase.js) */
+  .mapa-suave .leaflet-tile-pane { filter: none; }
   .leaflet-container { background: #1A1D23; }
   .leaflet-control-attribution { background: rgba(19,22,27,.8) !important; color: #8B91A0 !important; }
   .leaflet-control-attribution a { color: #6AA6FF !important; }

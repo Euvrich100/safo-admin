@@ -1,8 +1,10 @@
 'use client'
+import { agregarMapaBase } from '@/lib/mapaBase'
 import { CIUDAD } from '@/lib/ciudad'
 import { useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
-import { faTaxi, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
+import { iconoVehiculo, nombreVehiculo, svgDe } from '@/lib/vehiculos'
 
 // Mapa del administrador (OpenStreetMap + Leaflet, sin API key):
 //  - taxis verdes = conductores disponibles · amarillos = en viaje
@@ -13,7 +15,6 @@ const svg = (icono) => {
   const [ancho, alto, , , trazo] = icono.icon
   return `<svg viewBox="0 0 ${ancho} ${alto}" fill="currentColor" aria-hidden="true"><path d="${trazo}"/></svg>`
 }
-const TAXI_SVG = svg(faTaxi)
 const ALERTA_SVG = svg(faTriangleExclamation)
 
 const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
@@ -47,10 +48,7 @@ export default function MapaAdmin({
       s.mapa = L.map(contenedor.current, { center: CENTRO_HUANUCO, zoom: 13, zoomControl: false })
       L.control.zoom({ position: 'bottomright' }).addTo(s.mapa)
       s.mapa.attributionControl.setPrefix(false)
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>',
-      }).addTo(s.mapa)
+      agregarMapaBase(L, s.mapa)
       s.zonasCapa = L.layerGroup().addTo(s.mapa)
       s.capa = L.layerGroup().addTo(s.mapa)
       s.mapa.on('click', (e) => cb.current.onClickMapa?.([e.latlng.lat, e.latlng.lng]))
@@ -101,9 +99,9 @@ export default function MapaAdmin({
         puntos.push(p)
         L.marker(p, {
           title: c.nombre,
-          icon: L.divIcon({ className: 'safo-taxi-wrap', html: `<span class="safo-taxi ${c.en_viaje ? 'viaje' : 'libre'}">${TAXI_SVG}</span>`, iconSize: [38, 38], iconAnchor: [19, 19] }),
+          icon: L.divIcon({ className: 'safo-taxi-wrap', html: `<span class="safo-taxi ${c.en_viaje ? 'viaje' : 'libre'}">${svgDe(iconoVehiculo(c.tipo_vehiculo))}</span>`, iconSize: [38, 38], iconAnchor: [19, 19] }),
         })
-          .bindPopup(`<b>${esc(c.nombre)}</b><br>${esc([c.vehiculo_marca, c.vehiculo_modelo, c.vehiculo_color].filter(Boolean).join(' '))}<br>Placa ${esc(c.placa)}<br>${c.en_viaje ? 'En viaje' : 'Disponible'}`)
+          .bindPopup(`<b>${esc(c.nombre)}</b> · ${esc(nombreVehiculo(c.tipo_vehiculo))}<br>${esc([c.vehiculo_marca, c.vehiculo_modelo, c.vehiculo_color].filter(Boolean).join(' '))}<br>Placa ${esc(c.placa)}<br>${c.en_viaje ? 'En viaje' : 'Disponible'}`)
           .addTo(capa)
       })
 

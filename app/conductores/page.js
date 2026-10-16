@@ -8,6 +8,7 @@ import { faCircleCheck, faCircleXmark, faTaxi, faMagnifyingGlass, faXmark, faFil
 import AdminNavbar from '@/components/AdminNavbar'
 import DocImagen from '@/components/DocImagen'
 import ClaveTemporalModal from '@/components/ClaveTemporalModal'
+import { TIPOS_VEHICULO, nombreVehiculo, iconoVehiculo } from '@/lib/vehiculos'
 
 const FILTROS = [
   { val: 'pendiente', label: 'Pendientes' },
@@ -113,6 +114,7 @@ function FichaConductor({ id, onCerrar, onDecidido }) {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
               <Dato label="N° licencia" valor={c.licencia_numero} />
               <Dato label="Categoría" valor={c.licencia_categoria} />
+              <Dato label="Tipo de vehículo" valor={nombreVehiculo(c.tipo_vehiculo)} />
               <Dato label="Placa" valor={c.placa} />
               <Dato label="Marca / modelo" valor={[c.vehiculo_marca, c.vehiculo_modelo].filter(Boolean).join(' ')} />
               <Dato label="Color" valor={c.vehiculo_color} />
@@ -178,6 +180,7 @@ export default function ConductoresPage() {
   const [cargando, setCargando] = useState(true)
   const [filtro, setFiltro] = useState('pendiente')
   const [busqueda, setBusqueda] = useState('')
+  const [tipo, setTipo] = useState('')
   const [abierto, setAbierto] = useState(null)
 
   const cargarConductores = useCallback(async () => {
@@ -185,6 +188,7 @@ export default function ConductoresPage() {
     try {
       const params = new URLSearchParams({ estado_doc: filtro })
       if (busqueda.trim()) params.set('buscar', busqueda.trim())
+      if (tipo) params.set('tipo_vehiculo', tipo)
       const { data } = await api.get(`/api/admin/conductores?${params}`)
       setConductores(data)
     } catch (err) {
@@ -192,7 +196,7 @@ export default function ConductoresPage() {
     } finally {
       setCargando(false)
     }
-  }, [filtro, busqueda])
+  }, [filtro, busqueda, tipo])
 
   useEffect(() => {
     if (!listo) return
@@ -235,6 +239,16 @@ export default function ConductoresPage() {
           </div>
         </div>
 
+        <div className="flex gap-2 mb-6 flex-wrap items-center" role="group" aria-label="Filtrar por tipo de vehículo">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#8A8F9C] mr-1">Vehículo</span>
+          {[{ k: '', t: 'Todos', icono: null }, ...TIPOS_VEHICULO].map(x => (
+            <button key={x.k} onClick={() => setTipo(x.k)} aria-pressed={tipo === x.k}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition ${tipo === x.k ? 'bg-[#14213D] text-white' : 'text-[#6E6E73] border border-[#E2E2E7] hover:bg-[#F5F5F7]'}`}>
+              {x.icono && <FontAwesomeIcon icon={x.icono} className="mr-1.5" />}{x.t}
+            </button>
+          ))}
+        </div>
+
         {cargando ? (
           <div className="text-[#A1A1A6] text-center py-20">Cargando...</div>
         ) : conductores.length === 0 ? (
@@ -258,7 +272,7 @@ export default function ConductoresPage() {
                       <div className="text-[#6E6E73] text-sm">{c.celular} · DNI {c.dni || '—'}</div>
                     </div>
                     <div className="text-sm text-[#6E6E73]">
-                      <div>{c.placa || '—'}</div>
+                      <div><FontAwesomeIcon icon={iconoVehiculo(c.tipo_vehiculo)} className="mr-1.5 text-[#A1A1A6]" />{nombreVehiculo(c.tipo_vehiculo)} · {c.placa || '—'}</div>
                       <div>{[c.vehiculo_marca, c.vehiculo_modelo].filter(Boolean).join(' ') || '—'}</div>
                     </div>
                     <div className="text-sm text-[#6E6E73] hidden md:block">Enviada<br />{fmtFecha(c.creado_en)}</div>

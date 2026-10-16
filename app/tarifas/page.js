@@ -11,14 +11,47 @@ import { soles } from '@/lib/formato'
 
 const MapaAdmin = dynamic(() => import('@/components/MapaAdmin'), { ssr: false })
 
+// Los campos se agrupan en la pantalla; para guardar se usa la lista plana CAMPOS
+const GRUPOS = [
+  { titulo: 'Tarifa del taxi (taxi, carro y bajaj)', campos: [
+    { clave: 'tarifa_base', titulo: 'Tarifa base', ayuda: 'Monto fijo con el que arranca cada viaje', prefijo: 'S/' },
+    { clave: 'tarifa_km', titulo: 'Precio por kilómetro', ayuda: 'Pago del conductor por km, sin contar el combustible (se suma aparte)', prefijo: 'S/' },
+    { clave: 'tarifa_minuto', titulo: 'Precio por minuto', ayuda: 'Se suma por cada minuto estimado, ya con el tráfico', prefijo: 'S/' },
+    { clave: 'tarifa_minima', titulo: 'Tarifa mínima', ayuda: 'Ningún viaje se cotiza por debajo de este monto', prefijo: 'S/' },
+  ] },
+  { titulo: 'Combustible', campos: [
+    { clave: 'combustible_precio_galon', titulo: 'Precio del galón', ayuda: 'Actualízalo cuando cambie el precio en el grifo', prefijo: 'S/' },
+    { clave: 'rendimiento_km_galon', titulo: 'Rendimiento del taxi', ayuda: 'Kilómetros que recorre con un galón en ciudad', prefijo: 'km/gal' },
+  ] },
+  { titulo: 'Tarifa de la moto lineal', campos: [
+    { clave: 'moto_tarifa_base', titulo: 'Tarifa base', ayuda: 'Monto fijo con el que arranca cada viaje en moto', prefijo: 'S/' },
+    { clave: 'moto_tarifa_km', titulo: 'Precio por kilómetro', ayuda: 'Sin contar el combustible (se suma aparte con el rendimiento de la moto)', prefijo: 'S/' },
+    { clave: 'moto_tarifa_minuto', titulo: 'Precio por minuto', ayuda: 'Se suma por cada minuto estimado, ya con el tráfico', prefijo: 'S/' },
+    { clave: 'moto_tarifa_minima', titulo: 'Tarifa mínima', ayuda: 'Ningún viaje en moto se cotiza por debajo de este monto', prefijo: 'S/' },
+    { clave: 'moto_rendimiento_km_galon', titulo: 'Rendimiento de la moto', ayuda: 'Kilómetros que recorre con un galón en ciudad. Usa el mismo precio del galón', prefijo: 'km/gal' },
+  ] },
+  { titulo: 'Tiempo y tráfico', campos: [
+    { clave: 'velocidad_max_kmh', titulo: 'Velocidad máxima urbana', ayuda: 'Ningún tramo se calcula más rápido que esto (un auto, no una moto)', prefijo: 'km/h' },
+    { clave: 'trafico_libre', titulo: 'Demora con tráfico fluido', ayuda: 'Madrugada y noche. 1.00 = sin demora', prefijo: '×' },
+    { clave: 'trafico_medio', titulo: 'Demora con tráfico moderado', ayuda: 'Media mañana, tarde y primeras horas de la noche', prefijo: '×' },
+    { clave: 'trafico_pico', titulo: 'Demora en hora pico', ayuda: '7:00–9:15, 12:30–14:30 y 17:00–20:00', prefijo: '×' },
+  ] },
+  { titulo: 'Garantía y comisiones', campos: [
+    { clave: 'garantia_viaje', titulo: 'Garantía del pasajero', ayuda: 'Lo que paga al pedir el taxi (se devuelve si nadie lo atiende)', prefijo: 'S/' },
+    { clave: 'compensacion_conductor', titulo: 'Compensación al conductor', ayuda: 'Parte de la garantía que recibe si el pasajero cancela con el taxi en camino. El resto es de SafO', prefijo: 'S/' },
+    { clave: 'radio_busqueda_km', titulo: 'Radio de búsqueda', ayuda: 'Distancia máxima para mostrar conductores cercanos', prefijo: 'km' },
+  ] },
+]
 const CAMPOS = [
-  { clave: 'tarifa_base', titulo: 'Tarifa base', ayuda: 'Monto fijo con el que arranca cada viaje', prefijo: 'S/' },
-  { clave: 'tarifa_km', titulo: 'Precio por kilómetro', ayuda: 'Se suma por cada km del recorrido', prefijo: 'S/' },
-  { clave: 'tarifa_minuto', titulo: 'Precio por minuto', ayuda: 'Se suma por cada minuto estimado de viaje', prefijo: 'S/' },
-  { clave: 'tarifa_minima', titulo: 'Tarifa mínima', ayuda: 'Ningún viaje se cotiza por debajo de este monto', prefijo: 'S/' },
-  { clave: 'garantia_viaje', titulo: 'Garantía del pasajero', ayuda: 'Lo que paga al pedir el taxi (se devuelve si nadie lo atiende)', prefijo: 'S/' },
-  { clave: 'compensacion_conductor', titulo: 'Compensación al conductor', ayuda: 'Parte de la garantía que recibe si el pasajero cancela con el taxi en camino. El resto es de SafO', prefijo: 'S/' },
-  { clave: 'radio_busqueda_km', titulo: 'Radio de búsqueda', ayuda: 'Distancia máxima para mostrar conductores cercanos', prefijo: 'km' },
+  ...GRUPOS.flatMap(g => g.campos),
+  { clave: 'condicion_factor', texto: false },
+  { clave: 'condicion_texto', texto: true },
+]
+const CONDICIONES = [
+  { t: 'Normal', f: '1', x: '' },
+  { t: 'Lluvia', f: '1.25', x: 'Lluvia' },
+  { t: 'Feria o evento', f: '1.3', x: 'Feria o evento' },
+  { t: 'Obras o desvíos', f: '1.2', x: 'Obras o desvíos' },
 ]
 
 export default function TarifasPage() {
@@ -35,7 +68,7 @@ export default function TarifasPage() {
     try {
       const [c, z] = await Promise.all([api.get('/api/admin/configuracion'), api.get('/api/zonas')])
       const v = {}
-      CAMPOS.forEach(f => { v[f.clave] = String(c.data.vigentes[f.clave]) })
+      CAMPOS.forEach(f => { v[f.clave] = String(c.data.vigentes[f.clave] ?? '') })
       setValores(v); setOriginales(v); setZonas(z.data)
     } catch {
       toast.error('Error cargando la configuración', { id: 'err-cfg' })
@@ -50,10 +83,14 @@ export default function TarifasPage() {
   const ejemplo = useMemo(() => {
     if (!valores) return null
     const n = (k) => Number(valores[k]) || 0
-    const subtotal = n('tarifa_base') + 3 * n('tarifa_km') + 10 * n('tarifa_minuto')
+    const combKm = n('rendimiento_km_galon') > 0 ? n('combustible_precio_galon') / n('rendimiento_km_galon') : 0
+    const subtotal = n('tarifa_base') + 3 * (n('tarifa_km') + combKm) + 10 * n('tarifa_minuto')
     const tarifa = Math.max(n('tarifa_minima'), subtotal)
     const garantia = n('garantia_viaje'), comp = Math.min(n('compensacion_conductor'), garantia)
-    return { tarifa, garantia, comp, plataforma: garantia - comp }
+    const combMoto = n('moto_rendimiento_km_galon') > 0 ? n('combustible_precio_galon') / n('moto_rendimiento_km_galon') : 0
+    const subMoto = n('moto_tarifa_base') + 3 * (n('moto_tarifa_km') + combMoto) + 10 * n('moto_tarifa_minuto')
+    const tarifaMoto = Math.max(n('moto_tarifa_minima'), subMoto)
+    return { tarifa, tarifaMoto, combMoto, garantia, comp, plataforma: garantia - comp, combKm, tardaPico: Math.round(10 * n('trafico_pico')) }
   }, [valores])
 
   const guardar = async () => {
@@ -61,6 +98,7 @@ export default function TarifasPage() {
     try {
       const body = {}
       CAMPOS.forEach(f => { if (valores[f.clave] !== originales[f.clave]) body[f.clave] = valores[f.clave] })
+      if (body.condicion_factor !== undefined && !('condicion_texto' in body)) body.condicion_texto = valores.condicion_texto
       await api.put('/api/admin/configuracion', { valores: body })
       toast.success('Tarifas y comisiones guardadas')
       cargar()
@@ -113,7 +151,6 @@ export default function TarifasPage() {
 
   if (!listo || !valores) return <div className="min-h-screen bg-white" />
 
-  const entrada = 'w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#F4F6FA] text-sm font-semibold text-[#14213D] focus:outline-none focus:ring-2 focus:ring-[#0A66E0]/40'
 
   return (
     <div className="min-h-screen bg-white">
@@ -128,23 +165,67 @@ export default function TarifasPage() {
         {/* Tarifas */}
         <section className="tarjeta tarjeta-sombra p-5 sm:p-6">
           <h2 className="font-semibold text-[#14213D] mb-4"><FontAwesomeIcon icon={faMoneyBillWave} className="text-[#FFC21A] mr-2" />Tarifas y comisiones</h2>
-          <div className="grid md:grid-cols-2 gap-x-6 gap-y-4">
-            {CAMPOS.map(f => (
-              <label key={f.clave} className="block">
-                <span className="text-sm font-medium text-[#14213D]">{f.titulo}</span>
-                <span className="relative block mt-1.5">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#8A8F9C]">{f.prefijo}</span>
-                  <input type="number" inputMode="decimal" step="0.05" min="0" value={valores[f.clave]}
-                    onChange={e => setValores(v => ({ ...v, [f.clave]: e.target.value }))} className={entrada} />
-                </span>
-                <span className="block text-xs text-[#8A8F9C] mt-1">{f.ayuda}</span>
-              </label>
+          <div className="space-y-7">
+            {GRUPOS.map(g => (
+              <div key={g.titulo}>
+                <h3 className="text-sm font-semibold text-[#14213D] mb-3 pb-2 border-b border-[#E6E8EF]">{g.titulo}</h3>
+                <div className="grid md:grid-cols-2 gap-x-6 gap-y-4">
+                  {g.campos.map(f => (
+                    <label key={f.clave} className="block">
+                      <span className="text-sm font-medium text-[#14213D]">{f.titulo}</span>
+                      <span className="f-grupo mt-1.5">
+                        <span className="f-prefijo" aria-hidden="true">{f.prefijo}</span>
+                        <input type="number" inputMode="decimal" step="0.05" min="0" value={valores[f.clave]}
+                          onChange={e => setValores(v => ({ ...v, [f.clave]: e.target.value }))} />
+                      </span>
+                      <span className="block text-xs text-[#8A8F9C] mt-1">{f.ayuda}</span>
+                    </label>
+                  ))}
+                </div>
+                {g.titulo === 'Combustible' && ejemplo && (
+                  <p className="text-xs text-[#6E6E73] mt-3">Con estos datos el combustible cuesta <b>{soles(ejemplo.combKm)}</b> por kilómetro en taxi y se suma solo a cada tarifa.</p>
+                )}
+                {g.titulo === 'Tarifa de la moto lineal' && ejemplo && (
+                  <p className="text-xs text-[#6E6E73] mt-3">Con estos datos el combustible de la moto cuesta <b>{soles(ejemplo.combMoto)}</b> por kilómetro. Un viaje de 3 km y 10 min en moto se cotiza en <b>{soles(ejemplo.tarifaMoto)}</b>.</p>
+                )}
+              </div>
             ))}
+
+            <div>
+              <h3 className="text-sm font-semibold text-[#14213D] mb-1 pb-2 border-b border-[#E6E8EF]">Condición del día</h3>
+              <p className="text-xs text-[#6E6E73] mb-3">Para lluvia, ferias, bloqueos u obras. Alarga los tiempos de todos los viajes y el pasajero ve el aviso. Vuelve a «Normal» cuando pase.</p>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {CONDICIONES.map(c => {
+                  const activa = valores.condicion_factor === c.f || (c.f === '1' && Number(valores.condicion_factor) === 1)
+                  return (
+                    <button key={c.t} type="button" onClick={() => setValores(v => ({ ...v, condicion_factor: c.f, condicion_texto: c.x }))}
+                      className={`px-3.5 py-2 rounded-xl text-sm font-medium border transition ${activa ? 'bg-[#14213D] text-white border-[#14213D]' : 'bg-white text-[#4B4F5C] border-[#E6E8EF] hover:border-[#14213D]/30'}`}>{c.t}</button>
+                  )
+                })}
+              </div>
+              <div className="grid md:grid-cols-2 gap-x-6 gap-y-3">
+                <label className="block">
+                  <span className="text-sm font-medium text-[#14213D]">Demora por la condición</span>
+                  <span className="f-grupo mt-1.5">
+                    <span className="f-prefijo" aria-hidden="true">×</span>
+                    <input type="number" inputMode="decimal" step="0.05" min="1" value={valores.condicion_factor}
+                      onChange={e => setValores(v => ({ ...v, condicion_factor: e.target.value }))} />
+                  </span>
+                </label>
+                <label className="block">
+                  <span className="text-sm font-medium text-[#14213D]">Aviso para el pasajero</span>
+                  <span className="f-grupo mt-1.5">
+                    <input type="text" maxLength={40} value={valores.condicion_texto} placeholder="Ej. Lluvia por la tarde"
+                      onChange={e => setValores(v => ({ ...v, condicion_texto: e.target.value }))} />
+                  </span>
+                </label>
+              </div>
+            </div>
           </div>
 
           {ejemplo && (
             <div className="mt-5 rounded-xl bg-[#FFF6D9] px-4 py-3 text-sm text-[#5C4A00] grid sm:grid-cols-2 gap-1">
-              <div>Un viaje de <b>3 km</b> y <b>10 min</b> se cotiza en <b>{soles(ejemplo.tarifa)}</b>.</div>
+              <div>Un viaje de <b>3 km</b> y <b>10 min</b> (con la calle despejada) se cotiza en <b>{soles(ejemplo.tarifa)}</b> en taxi y <b>{soles(ejemplo.tarifaMoto)}</b> en moto, con combustible incluido. En hora pico esos 10 min pasan a ~{ejemplo.tardaPico}.</div>
               <div>Si el pasajero cancela con el taxi en camino: conductor <b>{soles(ejemplo.comp)}</b> · SafO <b>{soles(ejemplo.plataforma)}</b>.</div>
             </div>
           )}
@@ -163,7 +244,7 @@ export default function TarifasPage() {
         {/* Zonas */}
         <section className="tarjeta tarjeta-sombra p-5 sm:p-6">
           <h2 className="font-semibold text-[#14213D] mb-1"><FontAwesomeIcon icon={faMapLocationDot} className="text-[#0A66E0] mr-2" />Zonas de servicio</h2>
-          <p className="text-sm text-[#6E6E73] mb-4">Solo se pueden pedir taxis desde dentro de una zona activa. Si no hay ninguna activa, no se restringe.</p>
+          <p className="text-sm text-[#6E6E73] mb-4">Solo se pueden pedir viajes (taxi o moto) desde dentro de una zona activa. Si no hay ninguna activa, no se restringe.</p>
 
           <div className="grid lg:grid-cols-5 gap-5">
             <div className="lg:col-span-3 relative h-[340px] rounded-xl overflow-hidden border border-[#E6E8EF]">
@@ -203,7 +284,7 @@ export default function TarifasPage() {
                     </button>
                   </li>
                 ))}
-                {zonas.length === 0 && <li className="text-sm text-[#8A8F9C]">Aún no hay zonas: se puede pedir taxi desde cualquier lugar.</li>}
+                {zonas.length === 0 && <li className="text-sm text-[#8A8F9C]">Aún no hay zonas: se puede pedir un viaje desde cualquier lugar.</li>}
               </ul>
               <button onClick={() => setAjuste(a => a + 1)} className="text-xs text-[#0A66E0] hover:underline">Centrar mapa en las zonas</button>
             </div>

@@ -94,6 +94,7 @@ export default function ViajesPage() {
                         style={{ color: estilo.color, background: estilo.bg }}>
                         {v.estado}
                       </span>
+                      <span className="text-xs px-3 py-1 rounded-full font-medium bg-[#EAF2FE] text-[#0A66E0]">{v.servicio === 'moto' ? 'Moto' : 'Taxi'}</span>
                       <span className="text-[#A1A1A6] text-xs">
                         {new Date(v.solicitado_en).toLocaleString('es-PE')}
                       </span>

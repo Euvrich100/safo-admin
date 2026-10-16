@@ -7,6 +7,7 @@ import { faCloudArrowUp, faCircleCheck, faTaxi, faCircleUser, faIdCard, faAddres
 import SafoLogo from '@/components/SafoLogo'
 import ClaveInput from '@/components/ClaveInput'
 import { CIUDAD } from '@/lib/ciudad'
+import { VEHICULOS, TIPOS_VEHICULO, SERVICIOS } from '@/lib/vehiculos'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://safo-backend.onrender.com'
 
@@ -82,7 +83,7 @@ export default function RegistroConductorPage() {
   const [form, setForm] = useState({
     nombre: '', celular: '', dni: '', fecha_nacimiento: '',
     direccion: '', licencia_numero: '', licencia_categoria: 'A-IIb',
-    placa: '', vehiculo_marca: '', vehiculo_modelo: '',
+    tipo_vehiculo: 'taxi', placa: '', vehiculo_marca: '', vehiculo_modelo: '',
     vehiculo_color: '', vehiculo_anno: '',
     password: '', repetir: '',
   })
@@ -93,6 +94,10 @@ export default function RegistroConductorPage() {
   const [previews, setPreviews] = useState({})
 
   const set = (campo, valor) => setForm(f => ({ ...f, [campo]: valor }))
+  const vehiculo = VEHICULOS[form.tipo_vehiculo]
+
+  // Al cambiar de vehículo, la categoría de licencia pasa a la que le corresponde
+  const elegirVehiculo = (tipo) => setForm(f => ({ ...f, tipo_vehiculo: tipo, licencia_categoria: VEHICULOS[tipo].licenciaDefecto }))
 
   const subirArchivo = (campo, archivo) => {
     if (!archivo) return
@@ -222,14 +227,37 @@ export default function RegistroConductorPage() {
 
       {paso === 3 && (
         <div className="space-y-5">
-          <FileBox preview={previews.foto_vehiculo} onArchivo={subirArchivo} campo="foto_vehiculo" label="Foto del vehículo" icono={faTaxi} />
+          <div className="f-campo">
+            <span className="f-etiqueta" id="tipo-vehiculo">¿Con qué vas a trabajar?</span>
+            <div role="radiogroup" aria-labelledby="tipo-vehiculo" className="grid grid-cols-2 gap-2.5">
+              {TIPOS_VEHICULO.map(t => {
+                const activo = form.tipo_vehiculo === t.k
+                return (
+                  <button key={t.k} type="button" role="radio" aria-checked={activo} onClick={() => elegirVehiculo(t.k)}
+                    className={`text-left rounded-[12px] border px-3.5 py-3 transition ${activo ? 'border-[#16181D] bg-[#F6F7F9] ring-2 ring-[#16181D]/10' : 'border-[#E8EAEE] bg-white hover:border-[#C2C6D0]'}`}>
+                    <span className="flex items-center gap-2.5">
+                      <span className={`w-9 h-9 rounded-[10px] flex items-center justify-center text-[17px] shrink-0 ${activo ? 'bg-[#16181D] text-[#FFC21A]' : 'bg-[#F1F2F5] text-[#4A4F5C]'}`}>
+                        <FontAwesomeIcon icon={t.icono} />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-[14px] font-semibold text-[#16181D] leading-tight">{t.t}</span>
+                        <span className="block text-[11.5px] text-[#7A7F8C] leading-tight mt-0.5">{t.detalle}</span>
+                      </span>
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+            <span className="f-ayuda">Recibirás pedidos del servicio <b className="text-[#16181D]">{SERVICIOS[vehiculo.servicio].t}</b>{vehiculo.servicio === 'taxi' ? ' (el pasajero ve taxis, carros y bajajs juntos).' : ' (pasajeros que piden moto).'}</span>
+          </div>
+          <FileBox preview={previews.foto_vehiculo} onArchivo={subirArchivo} campo="foto_vehiculo" label={vehiculo.foto} icono={vehiculo.icono} />
           <div className="grid grid-cols-2 gap-4">
             <Campo valor={form.licencia_numero} onCambio={set} label="N.º de licencia" campo="licencia_numero" placeholder="A123456" />
-            <Campo valor={form.licencia_categoria} onCambio={set} label="Categoría" campo="licencia_categoria" options={['A-IIb', 'A-IIIb', 'B-IIb']} />
+            <Campo valor={form.licencia_categoria} onCambio={set} label="Categoría" campo="licencia_categoria" options={vehiculo.licencias} />
             <Campo valor={form.placa} onCambio={set} label="Placa" campo="placa" placeholder="ABC-123" />
             <Campo valor={form.vehiculo_anno} onCambio={set} label="Año" campo="vehiculo_anno" placeholder="2020" type="number" opcional />
-            <Campo valor={form.vehiculo_marca} onCambio={set} label="Marca" campo="vehiculo_marca" placeholder="Toyota" opcional />
-            <Campo valor={form.vehiculo_modelo} onCambio={set} label="Modelo" campo="vehiculo_modelo" placeholder="Yaris" opcional />
+            <Campo valor={form.vehiculo_marca} onCambio={set} label="Marca" campo="vehiculo_marca" placeholder={vehiculo.marca} opcional />
+            <Campo valor={form.vehiculo_modelo} onCambio={set} label="Modelo" campo="vehiculo_modelo" placeholder={vehiculo.modelo} opcional />
           </div>
           <Campo valor={form.vehiculo_color} onCambio={set} label="Color" campo="vehiculo_color" placeholder="Blanco" opcional />
 
@@ -237,6 +265,7 @@ export default function RegistroConductorPage() {
             <dt className="text-[#7A7F8C]">Nombre</dt><dd className="text-[#16181D] font-medium truncate">{form.nombre || '—'}</dd>
             <dt className="text-[#7A7F8C]">Celular</dt><dd className="text-[#16181D] font-medium tabular-nums">{form.celular || '—'}</dd>
             <dt className="text-[#7A7F8C]">DNI</dt><dd className="text-[#16181D] font-medium tabular-nums">{form.dni || '—'}</dd>
+            <dt className="text-[#7A7F8C]">Vehículo</dt><dd className="text-[#16181D] font-medium">{vehiculo.t}</dd>
             <dt className="text-[#7A7F8C]">Placa</dt><dd className="text-[#16181D] font-medium">{form.placa || '—'}</dd>
           </dl>
 
