@@ -5,7 +5,7 @@ import toast from 'react-hot-toast'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faRightFromBracket, faGaugeHigh, faTaxi, faUsers, faRoute, faCoins, faMapLocationDot,
-  faTriangleExclamation, faCommentDots, faSliders, faClipboardList, faBars, faXmark,
+  faTriangleExclamation, faCommentDots, faSliders, faClipboardList, faBars, faXmark, faScrewdriverWrench,
 } from '@fortawesome/free-solid-svg-icons'
 import api from '@/lib/api'
 import SafoLogo from './SafoLogo'
@@ -28,6 +28,7 @@ const GRUPOS = [
       { href: '/conductores', label: 'Conductores', icon: faTaxi, alerta: 'conductores_atencion' },
       { href: '/pasajeros', label: 'Pasajeros', icon: faUsers },
       { href: '/reclamos', label: 'Reclamos', icon: faCommentDots, alerta: 'reclamos_abiertos' },
+      { href: '/auxilio', label: 'Auxilio mecánico', icon: faScrewdriverWrench },
     ],
   },
   {

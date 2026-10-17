@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faPowerOff, faLocationDot, faLocationCrosshairs, faRoute, faPhone, faStar, faClockRotateLeft, faWallet,
   faUser, faHouse, faCheck, faXmark, faFlagCheckered, faTriangleExclamation, faRightFromBracket, faCar,
-  faCircleInfo, faLock, faBell,
+  faCircleInfo, faLock, faBell, faScrewdriverWrench,
 } from '@fortawesome/free-solid-svg-icons'
 import { faWhatsapp } from '@fortawesome/free-brands-svg-icons'
 import api from '@/lib/api'
@@ -20,6 +20,7 @@ import ClaveInput from '@/components/ClaveInput'
 import BotonSOS from '@/components/BotonSOS'
 import ReclamosPanel from '@/components/ReclamosPanel'
 import MisDocumentos from '@/components/MisDocumentos'
+import AuxilioMecanico from '@/components/AuxilioMecanico'
 
 const MapaConductor = dynamic(() => import('@/components/MapaConductor'), { ssr: false })
 
@@ -49,6 +50,7 @@ export default function ConductorPage() {
   const router = useRouter()
   const [sesion, setSesion] = useState(undefined) // undefined: leyendo · null: sin sesión
   const [tab, setTab] = useState('inicio')
+  const [auxilio, setAuxilio] = useState(false)
   const [perfil, setPerfil] = useState(null)
   const [ganancias, setGanancias] = useState(null)
   const [viaje, setViaje] = useState(null)
@@ -501,6 +503,13 @@ export default function ConductorPage() {
           </div>
         )}
         {Estadisticas()}
+        <button onClick={() => setAuxilio(true)} className="w-full rounded-2xl bg-white border border-[#E6E8EF] p-4 flex items-center gap-3 text-left">
+          <span className="w-11 h-11 shrink-0 rounded-full bg-[#EAF2FE] text-[#0A66E0] flex items-center justify-center"><FontAwesomeIcon icon={faScrewdriverWrench} /></span>
+          <span className="min-w-0">
+            <span className="block font-semibold text-[#14213D]">Auxilio mecánico</span>
+            <span className="block text-sm text-[#6E6E73]">¿Se malogró tu vehículo? Mecánicos de confianza</span>
+          </span>
+        </button>
         {ganancias && (
           <div className="rounded-2xl bg-white border border-[#E6E8EF] p-4 flex items-center justify-between text-sm">
             <span className="text-[#6E6E73]">Tu calificación</span>
@@ -661,6 +670,8 @@ export default function ConductorPage() {
           ))}
         </div>
       </nav>
+
+      {auxilio && <AuxilioMecanico autenticado onCerrar={() => setAuxilio(false)} />}
 
       {/* Permiso de ubicación (antes de pedírselo al navegador) */}
       {modalUbi && (

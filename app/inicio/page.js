@@ -2,16 +2,18 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faShieldHalved, faStar, faClock, faCircleCheck, faMobileScreenButton, faMagnifyingGlass, faTaxi, faUserPlus, faArrowRight, faLocationDot, faArrowUpRightFromSquare, faCircleDot, faMapLocationDot, faPeopleRoof, faRightToBracket } from '@fortawesome/free-solid-svg-icons'
+import { faShieldHalved, faStar, faClock, faCircleCheck, faMobileScreenButton, faMagnifyingGlass, faTaxi, faUserPlus, faArrowRight, faLocationDot, faArrowUpRightFromSquare, faCircleDot, faMapLocationDot, faPeopleRoof, faRightToBracket, faScrewdriverWrench } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from '@/components/SafoLogo'
 import EscenaCiudad from '@/components/EscenaCiudad'
 import { CIUDAD } from '@/lib/ciudad'
 import MapaCiudad, { MAPA_URL } from '@/components/MapaCiudad'
 import TelefonoApp from '@/components/TelefonoApp'
+import AuxilioMecanico from '@/components/AuxilioMecanico'
 
 export default function InicioPage() {
   const router = useRouter()
   const [sesion, setSesion] = useState(null)
+  const [auxilio, setAuxilio] = useState(false)
 
   // Si ya inició sesión, el botón lleva a su panel en vez de pedir registrarse otra vez
   useEffect(() => {
@@ -228,9 +230,15 @@ export default function InicioPage() {
             className="text-[#A1A1A6] hover:text-[#0A66E0] text-xs transition">
             ¿Eres conductor? Únete a nuestra red <FontAwesomeIcon icon={faArrowRight} className="ml-1" />
           </button>
+          {/* Auxilio mecánico: acceso discreto, solo para conductores (pide celular y contraseña) */}
+          <button onClick={() => setAuxilio(true)} aria-label="Auxilio mecánico para conductores" title="Auxilio mecánico"
+            className="w-8 h-8 rounded-full text-[#C5C8D2] hover:text-[#0A66E0] focus-visible:text-[#0A66E0] transition">
+            <FontAwesomeIcon icon={faScrewdriverWrench} className="text-sm" />
+          </button>
           </div>
         </div>
       </footer>
+      {auxilio && <AuxilioMecanico onCerrar={() => setAuxilio(false)} />}
 
     </div>
   )
