@@ -25,7 +25,7 @@ const GRUPOS = [
   {
     titulo: 'Personas',
     links: [
-      { href: '/conductores', label: 'Conductores', icon: faTaxi, alerta: 'docs_pendientes' },
+      { href: '/conductores', label: 'Conductores', icon: faTaxi, alerta: 'conductores_atencion' },
       { href: '/pasajeros', label: 'Pasajeros', icon: faUsers },
       { href: '/reclamos', label: 'Reclamos', icon: faCommentDots, alerta: 'reclamos_abiertos' },
     ],
@@ -59,7 +59,8 @@ export default function AdminNavbar() {
       try {
         const { data } = await api.get('/api/admin/alertas')
         if (!vivo) return
-        setAlertas(data)
+        // Conductores: solicitudes nuevas + renovaciones de documentos por revisar
+        setAlertas({ ...data, conductores_atencion: (data.docs_pendientes || 0) + (data.renovaciones_pendientes || 0) })
         if (sosPrevio.current !== null && data.sos_activas > sosPrevio.current) {
           toast.error('🚨 Nueva alerta SOS. Revísala ahora.', { duration: 15000, id: 'sos-nueva' })
         }

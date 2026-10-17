@@ -19,6 +19,7 @@ import SafoLogo from '@/components/SafoLogo'
 import ClaveInput from '@/components/ClaveInput'
 import BotonSOS from '@/components/BotonSOS'
 import ReclamosPanel from '@/components/ReclamosPanel'
+import MisDocumentos from '@/components/MisDocumentos'
 
 const MapaConductor = dynamic(() => import('@/components/MapaConductor'), { ssr: false })
 
@@ -328,6 +329,15 @@ export default function ConductorPage() {
       {perfil?.estado_doc === 'rechazado' && (
         <div className="rounded-2xl bg-[#FCEAE9] text-[#B42318] p-4 text-sm"><FontAwesomeIcon icon={faTriangleExclamation} className="mr-2" />Tus documentos fueron rechazados{perfil.rechazo_motivo ? `: ${perfil.rechazo_motivo}` : '.'}</div>
       )}
+      {perfil?.estado_doc === 'aprobado' && (perfil.documentos?.vencidos?.length > 0 || perfil.documentos?.vigencias?.some(v => v.estado === 'por_vencer')) && (
+        <button type="button" onClick={() => { setTab('cuenta'); setTimeout(() => document.getElementById('mis-documentos')?.scrollIntoView({ behavior: 'smooth' }), 80) }}
+          className={`w-full text-left rounded-2xl p-4 text-sm ${perfil.documentos.vencidos.length > 0 ? 'bg-[#FCEAE9] text-[#B42318]' : 'bg-[#FEF3E2] text-[#92400E]'}`}>
+          <FontAwesomeIcon icon={faTriangleExclamation} className="mr-2" />
+          {perfil.documentos.vencidos.length > 0
+            ? <>Tienes vencido: <b>{perfil.documentos.vencidos.join(', ')}</b>. No puedes recibir viajes hasta renovarlo. <u>Renovar ahora</u></>
+            : <>Por vencer: <b>{perfil.documentos.vigencias.filter(v => v.estado === 'por_vencer').map(v => v.etiqueta).join(', ')}</b>. <u>Actualiza tus documentos</u></>}
+        </button>
+      )}
       {sinSuscripcion && (
         <div className="rounded-2xl bg-[#FEF3E2] text-[#92400E] p-4 text-sm">
           <FontAwesomeIcon icon={faTriangleExclamation} className="mr-2" />Tu suscripción {vencida ? 'venció' : 'no está activa'}. Paga <b>S/ 5.00</b> por Yape{YAPE ? ` (${YAPE})` : ''}{PLIN ? ` o Plin (${PLIN})` : ''} y el administrador la confirmará para que puedas conectarte.
@@ -591,6 +601,9 @@ export default function ConductorPage() {
         <ClaveInput value={claves.repetir} onChange={v => setClaves(c => ({ ...c, repetir: v }))} placeholder="Repite la nueva contraseña" autoComplete="new-password" onEnter={cambiarClave} />
         <button onClick={cambiarClave} disabled={ocupado || !claves.actual || !claves.nueva} className="w-full py-3 rounded-xl bg-[#14213D] text-white font-semibold text-sm disabled:opacity-50">Guardar contraseña</button>
       </div>
+
+      <h3 className="text-lg font-semibold text-[#14213D] px-1 pt-2" id="mis-documentos">Mis documentos</h3>
+      <MisDocumentos onCambio={cargarPerfil} />
 
       <ReclamosPanel />
 

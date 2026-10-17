@@ -19,6 +19,7 @@ import ClaveInput from '@/components/ClaveInput'
 import MapaPasajero from '@/components/MapaPasajero'
 import BotonSOS from '@/components/BotonSOS'
 import ReclamosPanel from '@/components/ReclamosPanel'
+import AvatarConductor, { InsigniaVerificado } from '@/components/AvatarConductor'
 import { CIUDAD } from '@/lib/ciudad'
 import { PLAZA } from '@/components/MapaCiudad'
 
@@ -899,9 +900,9 @@ export default function PasajeroPage() {
                   )}
 
                   <div className="flex items-center gap-3 mb-3">
-                    <Avatar nombre={viaje.conductor_nombre} tam={52} />
+                    <AvatarConductor id={viaje.conductor_id} nombre={viaje.conductor_nombre} tam={52} conFoto={viaje.conductor_con_foto} />
                     <div className="min-w-0">
-                      <div className="font-semibold truncate">{viaje.conductor_nombre}</div>
+                      <div className="font-semibold truncate flex items-center gap-2"><span className="truncate">{viaje.conductor_nombre}</span>{viaje.conductor_verificado && <InsigniaVerificado compacta />}</div>
                       <div className="text-sm flex items-center gap-3 text-[#6E6E73]">
                         <Estrellas valor={viaje.calificacion_prom} /><span>{viaje.total_viajes || 0} viajes</span>
                       </div>
@@ -1009,9 +1010,9 @@ export default function PasajeroPage() {
                           <button onClick={() => setSeleccionado(sel ? null : c.id)} aria-pressed={sel}
                             className={`w-full text-left rounded-2xl border p-4 transition ${sel ? 'border-[#0A66E0] bg-[#F3F8FF] ring-2 ring-[#0A66E0]/20' : 'border-[#E2E2E7] hover:border-[#B8D2F7]'}`}>
                             <div className="flex items-center gap-3">
-                              <Avatar nombre={c.nombre} />
+                              <AvatarConductor id={c.id} nombre={c.nombre} conFoto={c.con_foto} />
                               <div className="min-w-0 flex-1">
-                                <div className="font-semibold truncate">{c.nombre}</div>
+                                <div className="font-semibold truncate flex items-center gap-2"><span className="truncate">{c.nombre}</span>{c.verificado && <InsigniaVerificado compacta />}</div>
                                 <div className="text-xs flex items-center gap-3 text-[#6E6E73] mt-0.5">
                                   <Estrellas valor={c.calificacion_prom} />
                                   <span>{c.total_viajes || 0} viajes</span>
