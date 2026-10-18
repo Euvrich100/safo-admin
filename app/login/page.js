@@ -4,10 +4,11 @@ import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
 import toast, { Toaster } from 'react-hot-toast'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTaxi, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
+import { faTaxi, faCircleInfo, faScrewdriverWrench } from '@fortawesome/free-solid-svg-icons'
 import SafoLogo from '@/components/SafoLogo'
 import ClaveInput from '@/components/ClaveInput'
 import AccesoSocial from '@/components/AccesoSocial'
+import AuxilioMecanico from '@/components/AuxilioMecanico'
 import MapaCiudad, { MAPA_URL } from '@/components/MapaCiudad'
 import { CIUDAD } from '@/lib/ciudad'
 
@@ -20,6 +21,7 @@ export default function LoginPage() {
   const [modo, setModo] = useState('clave') // 'clave' | 'otp'
   const [clave, setClave] = useState('')
   const [ayudaClave, setAyudaClave] = useState(false)
+  const [auxilio, setAuxilio] = useState(false)
 
   // Si ya hay una sesión abierta, entrar directo al panel que corresponde
   useEffect(() => {
@@ -180,6 +182,10 @@ export default function LoginPage() {
                 ¿Primera vez en SafO?{' '}
                 <button onClick={() => router.push('/registro/pasajero')} className="f-link">Crea tu cuenta</button>
               </p>
+              <p className="text-center text-[14px] text-[#4A4F5C]">
+                ¿Quieres trabajar como conductor?{' '}
+                <button onClick={() => router.push('/registro/conductor')} className="f-link">Regístrate aquí</button>
+              </p>
             </div>
           ) : paso === 1 ? (
             <div className="space-y-5">
@@ -205,7 +211,15 @@ export default function LoginPage() {
             </div>
           )}
 
-          <p className="text-[12.5px] text-[#7A7F8C] mt-10">SafO · Movilidad segura en {CIUDAD.nombre}</p>
+          <div className="mt-10 flex items-center justify-between gap-3">
+            <p className="text-[12.5px] text-[#7A7F8C]">SafO · Movilidad segura en {CIUDAD.nombre}</p>
+            {/* Auxilio mecánico: acceso discreto, solo para conductores */}
+            <button onClick={() => setAuxilio(true)} aria-label="Auxilio mecánico para conductores" title="Auxilio mecánico"
+              className="w-8 h-8 rounded-full text-[#C5C8D2] hover:text-[#0A66E0] focus-visible:text-[#0A66E0] transition">
+              <FontAwesomeIcon icon={faScrewdriverWrench} className="text-sm" />
+            </button>
+          </div>
+          {auxilio && <AuxilioMecanico onCerrar={() => setAuxilio(false)} />}
         </div>
       </div>
     </div>
