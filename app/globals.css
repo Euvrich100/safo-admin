@@ -21,8 +21,10 @@
   --azul: #0a66e0;
   --azul-osc: #084fb0;
   --taxi: #ffc21a;
-  --fuente-texto: "Instrument Sans Variable", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
-  --fuente-titulo: "Bricolage Grotesque Variable", "Instrument Sans Variable", "Segoe UI", system-ui, sans-serif;
+  /* Tipografía estilo Apple: en iPhone/Mac se usa San Francisco (la fuente del sistema);
+     en Windows y Android, Inter, la más parecida (con tamaño óptico: Display en títulos, Text en lectura) */
+  --fuente-texto: -apple-system, BlinkMacSystemFont, "Inter Variable", "Segoe UI", system-ui, Roboto, Arial, sans-serif;
+  --fuente-titulo: var(--fuente-texto);
 }
 
 @theme inline {
@@ -37,12 +39,25 @@ body {
   color: var(--foreground);
   font-family: var(--fuente-texto);
   font-optical-sizing: auto;
+  letter-spacing: -0.011em;
+  line-height: 1.47;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* Los títulos usan la fuente de display; el resto del texto, la de lectura */
-h1, h2 { font-family: var(--fuente-titulo); letter-spacing: -0.022em; }
-.titulo { font-family: var(--fuente-titulo); letter-spacing: -0.028em; }
+/* Títulos como en apple.com: semibold, muy juntos y de interlineado corto */
+h1, h2, h3, .titulo { font-family: var(--fuente-titulo); font-weight: 600; line-height: 1.1; }
+h1, .titulo { letter-spacing: -0.03em; }
+h2 { letter-spacing: -0.025em; }
+h3 { letter-spacing: -0.02em; }
+
+/* Apple casi no usa negritas pesadas: lo «bold» se queda en semibold */
+.font-bold { font-weight: 600; }
+.font-extrabold, .font-black { font-weight: 700; }
+
+/* Los controles de formulario no heredan el espaciado entre letras por sí solos */
+button, input, select, textarea { letter-spacing: inherit; }
 
 /* ───── Formularios (login y registros) ───── */
 .f-campo { display: grid; gap: 6px; }

@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import "@fontsource-variable/instrument-sans";
-import "@fontsource-variable/bricolage-grotesque";
+import "@fontsource-variable/inter/opsz.css";
 import "./globals.css";
 import { CIUDAD } from "@/lib/ciudad";
 import { config } from "@fortawesome/fontawesome-svg-core";
