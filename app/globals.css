@@ -134,6 +134,8 @@ select.f-input {
 .mapa-suave { isolation: isolate; }
 .mapa-suave .leaflet-container { background: transparent; font-family: inherit; }
 .mapa-suave .leaflet-tile-pane { filter: saturate(1.05); }
+/* OpenStreetMap (sin clave) no tiene versión oscura: en modo oscuro se invierten sus colores */
+.leaflet-container.mapa-oscuro-filtro .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.95) contrast(.9) saturate(.8); }
 .mapa-suave .leaflet-control-attribution { font-size: 10px; background: rgba(255,255,255,.8); }
 /* Ruta con trazo animado: el recorrido se siente vivo */
 .safo-ruta { stroke-dasharray: 1 12; animation: safo-ruta-mov 1.4s linear infinite; stroke-linecap: round; }
